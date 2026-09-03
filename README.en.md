@@ -1,9 +1,8 @@
-# sing-box multi-platform configuration templates
+# sing-box config templates for Android SFA / iOS SFI / macOS SFM / Linux / Windows
 
 [中文](README.md) · [English](README.en.md)
 
-Auditable, reproducible sing-box configuration templates for Android, iOS,
-macOS, Linux, and Windows. Desktop and Apple profiles target 1.14.x; Android
+Auditable, reproducible sing-box configuration templates (sing-box config templates) for Android SFA (with 1.12, 1.13, and 1.14 core compatibility lines), iOS (SFI), macOS (SFM), Linux, and Windows, with FakeIP and RealIP DNS modes and TUN and mixed proxy modes. Desktop and Apple profiles target 1.14.x; Android
 also has separate 1.14, 1.13, and 1.12 compatibility lines. The repository
 borrows the task-oriented policy-group experience popularized by ACL4SSR,
 while keeping the actual configuration native to sing-box and using remote
@@ -12,6 +11,12 @@ binary rule sets.
 > [!IMPORTANT]
 > This repository is not a proxy provider. Every public profile deliberately
 > contains `example.com` and `CHANGE_ME`; it validates, but it cannot connect.
+
+> [!TIP]
+> Choose first, then copy links. Public Raw JSON files are placeholder templates and cannot connect:
+> 1. Open the [configuration selector](https://qixuancao.github.io/sing-box-config-templates/en/) and follow “platform → Android core version → scenario” to get the Raw URL, one-tap import URI, and local render command;
+> 2. Render locally with `render.sh` using your own outbounds as shown in [Render a private profile](#render-a-private-profile), then `sing-box check`;
+> 3. Import only the file you rendered yourself. Importing the placeholder JSON directly validates but never connects.
 
 ## Choose a profile
 

@@ -1,4 +1,4 @@
-# 平台兼容性与验证边界
+# sing-box FakeIP 与 RealIP：Android / iOS / macOS 选择与兼容性
 
 ## 当前目标
 
@@ -8,12 +8,25 @@
 - 默认 DNS：仅 IPv4；`dual-stack.json` 改为双栈并优先 IPv4；
 - 规则：MetaCubeX `sing` 分支远程 `.srs`。
 
+## sing-box FakeIP 与 RealIP 如何选择
+
+- `fakeip.json`：日常首选。国外 A 查询走 FakeIP，减少真实 DNS 往返；极少数
+  应用不接受 FakeIP 地址时再换。
+- `realip.json`：兼容模式。所有查询返回真实 IP，适合银行、局域网或对 FakeIP
+  敏感的应用；1.12 / 1.13 版使用与 1.14 等价但更保守的 DNS 判定。
+- 若 FakeIP 下某个应用异常，先换同平台同版本目录的 `realip.json`，并清除
+  应用缓存或等待 DNS 缓存过期，详见
+  [`troubleshooting.md`](troubleshooting.md)。
+
 ## 为什么 Android 按版本拆分
 
 1.14 新增顶层 `http_clients`、规则集 `http_client` 和 DNS `evaluate` /
-`match_response`。1.13 与 1.12 不认识这些字段或动作。因此旧版目录会：
+`match_response`，并提供 [JSON Schema](https://sing-box.sagernet.org/configuration/schema/)
+（顶层 `$schema`，见
+[sing-box v1.14.0](https://github.com/SagerNet/sing-box/releases/tag/v1.14.0)）。
+1.13 与 1.12 不认识这些字段或动作。因此旧版目录会：
 
-- 删除 1.14 的共享 HTTP 客户端字段；
+- 删除 1.14 的共享 HTTP 客户端字段和顶层 `$schema`；
 - 用每个远程规则集的 `download_detour: direct` 下载规则；
 - 将 FakeIP 的 1.14 DNS 评估流程降级为可在旧核心解析的规则。
 

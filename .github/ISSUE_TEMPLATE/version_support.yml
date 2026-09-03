@@ -1,0 +1,48 @@
+name: New sing-box version support
+description: Request validation against a new sing-box core release.
+title: "[Version] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form when SagerNet publishes a new stable core and the
+        pinned checkers in README/docs need an update. Do not paste
+        private configurations.
+  - type: input
+    id: upstream_version
+    attributes:
+      label: Upstream sing-box version
+      placeholder: 1.14.1
+    validations:
+      required: true
+  - type: input
+    id: release_url
+    attributes:
+      label: Upstream release URL
+      placeholder: https://github.com/SagerNet/sing-box/releases/tag/v1.14.1
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Expected impact
+      options:
+        - Patch only, no schema change expected
+        - Minor version, possible schema change
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Release-note highlights
+      description: Link the relevant migration or deprecation notes if any.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed all server addresses, credentials, keys, and subscription tokens.
+          required: true

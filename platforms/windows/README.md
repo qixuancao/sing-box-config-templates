@@ -1,10 +1,14 @@
-# Windows
+# sing-box Windows TUN 配置
 
 - `mixed.json`：监听 `127.0.0.1:2080`，手动设置 HTTP/SOCKS 代理，适合先验证。
 - `tun.json`：以管理员权限运行，全局接管流量，并启用 `strict_route` 以降低
   Windows 多宿主 DNS 泄漏风险。
 
-官方文档列出了 Scoop、Chocolatey 和 winget 安装方式。示例：
+官方文档列出了 Scoop、Chocolatey 和 winget 安装方式。图形界面可选官方
+[sing-box for Desktop](https://sing-box.sagernet.org/clients/desktop/)
+（Windows 10+ x64 / x86 / arm64，见
+[sing-box v1.14.0](https://github.com/SagerNet/sing-box/releases/tag/v1.14.0)），
+继续保留命令行（CLI）作为可审计的默认路径。示例：
 
 ```powershell
 winget install sing-box

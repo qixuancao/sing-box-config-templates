@@ -87,7 +87,8 @@ for profile in "${profiles[@]}"; do
 
   if [[ "$version_line" == "1.14" ]]; then
     jq -e '
-      (.http_clients | type == "array" and length > 0)
+      (."$schema" == "https://sing-box.sagernet.org/schema.json")
+      and (.http_clients | type == "array" and length > 0)
       and (.route.default_http_client == "rule-set-direct")
       and all(.route.rule_set[];
         if .type == "remote" then
@@ -99,7 +100,8 @@ for profile in "${profiles[@]}"; do
     ' "$profile" >/dev/null
   else
     jq -e '
-      (has("http_clients") | not)
+      (has("$schema") | not)
+      and (has("http_clients") | not)
       and (.route | has("default_http_client") | not)
       and all(.route.rule_set[];
         if .type == "remote" then

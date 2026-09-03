@@ -1,11 +1,11 @@
-# 从零开始
+# sing-box 配置快速入门
 
 ## 1. 安装客户端
 
-- Android：官方 SFA。
-- iOS / iPadOS：官方 SFI。
-- macOS：官方 SFM，或命令行 `sing-box`。
-- Linux / Windows：官方命令行版或系统包管理器。
+- Android：官方 SFA，先在“关于”页确认 sing-box 内核是 1.14 / 1.13 / 1.12 中的哪一条。
+- iOS / iPadOS / tvOS：自 1.14 起请安装 App Store 新应用 sing-box MT（旧 VT 用户需重新安装），见 [sing-box v1.14.0](https://github.com/SagerNet/sing-box/releases/tag/v1.14.0)。
+- macOS：SFM standalone（不再从 macOS App Store 提供，不自动继承旧配置），或命令行 `sing-box`。
+- Linux / Windows：官方命令行版或系统包管理器；图形界面可选官方 [sing-box for Desktop](https://sing-box.sagernet.org/clients/desktop/)，命令行继续保留。
 
 下载入口优先使用 [SagerNet 官方项目](https://github.com/SagerNet/sing-box)
 及其文档，不要从不明网盘安装改包。

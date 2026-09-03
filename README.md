@@ -1,15 +1,21 @@
-# sing-box 多平台配置模板
+# sing-box 配置模板（sing-box config templates）：Android SFA / iOS SFI / macOS SFM / Linux / Windows
 
 [中文](README.md) · [English](README.en.md)
 
-一套面向普通用户、可审计、可生成的 sing-box 配置。仓库借鉴 ACL4SSR
+可审计、可本地生成的 sing-box 配置（sing-box config templates），覆盖 Android SFA（含 1.12 / 1.13 / 1.14 三条内核兼容线）、iOS（SFI）、macOS（SFM）、Linux 与 Windows，提供 FakeIP 与 RealIP 两种 DNS 模式，以及 TUN 全局代理与 mixed 本地代理两种运行模式。仓库借鉴 ACL4SSR
 “按用途选择策略”的体验，但使用 sing-box 原生 JSON、远程二进制规则集和
-平台专用配置，覆盖 Android、iOS、macOS、Linux 与 Windows。桌面与 Apple
+平台专用配置。桌面与 Apple
 配置面向 1.14.x；Android 额外维护 1.14、1.13、1.12 三条兼容线。
 
 > [!IMPORTANT]
 > 本仓库不是机场，也不提供节点。所有公开 JSON 都故意使用
 > `example.com` / `CHANGE_ME`，因此能通过语法检查，但不能直接联网。
+
+> [!TIP]
+> 先选择，再拿链接。公开 Raw JSON 是占位模板，不能直接联网：
+> 1. 打开[配置选择器](https://qixuancao.github.io/sing-box-config-templates/)，按“平台 → Android 内核版本 → 使用场景”拿到 Raw URL、一键导入 URI 和本地 render 命令；
+> 2. 按[三分钟生成自己的配置](#三分钟生成自己的配置)用 `render.sh` 在本地注入你自己的出站，再 `sing-box check`；
+> 3. 只导入你自己生成后的文件。直接导入本仓库的占位 JSON 会校验通过但无法连接。
 
 ## 先选你的平台
 

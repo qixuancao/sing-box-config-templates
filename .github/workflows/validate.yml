@@ -42,6 +42,9 @@ jobs:
       - name: Check shell scripts
         run: bash -n scripts/*.sh
 
+      - name: Validate Pages SEO and selector
+        run: ./scripts/check-pages.sh
+
       - name: Validate every platform profile
         run: ./scripts/check.sh
 

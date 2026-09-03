@@ -14,6 +14,7 @@ The automated audit detects common secret shapes and private-network markers,
 but it cannot recognize every credential. A passing workflow is not permission
 to publish an unreviewed generated file.
 
-Please report a suspected credential leak privately to the repository owner;
+Please report a suspected credential leak via GitHub Private Vulnerability
+Reporting ([report a vulnerability](https://github.com/qixuancao/sing-box-config-templates/security/advisories/new));
 do not open a public issue containing the credential. For ordinary bugs, share
 only the minimum redacted log described in `CONTRIBUTING.md`.

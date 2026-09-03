@@ -1,0 +1,46 @@
+name: Feature request
+description: Suggest a new profile variant, platform, or documentation improvement.
+title: "[Feat] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste a private configuration. Remove servers, IPs, ports,
+        passwords, UUIDs, keys, and subscription tokens.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Android / SFA profile
+        - iOS / SFI profile
+        - macOS / SFM profile
+        - Linux profile
+        - Windows profile
+        - Documentation / selector / Pages
+        - Scripts / CI
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and use case
+      description: Who needs this and what cannot be done today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Which profile, rule, or doc should change?
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: This request does not include any server address, credential, key, or subscription token.
+          required: true

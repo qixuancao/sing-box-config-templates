@@ -77,7 +77,7 @@ android_udp_first_filter='
   | (.outbounds[] | select(.tag == "select") | .default) = "udp-auto"
 '
 legacy_android_filter='
-  del(.http_clients, .route.default_http_client)
+  del(."$schema", .http_clients, .route.default_http_client)
   | .route.rule_set |= map(
       del(.http_client)
       | .download_detour = "direct"

@@ -1,4 +1,4 @@
-# Android / sing-box for Android
+# sing-box Android SFA 配置选择（1.12 / 1.13 / 1.14）
 
 先确认 SFA 使用的 sing-box 内核版本，再选择用途。顶层八份 JSON 是稳定入口，
 当前与 `1.14/` 同语义；需要锁定旧 schema 时使用版本化目录。

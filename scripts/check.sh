@@ -108,7 +108,8 @@ for profile in \
   "$repo_dir"/platforms/android/*.json \
   "$repo_dir"/platforms/android/1.14/*.json; do
   jq -e '
-    (.http_clients | type == "array" and length > 0)
+    (."$schema" == "https://sing-box.sagernet.org/schema.json")
+    and (.http_clients | type == "array" and length > 0)
     and (.route.default_http_client == "rule-set-direct")
     and all(.route.rule_set[];
       if .type == "remote" then
@@ -117,6 +118,30 @@ for profile in \
         true
       end
     )
+  ' "$profile" >/dev/null
+done
+
+# $schema must exist on the current 1.14 line (templates, top-level Android,
+# versioned 1.14, and all desktop/Apple profiles) and must be absent on the
+# legacy 1.12/1.13 lines, which target cores without JSON Schema support.
+for profile in \
+  "$repo_dir"/templates/*.json \
+  "$repo_dir"/platforms/android/*.json \
+  "$repo_dir"/platforms/android/1.14/*.json \
+  "$repo_dir"/platforms/ios/*.json \
+  "$repo_dir"/platforms/macos/*.json \
+  "$repo_dir"/platforms/linux/*.json \
+  "$repo_dir"/platforms/windows/*.json; do
+  jq -e '
+    ."$schema" == "https://sing-box.sagernet.org/schema.json"
+  ' "$profile" >/dev/null
+done
+
+for profile in \
+  "$repo_dir"/platforms/android/1.13/*.json \
+  "$repo_dir"/platforms/android/1.12/*.json; do
+  jq -e '
+    has("$schema") | not
   ' "$profile" >/dev/null
 done
 
