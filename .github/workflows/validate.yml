@@ -15,7 +15,7 @@ jobs:
       SING_BOX_VERSION: 1.14.0
       SING_BOX_SHA256: 2375de6999f4f56ab46b4fc5ddf26a6aba1d3e61a0f4e7ddec2f4690457d5f63
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install jq and ripgrep
         run: sudo apt-get update && sudo apt-get install -y jq ripgrep
