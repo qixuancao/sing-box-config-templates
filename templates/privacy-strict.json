@@ -1,0 +1,295 @@
+{
+  "log": {
+    "disabled": false,
+    "level": "warn",
+    "timestamp": true
+  },
+  "dns": {
+    "servers": [
+      {
+        "type": "https",
+        "tag": "direct-dns",
+        "server": "223.5.5.5",
+        "domain_resolver": "direct-dns-bootstrap"
+      },
+      {
+        "type": "udp",
+        "tag": "direct-dns-bootstrap",
+        "server": "223.5.5.5"
+      },
+      {
+        "type": "https",
+        "tag": "proxy-dns",
+        "server": "8.8.8.8",
+        "detour": "select"
+      }
+    ],
+    "rules": [
+      {
+        "query_type": [
+          "AAAA",
+          "HTTPS",
+          "SVCB"
+        ],
+        "action": "predefined",
+        "rcode": "NOERROR"
+      },
+      {
+        "clash_mode": "Direct",
+        "action": "route",
+        "server": "direct-dns"
+      },
+      {
+        "clash_mode": "Global",
+        "action": "route",
+        "server": "proxy-dns"
+      },
+      {
+        "query_type": [
+          "A"
+        ],
+        "action": "route",
+        "server": "proxy-dns",
+        "client_subnet": "114.114.114.0/24"
+      }
+    ],
+    "final": "proxy-dns",
+    "strategy": "ipv4_only"
+  },
+  "inbounds": [
+    {
+      "type": "tun",
+      "tag": "tun-in",
+      "address": [
+        "172.19.0.1/30"
+      ],
+      "mtu": 9000,
+      "auto_route": true,
+      "strict_route": true,
+      "stack": "system"
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "hysteria2",
+      "tag": "proxy-example",
+      "server": "example.com",
+      "server_port": 443,
+      "password": "CHANGE_ME",
+      "tls": {
+        "enabled": true,
+        "server_name": "example.com",
+        "insecure": false
+      }
+    },
+    {
+      "type": "selector",
+      "tag": "select",
+      "outbounds": [
+        "auto",
+        "udp-auto",
+        "proxy-example"
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "urltest",
+      "tag": "auto",
+      "outbounds": [
+        "proxy-example"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "3m",
+      "tolerance": 150,
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "urltest",
+      "tag": "udp-auto",
+      "outbounds": [
+        "proxy-example"
+      ],
+      "url": "https://www.gstatic.com/generate_204",
+      "interval": "3m",
+      "tolerance": 150,
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "selector",
+      "tag": "GLOBAL",
+      "outbounds": [
+        "select",
+        "auto",
+        "udp-auto",
+        "proxy-example",
+        "direct"
+      ],
+      "default": "select",
+      "interrupt_exist_connections": false
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "action": "sniff"
+      },
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "protocol": "dns"
+          },
+          {
+            "port": 53
+          }
+        ],
+        "action": "hijack-dns"
+      },
+      {
+        "action": "resolve",
+        "strategy": "ipv4_only"
+      },
+      {
+        "ip_version": 6,
+        "action": "reject"
+      },
+      {
+        "ip_is_private": true,
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "Direct",
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "port": 853
+          },
+          {
+            "network": "udp",
+            "port": 443
+          },
+          {
+            "protocol": "stun"
+          }
+        ],
+        "action": "reject"
+      },
+      {
+        "clash_mode": "Global",
+        "action": "route",
+        "outbound": "GLOBAL"
+      },
+      {
+        "rule_set": "category-ads-all",
+        "action": "reject"
+      },
+      {
+        "rule_set": "geosite-private",
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "geosite-cn",
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": "geoip-cn"
+          },
+          {
+            "rule_set": "geolocation-!cn",
+            "invert": true
+          }
+        ],
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "network": "udp",
+        "action": "route",
+        "outbound": "udp-auto"
+      },
+      {
+        "rule_set": "geolocation-!cn",
+        "action": "route",
+        "outbound": "select"
+      }
+    ],
+    "rule_set": [
+      {
+        "type": "remote",
+        "tag": "category-ads-all",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-private",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "geoip-cn",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "geosite-cn",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "geolocation-!cn",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
+        "http_client": "rule-set-direct"
+      }
+    ],
+    "final": "select",
+    "auto_detect_interface": true,
+    "default_domain_resolver": {
+      "server": "direct-dns"
+    },
+    "default_http_client": "rule-set-direct"
+  },
+  "experimental": {
+    "clash_api": {
+      "default_mode": "Rule"
+    },
+    "cache_file": {
+      "enabled": true,
+      "cache_id": "template-privacy-strict"
+    }
+  },
+  "http_clients": [
+    {
+      "tag": "rule-set-direct",
+      "domain_resolver": {
+        "server": "direct-dns-bootstrap",
+        "strategy": "ipv4_only"
+      }
+    }
+  ]
+}

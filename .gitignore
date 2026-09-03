@@ -1,0 +1,22 @@
+# Private node definitions and locally rendered configurations
+nodes.json
+generated/
+*.local.json
+
+# sing-box runtime state
+*.db
+*.db-shm
+*.db-wal
+cache/
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store

@@ -1,0 +1,19 @@
+{
+  "outbounds": [
+    {
+      "type": "hysteria2",
+      "tag": "proxy-example",
+      "server": "example.com",
+      "server_port": 443,
+      "password": "CHANGE_ME",
+      "tls": {
+        "enabled": true,
+        "server_name": "example.com",
+        "insecure": false
+      }
+    }
+  ],
+  "udp_outbounds": [
+    "proxy-example"
+  ]
+}

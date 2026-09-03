@@ -1,0 +1,38 @@
+name: Validate templates
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sing-box-check:
+    runs-on: ubuntu-latest
+    env:
+      SING_BOX_VERSION: 1.14.0
+      SING_BOX_SHA256: 2375de6999f4f56ab46b4fc5ddf26a6aba1d3e61a0f4e7ddec2f4690457d5f63
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jq and ripgrep
+        run: sudo apt-get update && sudo apt-get install -y jq ripgrep
+
+      - name: Download pinned sing-box checker
+        run: |
+          archive="sing-box-${SING_BOX_VERSION}-linux-amd64.tar.gz"
+          curl --fail --location --retry 3 \
+            --output "$archive" \
+            "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/${archive}"
+          printf '%s  %s\n' "$SING_BOX_SHA256" "$archive" | sha256sum --check --strict
+          tar -xzf "$archive"
+          printf 'SING_BOX=%s/%s\n' \
+            "$PWD" "sing-box-${SING_BOX_VERSION}-linux-amd64/sing-box" >> "$GITHUB_ENV"
+
+      - name: Audit public placeholders
+        run: ./scripts/audit-public.sh
+
+      - name: Validate all templates
+        run: ./scripts/check.sh
