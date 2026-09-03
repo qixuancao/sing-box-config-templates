@@ -1,0 +1,40 @@
+# Contributing
+
+欢迎补充平台说明、修复规则顺序或增加经过验证的配置变体。请保持一次提交只
+解决一个可说明的问题。
+
+## 提交前
+
+```bash
+./scripts/sync-platforms.sh --check
+./scripts/audit-public.sh
+./scripts/check-links.sh
+SING_BOX=/path/to/sing-box-1.14 ./scripts/check.sh
+SING_BOX=/path/to/sing-box-1.14.0 ./scripts/check-android-version.sh 1.14
+SING_BOX=/path/to/sing-box-1.13.21 ./scripts/check-android-version.sh 1.13
+SING_BOX=/path/to/sing-box-1.12.25 ./scripts/check-android-version.sh 1.12
+```
+
+修改远程规则 URL 或准备发版时，再用对应检查器运行
+`./scripts/check-rule-sets.sh 1.xx`。该检查需要联网，平时由每周 CI 执行。
+
+若修改 `templates/`，先运行 `./scripts/sync-platforms.sh` 更新平台文件。
+
+## Issue 最少信息
+
+- 操作系统与版本；
+- SFA / SFI / SFM / CLI 版本；
+- 配置相对路径；
+- 预期行为与实际行为；
+- 删除服务器、域名、IP、端口、密码、UUID、密钥和订阅 token 后的日志。
+
+不要上传完整私有配置。若凭据已经公开，先轮换，再处理 Git 历史。
+
+## 设计约束
+
+- 目标语法保持在 README 声明的 sing-box 版本；
+- Android 新变体必须同步生成三条版本线，并用各自固定核心检查；
+- 不加入真实节点、付费订阅或绕过授权的服务；
+- 平台不支持的字段不能只因为 schema 接受就写入；
+- 新规则集必须有稳定来源、清晰用途和故障退路；
+- 不把庞大静态列表复制到每份配置。

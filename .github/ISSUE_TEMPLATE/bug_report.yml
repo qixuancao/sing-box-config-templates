@@ -1,0 +1,71 @@
+name: Configuration bug
+description: Report a reproducible problem in one public profile.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Never paste a private configuration. Remove servers, IPs, ports,
+        passwords, UUIDs, keys, and subscription tokens from logs.
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Android / SFA
+        - iOS or iPadOS / SFI
+        - macOS / SFM
+        - macOS / CLI
+        - Linux
+        - Windows
+    validations:
+      required: true
+  - type: input
+    id: client_version
+    attributes:
+      label: Client version
+      placeholder: SFA 1.14.0
+    validations:
+      required: true
+  - type: input
+    id: core_version
+    attributes:
+      label: sing-box core version
+      placeholder: 1.14.0
+    validations:
+      required: true
+  - type: input
+    id: profile
+    attributes:
+      label: Profile path
+      placeholder: platforms/android/1.14/fakeip.json
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Explain the smallest repeatable sequence.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Redacted logs
+      render: shell
+      description: Do not include credentials or complete configurations.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety check
+      options:
+        - label: I removed all server addresses, credentials, keys, and subscription tokens.
+          required: true

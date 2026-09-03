@@ -67,7 +67,6 @@
       ],
       "mtu": 9000,
       "auto_route": true,
-      "strict_route": true,
       "stack": "system"
     }
   ],
@@ -114,6 +113,90 @@
       "url": "https://www.gstatic.com/generate_204",
       "interval": "3m",
       "tolerance": 150,
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "streaming",
+      "outbounds": [
+        "select",
+        "auto",
+        "udp-auto",
+        "direct"
+      ],
+      "default": "select",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "ai",
+      "outbounds": [
+        "select",
+        "auto",
+        "udp-auto",
+        "direct"
+      ],
+      "default": "select",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "telegram",
+      "outbounds": [
+        "select",
+        "auto",
+        "udp-auto",
+        "direct"
+      ],
+      "default": "select",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "microsoft",
+      "outbounds": [
+        "select",
+        "auto",
+        "udp-auto",
+        "direct"
+      ],
+      "default": "direct",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "apple",
+      "outbounds": [
+        "select",
+        "auto",
+        "udp-auto",
+        "direct"
+      ],
+      "default": "direct",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "google",
+      "outbounds": [
+        "select",
+        "auto",
+        "udp-auto",
+        "direct"
+      ],
+      "default": "select",
+      "interrupt_exist_connections": false
+    },
+    {
+      "type": "selector",
+      "tag": "github",
+      "outbounds": [
+        "select",
+        "auto",
+        "udp-auto",
+        "direct"
+      ],
+      "default": "select",
       "interrupt_exist_connections": false
     },
     {
@@ -227,6 +310,66 @@
         "outbound": "udp-auto"
       },
       {
+        "rule_set": "category-ai-!cn",
+        "action": "route",
+        "outbound": "ai"
+      },
+      {
+        "rule_set": "youtube",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "netflix",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "disney",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "spotify",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "tiktok",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "telegram",
+        "action": "route",
+        "outbound": "telegram"
+      },
+      {
+        "rule_set": "microsoft",
+        "action": "route",
+        "outbound": "microsoft"
+      },
+      {
+        "rule_set": "onedrive",
+        "action": "route",
+        "outbound": "microsoft"
+      },
+      {
+        "rule_set": "apple",
+        "action": "route",
+        "outbound": "apple"
+      },
+      {
+        "rule_set": "google",
+        "action": "route",
+        "outbound": "google"
+      },
+      {
+        "rule_set": "github",
+        "action": "route",
+        "outbound": "github"
+      },
+      {
         "rule_set": "geolocation-!cn",
         "action": "route",
         "outbound": "select"
@@ -267,10 +410,93 @@
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
         "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "category-ai-!cn",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ai-!cn.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "youtube",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/youtube.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "netflix",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/netflix.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "disney",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/disney.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "spotify",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/spotify.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "tiktok",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/tiktok.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "telegram",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/telegram.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "microsoft",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/microsoft.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "onedrive",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/onedrive.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "apple",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/apple.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "google",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/google.srs",
+        "http_client": "rule-set-direct"
+      },
+      {
+        "type": "remote",
+        "tag": "github",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/github.srs",
+        "http_client": "rule-set-direct"
       }
     ],
     "final": "select",
-    "auto_detect_interface": true,
     "default_domain_resolver": {
       "server": "direct-dns"
     },

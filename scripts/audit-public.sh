@@ -9,7 +9,14 @@ command -v jq >/dev/null 2>&1 || {
   exit 1
 }
 
-for file in templates/*.json examples/nodes.example.json; do
+json_files=()
+while IFS= read -r file; do
+  json_files+=("$file")
+done < <(
+  find templates platforms examples -type f -name '*.json' -print | LC_ALL=C sort
+)
+
+for file in "${json_files[@]}"; do
   jq empty "$file"
 
   jq -e '
@@ -21,11 +28,18 @@ for file in templates/*.json examples/nodes.example.json; do
     [paths(objects) as $p | getpath($p) | keys[]]
     | all(. != "uuid" and . != "private_key" and . != "public_key" and . != "short_id")
   ' "$file" >/dev/null
+
+  jq -e '
+    [.outbounds[]?
+     | select(.type == "hysteria2")
+     | (.server == "example.com" and .password == "CHANGE_ME")]
+    | all
+  ' "$file" >/dev/null
 done
 
 if command -v rg >/dev/null 2>&1; then
   if rg -n --hidden --glob '!.git/**' \
-    '(100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]{1,3}\.[0-9]{1,3}|[a-z0-9-]+\.ts\.net|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY)' .; then
+    '(100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]{1,3}\.[0-9]{1,3}|[a-z0-9-]+\.ts\.net|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|eyJ[a-zA-Z0-9_-]{20,}\.)' .; then
     printf '%s\n' 'error: a forbidden private marker was found' >&2
     exit 1
   fi

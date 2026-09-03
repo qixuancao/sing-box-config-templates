@@ -33,7 +33,20 @@ command -v jq >/dev/null 2>&1 || {
   exit 1
 }
 
-reserved='["select","auto","udp-auto","direct","GLOBAL"]'
+reserved='[
+  "select",
+  "auto",
+  "udp-auto",
+  "streaming",
+  "ai",
+  "telegram",
+  "microsoft",
+  "apple",
+  "google",
+  "github",
+  "direct",
+  "GLOBAL"
+]'
 
 jq -e --argjson reserved "$reserved" '
   (.outbounds | type == "array" and length > 0)

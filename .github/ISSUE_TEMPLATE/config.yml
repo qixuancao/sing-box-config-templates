@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: sing-box upstream documentation
+    url: https://sing-box.sagernet.org/
+    about: Check official behavior and configuration fields first.
