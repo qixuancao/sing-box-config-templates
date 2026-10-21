@@ -21,6 +21,7 @@ cleanup() {
 trap cleanup EXIT
 
 "$repo_dir/scripts/sync-platforms.sh" --check
+python3 -B "$repo_dir/scripts/check-ios-routes.py"
 
 for template in "$repo_dir"/templates/*.json; do
   normalized="$tmp_dir/normalized-$(basename "$template")"

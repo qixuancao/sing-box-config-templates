@@ -49,11 +49,24 @@ Android/iOS 的字段省略是平台适配，不是功能缺失造成的遗漏�
 `auto_redirect` 是官方针对 Linux TUN 的推荐方案；Windows 的
 `strict_route` 有助于限制多宿主 DNS 泄漏，但可能与虚拟网络软件冲突。
 
+### iOS 局域网绕行
+
+仅 `platforms/ios/{fakeip,realip}.json` 默认添加 `route_exclude_address`，
+排除常见本地 IPv4/IPv6 地址及 CGNAT。生成时从排除范围中扣除 TUN 子网、
+虚拟 DNS 与 FakeIP 地址池，避免绕过 `172.19.0.2` 或误排 IPv6 FakeIP。
+其他平台、通用模板与 `privacy-strict` 保持原有接管策略。
+
+这允许本地 IPv6 通信绕过 TUN，但不启用公网 IPv6。绕行的流量（包括应用向
+局域网 DNS 发起的查询）不受 sing-box 规则控制；需要代理内网或严格 DNS
+接管时，应在生成后的私有配置中调整/删除排除项。SFI 的 Include All Networks
+选项也会影响行为。完整边界与依据见 [iOS 说明](../platforms/ios/README.md#局域网与链路本地流量)。
+
 ## 已自动验证
 
 - 每份 JSON 能解析；
 - 公共占位配置和注入示例节点后的配置都通过 `sing-box check`；
 - 平台字段符合上表约束；
+- iOS 局域网排除范围完整，且不重叠 TUN、虚拟 DNS 或 FakeIP；
 - Android 旧 Raw 路径、当前稳定入口和三条版本目录都保留；
 - 八种 Android 用途差异符合各自契约；
 - 配置不包含真实节点凭据或明显私有网络标记；

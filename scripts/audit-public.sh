@@ -38,10 +38,17 @@ for file in "${json_files[@]}"; do
 done
 
 if command -v rg >/dev/null 2>&1; then
-  if rg -n --hidden --glob '!.git/**' \
-    '(100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]{1,3}\.[0-9]{1,3}|[a-z0-9-]+\.ts\.net|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|eyJ[a-zA-Z0-9_-]{20,}\.)' .; then
+  # Allow only the exact public CGNAT CIDR, not individual device addresses.
+  if rg -n --pcre2 --hidden --glob '!.git/**' \
+    '(100\.(?!64\.0\.0/10(?![0-9A-Za-z_./]))(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.[0-9]{1,3}\.[0-9]{1,3}|[a-z0-9-]+\.ts\.net|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|eyJ[a-zA-Z0-9_-]{20,}\.)' .; then
     printf '%s\n' 'error: a forbidden private marker was found' >&2
     exit 1
+  else
+    search_status=$?
+    if [[ "$search_status" != 1 ]]; then
+      printf '%s\n' 'error: public-marker scan failed' >&2
+      exit "$search_status"
+    fi
   fi
 fi
 

@@ -7,6 +7,17 @@
 - **sing-box 内核版本**（如 `1.14.0` / `1.13.21` / `1.12.25`）：SagerNet
   上游的实际运行版本，本仓库用其做 `sing-box check` 与规则集解析验证。
 
+## Unreleased
+
+### 修复
+
+- 为 iOS FakeIP / RealIP 添加局域网、链路本地、回环、组播、有限广播和 CGNAT
+  排除路由（[#1](https://github.com/qixuancao/sing-box-config-templates/issues/1)）。
+  根据源模板自动扣除 TUN、虚拟 DNS 与 FakeIP 网段，不整段排除包含 TUN 的
+  私网；其余平台与隐私模板保持原有策略。
+- 增加地址覆盖、IPv6 FakeIP 冲突与生成结果的回归检查，并说明 SFI 系统选项
+  及局域网 DNS 绕行的限制。公共审计仅放行标准 CGNAT CIDR，仍拦截设备地址。
+
 ## v0.1.0
 
 首个仓库版本。对应上游 sing-box 内核：`1.14.0`（当前多平台与 Android 1.14）、

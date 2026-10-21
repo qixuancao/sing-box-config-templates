@@ -13,6 +13,10 @@ command -v jq >/dev/null 2>&1 || {
   printf '%s\n' 'error: jq is required' >&2
   exit 1
 }
+command -v python3 >/dev/null 2>&1 || {
+  printf '%s\n' 'error: python3 is required to generate safe iOS LAN bypass routes' >&2
+  exit 1
+}
 
 tmp_dir=$(mktemp -d)
 cleanup() {
@@ -143,8 +147,10 @@ for variant in \
 done
 
 for variant in fakeip realip; do
+  ios_excludes=$(python3 "$repo_dir/scripts/ios_route_excludes.py" \
+    "$repo_dir/templates/$variant.json")
   emit "templates/$variant.json" "platforms/ios/$variant.json" \
-    "$apple_filter | .experimental.cache_file.cache_id = \"ios-$variant\""
+    "$apple_filter | .inbounds[0].route_exclude_address = $ios_excludes | .experimental.cache_file.cache_id = \"ios-$variant\""
   emit "templates/$variant.json" "platforms/macos/$variant.json" \
     "$macos_filter | .experimental.cache_file.cache_id = \"macos-$variant\""
 done

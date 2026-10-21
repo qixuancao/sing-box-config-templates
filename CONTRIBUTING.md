@@ -5,8 +5,13 @@
 
 ## 提交前
 
+同步与检查需要 Bash、`jq`、Python 3（仅标准库）和带 PCRE2 的 `ripgrep`；
+`render.sh` 注入节点仍只需要 Bash 与 `jq`。iOS 排除路由的生成源位于
+`scripts/ios_route_excludes.py`，不要直接维护拆分后的 CIDR 列表。
+
 ```bash
 ./scripts/sync-platforms.sh --check
+python3 -B scripts/check-ios-routes.py
 ./scripts/audit-public.sh
 ./scripts/check-links.sh
 SING_BOX=/path/to/sing-box-1.14 ./scripts/check.sh
