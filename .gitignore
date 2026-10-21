@@ -1,4 +1,5 @@
 # Private node definitions and locally rendered configurations
+/proxy-config-backup/
 nodes.json
 nodes.txt
 generated/
