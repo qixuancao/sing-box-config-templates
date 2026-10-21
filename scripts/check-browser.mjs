@@ -29,7 +29,7 @@ const server = createServer(async (req, res) => {
     res.end(body);
   } catch { res.writeHead(404); res.end(); }
 });
-let chrome, ws;
+let chrome, ws, closeBrowser;
 try {
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const origin = `http://127.0.0.1:${server.address().port}`;
@@ -62,15 +62,15 @@ try {
     pending.set(id, {resolve: value => {clearTimeout(timer); resolve(value);}, reject: error => {clearTimeout(timer); reject(error);}});
     ws.send(JSON.stringify({id, method, params}));
   });
+  closeBrowser = () => send('Browser.close');
   const evaluate = async expression => {
     const result = await send('Runtime.evaluate', {expression, awaitPromise: true, returnByValue: true, userGesture: true});
     if (result.exceptionDetails) throw new Error(result.exceptionDetails.text);
     return result.result.value;
   };
-  const ready = () => until(() => evaluate("Boolean(document.getElementById('scenario')?.options.length)"));
   const navigate = async suffix => {
     await send('Page.navigate', {url: `${origin}/sing-box-config-templates/${suffix}`});
-    await until(() => evaluate(`document.documentElement.lang === ${JSON.stringify(suffix ? 'en' : 'zh-CN')} && Boolean(document.getElementById('scenario')?.options.length)`));
+    await until(() => evaluate(`document.readyState === 'complete' && document.documentElement.lang === ${JSON.stringify(suffix ? 'en' : 'zh-CN')} && Boolean(document.getElementById('scenario')?.options.length)`));
   };
   const input = async text => evaluate(`document.getElementById('nodes-input').value=${JSON.stringify(text)}; document.getElementById('nodes-input').dispatchEvent(new Event('input'));`);
   const generated = () => evaluate("!document.getElementById('download-json').disabled && document.getElementById('status').classList.contains('success')");
@@ -113,7 +113,9 @@ try {
     assert.equal((await evaluate("document.getElementById('json-preview').value")).includes('udp-auto'), false);
     await evaluate("document.getElementById('platform').value='android'; document.getElementById('platform').dispatchEvent(new Event('change'))");
     assert.equal(await evaluate("document.getElementById('download-json').disabled"), true);
-    await send('Page.reload'); await ready();
+    const previousDocument = await evaluate('performance.timeOrigin');
+    await send('Page.reload');
+    await until(() => evaluate(`performance.timeOrigin !== ${previousDocument} && document.readyState === 'complete' && Boolean(document.getElementById('scenario')?.options.length)`));
     assert.equal(await evaluate("document.getElementById('nodes-input').value"), '', 'Refresh must clear node material');
   }
   console.log('Checking JSON downloads and node file re-import...');
@@ -150,12 +152,14 @@ try {
   assert.equal(requests.some(request => request.url.includes('example-password')), false);
   console.log(`Browser passed: ${combinations} bilingual presets, real JSON and nodes downloads, file re-import, stale output, refresh privacy and mobile layout.`);
 } finally {
+  // Graceful shutdown lets Chrome's child processes finish their profile writes.
+  if (ws?.readyState === WebSocket.OPEN && closeBrowser) await closeBrowser().catch(() => {});
   ws?.close();
-  if (chrome && chrome.exitCode === null) {
+  if (chrome && chrome.exitCode === null && chrome.signalCode === null) {
     const exited = new Promise(resolve => chrome.once('exit', resolve));
-    chrome.kill(); await Promise.race([exited, pause(2000)]);
-    if (chrome.exitCode === null) { chrome.kill('SIGKILL'); await exited; }
+    await Promise.race([exited, pause(2000)]);
+    if (chrome.exitCode === null && chrome.signalCode === null) { chrome.kill('SIGKILL'); await exited; }
   }
   await new Promise(resolve => server.close(resolve));
-  await rm(temporary, {recursive: true, force: true});
+  await rm(temporary, {recursive: true, force: true, maxRetries: 10, retryDelay: 100});
 }
