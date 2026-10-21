@@ -1,32 +1,46 @@
 # sing-box 配置工具
 
-[English](README.en.md) · [配置选择器](https://qixuancao.github.io/sing-box-config-templates/) · [更新记录](CHANGELOG.md)
+[English](README.en.md) · [在线生成配置](https://qixuancao.github.io/sing-box-config-templates/) · [更新记录](CHANGELOG.md)
 
 为 Android、iOS、macOS、Linux 和 Windows 生成 sing-box 配置。内置国内外分流、应用策略组、FakeIP / RealIP DNS，以及 TUN 和本地 HTTP/SOCKS 代理模式。
 
 - 按流媒体、AI、Telegram、Microsoft、Apple、Google、GitHub 选择出口；
 - 手动选节点或通过 URLTest 按延迟自动选择；
 - 在本地合并节点，生成可直接导入客户端的 JSON；
-- 所有平台按 1.13、1.14 两条内核版本线维护。
+- 稳定配置维护 1.13、1.14；[1.15 实验配置](experimental/1.15/README.md)按固定 alpha 预备。
+- DNS、入站、规则按“类别 → 版本 → 方案”独立维护，见[配置模块](modules/README.md)。
 
-## 快速开始
+## 在线生成
 
-需要 Bash、`jq` 和 sing-box。
+打开[配置生成器](https://qixuancao.github.io/sing-box-config-templates/)：
+
+1. 粘贴节点分享链接，或读取节点 JSON 文件。
+2. 选择设备；内核版本和其他场景在高级设置中。
+3. 点击“生成配置”，下载 `sing-box.json` 后导入客户端。
+
+支持 Naive HTTPS、Hysteria2、Trojan、Shadowsocks、VLESS 分享链接。解析、生成和
+下载均在浏览器内完成，节点不上传、不自动保存。支持保存 `nodes.json`，方便下次更新。
+
+## 命令行生成
+
+需要 Node.js 22+；运行和内核检查需要 sing-box。
 
 ```bash
 git clone https://github.com/qixuancao/sing-box-config-templates.git
 cd sing-box-config-templates
-cp examples/nodes.example.json nodes.json
 ```
 
-编辑 `nodes.json`，填入自己的 sing-box 出站，然后生成配置：
+把分享链接逐行保存到 `nodes.txt`，或使用[节点 JSON](docs/nodes.md)：
 
 ```bash
-./scripts/render.sh platforms/android/1.14/fakeip.json nodes.json generated/android.json
-sing-box check -c generated/android.json
+node scripts/generate.mjs --platform android --core 1.14 \
+  --input nodes.txt --output generated/sing-box.json
+sing-box check -c generated/sing-box.json
 ```
 
-在客户端导入 `generated/android.json`。`nodes.json` 和 `generated/` 已加入 `.gitignore`，生成文件权限为 `0600`。节点格式见 [节点配置](docs/nodes.md)。
+网页和 CLI 共用同一套解析、生成模块。`nodes.txt`、`nodes.json` 和 `generated/`
+已加入 `.gitignore`，CLI 输出文件权限为 `0600`。原来的 `render.sh TEMPLATE NODES OUTPUT`
+命令继续可用，现在调用同一套 Node.js 引擎。
 
 ## 选择平台
 
@@ -61,8 +75,13 @@ sing-box run -c generated/linux.json
 | `battery-saver.json` | 降低测速频率和日志量 |
 | `udp-first.json` | 游戏、语音；优先使用指定的 UDP 节点 |
 
+## 修改与复用
+
+节点协议、配置组合、平台适配与网页交互分别维护。个人规则可通过私有模板传入，
+其他项目可以直接调用纯 JavaScript API。修改入口和例子见[模块结构](docs/architecture.md)。
+
 ## 文档
 
-[入门](docs/getting-started.md) · [策略组与规则顺序](docs/policy-groups.md) · [版本兼容](docs/compatibility.md) · [故障排查](docs/troubleshooting.md) · [Raw 链接](SUBSCRIPTIONS.md) · [参与开发](CONTRIBUTING.md)
+[入门](docs/getting-started.md) · [更新节点](docs/update-nodes.md) · [策略组与规则顺序](docs/policy-groups.md) · [版本兼容](docs/compatibility.md) · [故障排查](docs/troubleshooting.md) · [Raw 链接](SUBSCRIPTIONS.md) · [参与开发](CONTRIBUTING.md)
 
 规则集来自 [MetaCubeX/meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat)，策略分组参考 [ACL4SSR](https://github.com/ACL4SSR/ACL4SSR)。代码与配置采用 [MIT](LICENSE)，第三方规则许可见 [THIRD_PARTY.md](THIRD_PARTY.md)。

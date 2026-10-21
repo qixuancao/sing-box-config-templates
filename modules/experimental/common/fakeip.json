@@ -1,0 +1,11 @@
+{
+  "experimental": {
+    "clash_api": {
+      "default_mode": "Rule"
+    },
+    "cache_file": {
+      "enabled": true,
+      "store_fakeip": true
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "modules": {
+    "dns": "realip",
+    "inbounds": "mixed",
+    "outbounds": "standard",
+    "rules": "mixed",
+    "rule-sets": "standard",
+    "experimental": "default"
+  }
+}

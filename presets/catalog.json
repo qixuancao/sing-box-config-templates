@@ -1,0 +1,67 @@
+{
+  "default_core": "1.14",
+  "versions": {
+    "1.14": {
+      "channel": "stable",
+      "checker": "1.14.0"
+    },
+    "1.13": {
+      "channel": "stable",
+      "checker": "1.13.21"
+    },
+    "1.15": {
+      "channel": "experimental",
+      "checker": "1.15.0-alpha.12",
+      "sha256": "b107528ec7d989333d986573c097d840b9ef1afa9bb177f8eb03e0767f370514"
+    }
+  },
+  "platforms": {
+    "android": {
+      "scenarios": [
+        "fakeip",
+        "realip",
+        "tcp-stable",
+        "privacy-strict",
+        "dual-stack",
+        "no-adblock",
+        "battery-saver",
+        "udp-first"
+      ]
+    },
+    "ios": {
+      "scenarios": [
+        "fakeip",
+        "realip"
+      ],
+      "ios_lan_bypass": true
+    },
+    "macos": {
+      "scenarios": [
+        "fakeip",
+        "realip",
+        "mixed"
+      ],
+      "auto_detect_interface": true
+    },
+    "linux": {
+      "scenarios": [
+        "mixed",
+        "tun"
+      ],
+      "auto_detect_interface": true,
+      "inbound_overrides": {
+        "tun": "linux-tun"
+      }
+    },
+    "windows": {
+      "scenarios": [
+        "mixed",
+        "tun"
+      ],
+      "auto_detect_interface": true,
+      "inbound_overrides": {
+        "tun": "windows-tun"
+      }
+    }
+  }
+}

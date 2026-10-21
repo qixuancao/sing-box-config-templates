@@ -1,6 +1,7 @@
-# sing-box 节点文件格式：本地生成、不上传凭据
+# 节点链接与 JSON 格式
 
-`render.sh` 接受一个小型 JSON 文档：
+网页和 `scripts/generate.mjs` 接受每行一个分享链接，或原生 sing-box 节点 JSON。
+也可输入出站数组或单个出站对象。推荐保存为下面的节点文档，方便明确选择 UDP 节点：
 
 ```json
 {
@@ -31,11 +32,12 @@
 ## 两个数组分别做什么
 
 - `outbounds`：所有节点。tag 必须唯一且非空。
-- `udp_outbounds`：确认能承载 UDP 的节点 tag；省略时默认把所有节点都当作
-  支持 UDP。
+- `udp_outbounds`：确认能承载 UDP 的节点 tag；省略时按节点类型和 `network` 字段推断。
+  Naive、HTTP 等默认不加入 UDP；`network: "tcp"` 的节点同样排除。
 
-如果某些节点只支持 TCP，请显式填写 `udp_outbounds`。否则自动选择器可能把
-QUIC、语音或 DNS 流量送到不支持 UDP 的节点。
+生成器只能识别配置所声明的能力，不能替你确认服务端是否启用了 UDP。
+需要进一步限制时显式填写 `udp_outbounds`；其名称必须存在且不重复。
+原版脚本“省略即全部支持 UDP”的行为已改为上述能力推断。
 
 全部节点都只支持 TCP 时，使用 `"udp_outbounds": []`。生成器会移除 `udp-auto`
 及其选择项，将需要代理的 UDP 改为明确拒绝；国内和局域网已有的 UDP 直连规则
@@ -58,15 +60,25 @@ select auto udp-auto streaming ai telegram microsoft apple google github direct 
 
 脚本遇到重复 tag、保留 tag、空的 `outbounds` 或不存在的 UDP tag 会直接退出。
 
-## 订阅与节点文件不是一回事
+## 分享链接支持范围
 
-本仓库的远程链接是“完整 sing-box 配置链接”。`render.sh` 接受的是已经整理成
-标准出站对象的本地 JSON，并不会联网抓取、解析或转换机场订阅。这样做可以让
-渲染过程可审计，也避免把订阅 token 意外写入日志或 Git 历史。
+| 类型 | 支持的设置 |
+| --- | --- |
+| `naive+https://` | 用户名、密码、SNI；默认按 TCP 处理 |
+| `hy2://` / `hysteria2://` | 密码、SNI、证书校验选项、Salamander 混淆 |
+| `trojan://` | TLS、SNI、ALPN、TCP / WebSocket / gRPC / HTTPUpgrade |
+| `vless://` | UUID、TLS / Reality、Vision、上述传输与 packetEncoding |
+| `ss://` | SIP002 与旧版 Base64 格式、常见 AEAD / 2022 加密 |
 
-## 最低安全要求
+未支持的参数会报错，例如 SS 插件、XHTTP 或 Hysteria2 证书 pin，避免转换时悄悄丢失设置。
+这类配置可使用原生 sing-box 节点 JSON，再用实际内核检查。HTTP(S) 订阅地址不是节点
+分享链接，请从客户端导出节点后输入。
 
-1. 只在被 Git 忽略的 `nodes.json` 中放真实凭据；
-2. 生成后执行 `git status --short`，确认没有私有文件进入暂存区；
-3. 不要把含 token 的远程 URL 发到公开 Issue；
-4. 凭据一旦进入公开 Git 历史，删除文件不够，必须立刻轮换凭据。
+字段依据：[sing-box 出站](https://sing-box.sagernet.org/configuration/outbound/)、
+[Hysteria2 URI](https://v2.hysteria.network/docs/developers/URI-Scheme/)。
+
+## 保存与更新
+
+网页的“保存节点 JSON”导出本节的节点文档，“下载 sing-box.json”导出完整配置。
+命令行建议使用已被 Git 忽略的 `nodes.json` / `nodes.txt`，输出放在 `generated/`。
+更新步骤见[更换节点](update-nodes.md)。

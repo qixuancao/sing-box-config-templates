@@ -1,7 +1,9 @@
 # Private node definitions and locally rendered configurations
 nodes.json
+nodes.txt
 generated/
 *.local.json
+.render.*
 
 # sing-box runtime state
 *.db

@@ -23,15 +23,6 @@ trap cleanup EXIT
 "$repo_dir/scripts/sync-platforms.sh" --check
 python3 -B "$repo_dir/scripts/check-ios-routes.py"
 
-for template in "$repo_dir"/templates/*.json; do
-  normalized="$tmp_dir/normalized-$(basename "$template")"
-  jq -f "$repo_dir/scripts/policy-layout.jq" "$template" >"$normalized"
-  cmp -s -- "$normalized" "$template" || {
-    printf 'error: policy layout is out of date: %s\n' "$template" >&2
-    exit 1
-  }
-done
-
 required_groups='[
   "select",
   "auto",

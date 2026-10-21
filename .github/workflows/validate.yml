@@ -19,6 +19,10 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+
       - name: Install validation dependencies
         run: sudo apt-get update && sudo apt-get install -y jq ripgrep python3
 
@@ -51,8 +55,17 @@ jobs:
       - name: Validate every platform profile
         run: ./scripts/check.sh
 
+      - name: Verify versioned module substitution and isolation
+        run: python3 -B scripts/check-modules.py
+
       - name: Validate TCP-only and mixed node rendering
         run: python3 -B scripts/check-render.py
+
+      - name: Validate shared generator and five link protocols
+        run: node --test tests/generator.test.mjs
+
+      - name: Test browser JSON downloads and local-only generation
+        run: node scripts/check-browser.mjs
 
   legacy-profiles:
     runs-on: ubuntu-latest
@@ -68,6 +81,10 @@ jobs:
       SING_BOX_SHA256: ${{ matrix.sing_box_sha256 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -88,6 +105,48 @@ jobs:
 
       - name: Validate TCP-only and mixed node rendering
         run: python3 -B scripts/check-render.py
+
+      - name: Validate generated link profiles on the 1.13 core
+        run: node --test tests/generator.test.mjs
+
+  experimental-profiles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Read experimental checker pin
+        run: |
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json
+          from pathlib import Path
+          pin = json.loads(Path('presets/catalog.json').read_text())['versions']['1.15']
+          assert pin['channel'] == 'experimental'
+          print('SING_BOX_VERSION=' + pin['checker'])
+          print('SING_BOX_SHA256=' + pin['sha256'])
+          PY
+
+      - name: Download temporary experimental checker
+        run: |
+          archive="sing-box-${SING_BOX_VERSION}-linux-amd64.tar.gz"
+          curl --fail --location --retry 3 --output "$archive" \
+            "https://github.com/SagerNet/sing-box/releases/download/v${SING_BOX_VERSION}/${archive}"
+          printf '%s  %s\n' "$SING_BOX_SHA256" "$archive" | sha256sum --check --strict
+          tar -xzf "$archive"
+          printf 'SING_BOX=%s/%s\n' \
+            "$PWD" "sing-box-${SING_BOX_VERSION}-linux-amd64/sing-box" >> "$GITHUB_ENV"
+
+      - name: Check all experimental platform configurations without starting a proxy
+        run: ./scripts/check-platform-version.sh 1.15
+
+      - name: Check generated link configurations with the experimental core
+        run: node --test tests/generator.test.mjs
 
   rule-set-compatibility:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

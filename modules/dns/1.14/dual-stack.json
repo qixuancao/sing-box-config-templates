@@ -1,0 +1,47 @@
+{
+  "dns": {
+    "servers": [
+      {
+        "type": "https",
+        "tag": "direct-dns",
+        "server": "223.5.5.5",
+        "domain_resolver": "direct-dns-bootstrap"
+      },
+      {
+        "type": "udp",
+        "tag": "direct-dns-bootstrap",
+        "server": "223.5.5.5"
+      },
+      {
+        "type": "https",
+        "tag": "proxy-dns",
+        "server": "8.8.8.8",
+        "detour": "select"
+      }
+    ],
+    "rules": [
+      {
+        "clash_mode": "Direct",
+        "action": "route",
+        "server": "direct-dns"
+      },
+      {
+        "clash_mode": "Global",
+        "action": "route",
+        "server": "proxy-dns"
+      },
+      {
+        "rule_set": "geosite-cn",
+        "action": "route",
+        "server": "direct-dns"
+      },
+      {
+        "rule_set": "geolocation-!cn",
+        "action": "route",
+        "server": "proxy-dns"
+      }
+    ],
+    "final": "proxy-dns",
+    "strategy": "prefer_ipv4"
+  }
+}

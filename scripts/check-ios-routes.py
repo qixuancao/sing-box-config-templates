@@ -26,9 +26,10 @@ def networks(values):
 
 class IOSRoutesTest(unittest.TestCase):
     def ios_profiles(self):
-        for line in ("1.14", "1.13"):
+        for line in ("1.14", "1.13", "1.15"):
             for variant in ("fakeip", "realip"):
-                profile = read_profile(f"platforms/ios/{line}/{variant}.json")
+                path = f"experimental/1.15/platforms/ios/{variant}.json" if line == "1.15" else f"platforms/ios/{line}/{variant}.json"
+                profile = read_profile(path)
                 yield f"{line}/{variant}", profile, networks(profile["inbounds"][0].get("route_exclude_address", []))
 
     def assert_kept(self, exclusions, reserved):
@@ -116,7 +117,7 @@ class IOSRoutesTest(unittest.TestCase):
     def test_public_audit_allows_only_the_exact_cgnat_network(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            for name in ("scripts", "templates", "platforms", "examples"):
+            for name in ("scripts", "templates", "platforms", "experimental", "modules", "presets", "examples"):
                 (root / name).mkdir()
             audit = root / "scripts/audit-public.sh"
             shutil.copyfile(ROOT / "scripts/audit-public.sh", audit)

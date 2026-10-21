@@ -5,6 +5,7 @@
 - Android、iOS、macOS、Linux、Windows 均维护 1.14、1.13 两条兼容线；
 - 路径统一为 `platforms/<平台>/<内核版本>/<配置>.json`；
 - CI 检查器：官方 1.14.0、1.13.21 Linux amd64 发布包；
+- 另有 [1.15 实验配置](../experimental/1.15/README.md)，固定在 `1.15.0-alpha.12` 验证，默认选择仍为 1.14；
 - 默认 DNS：仅 IPv4；`dual-stack.json` 改为双栈并优先 IPv4；
 - 规则：MetaCubeX `sing` 分支远程 `.srs`。
 
@@ -24,14 +25,14 @@
 `match_response`，并提供 [JSON Schema](https://sing-box.sagernet.org/configuration/schema/)
 （顶层 `$schema`，见
 [sing-box v1.14.0](https://github.com/SagerNet/sing-box/releases/tag/v1.14.0)）。
-1.13 不认识这些字段或动作。因此旧版目录会：
+1.13 不认识这些字段或动作。因此 `modules/<类别>/1.13/` 使用独立的兼容配置：
 
 - 删除 1.14 的共享 HTTP 客户端字段和顶层 `$schema`；
 - 用每个远程规则集的 `download_detour: direct` 下载规则；
 - 将 FakeIP 的 1.14 DNS 评估流程降级为可在旧核心解析的规则；
 - 从桌面 TUN 配置中删除 1.14 才新增的 `dns_mode` / `dns_address`，保留路由级 DNS 劫持。
 
-这些不是仅改目录名的副本。同步脚本确定性生成差异，CI 再用两个真实版本分别
+这些不是仅改目录名的副本。同步脚本从版本模块确定性组合配置，CI 再用两个真实版本分别
 检查公共配置和注入示例节点后的配置。版本目录按 minor 兼容线命名；表中固定的
 patch 是实际自动验证点，不等于所有历史 ROM/patch 都做过实机测试。
 
@@ -52,7 +53,7 @@ Android/iOS 的字段省略是平台适配，不是功能缺失造成的遗漏�
 
 ### iOS 局域网绕行
 
-仅 `platforms/ios/{1.13,1.14}/{fakeip,realip}.json` 默认添加 `route_exclude_address`，
+稳定配置 `platforms/ios/{1.13,1.14}/{fakeip,realip}.json` 和独立的 1.15 实验 iOS 配置默认添加 `route_exclude_address`，
 排除常见本地 IPv4/IPv6 地址及 CGNAT。生成时从排除范围中扣除 TUN 子网、
 虚拟 DNS 与 FakeIP 地址池，避免绕过 `172.19.0.2` 或误排 IPv6 FakeIP。
 其他平台、通用模板与 `privacy-strict` 保持原有接管策略。

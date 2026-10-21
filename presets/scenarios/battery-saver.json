@@ -1,0 +1,11 @@
+{
+  "modules": {
+    "dns": "realip",
+    "inbounds": "tun",
+    "outbounds": "battery-saver",
+    "rules": "standard",
+    "rule-sets": "standard",
+    "experimental": "default"
+  },
+  "log_level": "error"
+}

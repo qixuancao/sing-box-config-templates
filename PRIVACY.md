@@ -1,8 +1,13 @@
 # 隐私说明（PRIVACY）
 
-本仓库提供的是 sing-box 配置模板。模板本身不会收集你的信息，也没有统计、
-上报或外部分析脚本。但 sing-box 在运行时会按配置产生以下默认外联，
-使用前请知悉。
+网页生成器在浏览器内解析节点、组合配置并导出文件，不发送节点信息、不使用分析脚本，
+也不自动写入浏览器持久存储。刷新或离开页面会清空节点。页面与公共模板由 GitHub Pages
+提供；GitHub 对普通网站访问的处理见其隐私政策。
+
+点击“下载 sing-box.json”“保存节点 JSON”或“复制 JSON”会按你的操作导出节点信息。
+下载的文件与剪贴板由你自己的设备保存。
+
+生成的配置交给 sing-box 运行后，默认会访问下列服务：
 
 ## 默认运行时外联
 
@@ -37,8 +42,7 @@
 
 ## 本地生成原则
 
-- 真实节点、密码、UUID、密钥与订阅 Token 只放在被 Git 忽略的 `nodes.json`
-  与 `generated/`，绝不提交到公开仓库；
-- `render.sh` 只在本地做 JSON 合并，不上传、不解密、不转换远程订阅；
+- 命令行建议使用被 Git 忽略的 `nodes.json`、`nodes.txt` 与 `generated/`；
+- `generate.mjs` 和 `render.sh` 在本地解析节点、组合 JSON，不联网获取输入；
 - 提交 Issue 前务必删除服务器、域名、IP、端口、密码、UUID、密钥和订阅
   token，详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。

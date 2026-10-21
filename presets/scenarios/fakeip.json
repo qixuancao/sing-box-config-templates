@@ -1,0 +1,10 @@
+{
+  "modules": {
+    "dns": "fakeip",
+    "inbounds": "tun",
+    "outbounds": "standard",
+    "rules": "standard",
+    "rule-sets": "standard",
+    "experimental": "fakeip"
+  }
+}

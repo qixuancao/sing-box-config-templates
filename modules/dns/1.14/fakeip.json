@@ -1,0 +1,83 @@
+{
+  "dns": {
+    "servers": [
+      {
+        "type": "https",
+        "tag": "direct-dns",
+        "server": "223.5.5.5",
+        "domain_resolver": "direct-dns-bootstrap"
+      },
+      {
+        "type": "udp",
+        "tag": "direct-dns-bootstrap",
+        "server": "223.5.5.5"
+      },
+      {
+        "type": "https",
+        "tag": "proxy-dns",
+        "server": "8.8.8.8",
+        "detour": "select"
+      },
+      {
+        "type": "fakeip",
+        "tag": "fakeip",
+        "inet4_range": "198.18.0.0/15"
+      }
+    ],
+    "rules": [
+      {
+        "query_type": [
+          "AAAA",
+          "HTTPS",
+          "SVCB"
+        ],
+        "action": "predefined",
+        "rcode": "NOERROR"
+      },
+      {
+        "clash_mode": "Direct",
+        "action": "route",
+        "server": "direct-dns"
+      },
+      {
+        "clash_mode": "Global",
+        "action": "route",
+        "server": "proxy-dns"
+      },
+      {
+        "rule_set": "geosite-cn",
+        "action": "route",
+        "server": "direct-dns"
+      },
+      {
+        "rule_set": "geolocation-!cn",
+        "query_type": [
+          "A"
+        ],
+        "action": "route",
+        "server": "fakeip"
+      },
+      {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": "geolocation-!cn",
+            "invert": true
+          }
+        ],
+        "action": "evaluate",
+        "server": "proxy-dns",
+        "tag": "cn-probe",
+        "client_subnet": "114.114.114.0/24"
+      },
+      {
+        "match_response": "cn-probe",
+        "rule_set": "geoip-cn",
+        "action": "respond"
+      }
+    ],
+    "final": "proxy-dns",
+    "strategy": "ipv4_only"
+  }
+}

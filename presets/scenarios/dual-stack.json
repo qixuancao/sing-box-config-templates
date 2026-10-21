@@ -1,0 +1,10 @@
+{
+  "modules": {
+    "dns": "dual-stack",
+    "inbounds": "dual-stack",
+    "outbounds": "standard",
+    "rules": "dual-stack",
+    "rule-sets": "standard",
+    "experimental": "default"
+  }
+}

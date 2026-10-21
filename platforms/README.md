@@ -14,4 +14,5 @@
 [`../docs/getting-started.md`](../docs/getting-started.md) 生成私有配置。
 
 平台目录由 [`../scripts/sync-platforms.sh`](../scripts/sync-platforms.sh)
-从兼容模板确定性生成，CI 会拒绝未同步的修改。
+从[配置模块](../modules/README.md)和 `presets/` 确定性生成，CI 会拒绝未同步的修改。
+1.15 的预备配置位于单独的[实验目录](../experimental/1.15/README.md)。

@@ -17,83 +17,52 @@
 sing-box version
 ```
 
-## 2. 选择模板
+## 2. 在网页生成
 
-第一次使用时：
+打开[配置生成器](https://qixuancao.github.io/sing-box-config-templates/)：
 
-1. 所有平台先按内核选择 `1.14/` 或 `1.13/` 目录；Android 从 `fakeip.json` 开始；
-2. Apple 图形客户端先用本平台的 `fakeip.json`；
-3. Linux / Windows 命令行先用 `mixed.json`，确认节点可用；
-4. 只有确实需要全局透明代理时，再启用桌面系统的 `tun.json`。
+1. 粘贴自己的节点分享链接，每行一个；也可读取节点 JSON / TXT 文件。
+2. 选择设备，在高级设置中核对实际内核是 1.13 还是 1.14。
+3. 点击“生成配置”，再点击“下载 sing-box.json”。
+4. 在 SFA / SFI / SFM 的配置页面导入本地文件，然后启用连接。
 
-不要直接修改 `platforms/` 里的公开文件来保存密码。它们会被平台同步脚本
-覆盖，也容易被误提交。
+手机和 Apple 客户端默认推荐 FakeIP；应用兼容问题可在高级设置改为 RealIP。
+Linux / Windows 默认推荐本地 HTTP / SOCKS，运行后将应用代理设为
+`127.0.0.1:2080`。需要接管系统流量时再选择 TUN，并授予系统所需权限。
 
-## 3. 创建私有节点文件
+“试用示例”只用于预览操作流程，连接时请使用自己的节点。“保存节点 JSON”可保留
+输入供下次更新，页面刷新会清空输入。节点格式见[节点链接与 JSON](nodes.md)。
+
+## 3. 命令行生成
+
+需要 Node.js 22+。将节点分享链接逐行放进 `nodes.txt`，或使用 `nodes.json`：
 
 ```bash
-cp examples/nodes.example.json nodes.json
+node scripts/generate.mjs --platform android --core 1.14 \
+  --input nodes.txt --output generated/sing-box.json
+sing-box check -c generated/sing-box.json
 ```
 
-编辑 `nodes.json`，把示例出站替换成自己的 sing-box 出站。
-`nodes.json` 已写入 `.gitignore`。字段说明见 [`nodes.md`](nodes.md)。
-
-## 4. 渲染并检查
-
-Android 示例：
+选择其他平台或场景：
 
 ```bash
-./scripts/render.sh \
-  platforms/android/1.14/fakeip.json \
-  nodes.json \
-  generated/android.json
-sing-box check -c generated/android.json
+node scripts/generate.mjs --platform linux --core 1.13 --scenario mixed \
+  --input nodes.json --output generated/linux.json
+sing-box check -c generated/linux.json
+sing-box run -c generated/linux.json
 ```
 
-若使用旧版 SFA，把模板路径换成相应目录，并用相同版本的检查器。例如：
+已有脚本调用可以继续使用：
 
 ```bash
-./scripts/render.sh \
-  platforms/android/1.13/realip.json \
-  nodes.json \
-  generated/android-1.13-realip.json
-sing-box check -c generated/android-1.13-realip.json
-```
-
-Linux 无 root 示例：
-
-```bash
-./scripts/render.sh \
-  platforms/linux/1.14/mixed.json \
-  nodes.json \
-  generated/linux-mixed.json
-sing-box check -c generated/linux-mixed.json
-```
-
-脚本会替换唯一的公开占位节点，同时更新 `select`、`auto`、`udp-auto` 和
-`GLOBAL`。不会上传、解密或转换你的节点。
-
-## 5. 导入或运行
-
-- SFA / SFI / SFM：导入 `generated/*.json` 本地文件。
-- mixed 模式：运行后在应用中设置 HTTP 或 SOCKS 地址
-  `127.0.0.1:2080`。
-- TUN 命令行模式：确认有本机控制台或其他回撤手段，再以所需权限运行。
-
-```bash
-sing-box run -c generated/linux-mixed.json
-```
-
-若要使用远程配置，把**生成后的私有文件**放在你控制且需要认证的 HTTPS
-存储中。公开 Raw 链接只是机制演示，不包含可用节点。
-
-## 6. 更新仓库
-
-```bash
-git pull --ff-only
 ./scripts/render.sh platforms/android/1.14/fakeip.json nodes.json generated/android.json
-sing-box check -c generated/android.json
 ```
 
-模板、规则 tag 或 sing-box 版本升级后都应重新渲染，不要长期使用无人检查的
-旧生成文件。
+两种命令都调用网页使用的同一套引擎。命令行输出为 `0600`，失败时保留原有输出。
+可用 `--input -` 从 stdin 读取，个人模板用 `--template /path/to/private/template.json`。
+
+## 4. 更新与排查
+
+更换节点或模板升级见[更新节点](update-nodes.md)。导入或连接异常见[故障排查](troubleshooting.md)。
+网页检查输入格式、节点名称与配置引用；客户端仍需验证完整字段及实际连接。
+仓库 CI 使用 1.13.21 / 1.14.0 内核检查生成结果，静态检查通过不等于节点在线。
