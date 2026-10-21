@@ -18,12 +18,23 @@ SING_BOX=/path/to/sing-box-1.14 ./scripts/check.sh
 SING_BOX=/path/to/sing-box-1.14.0 ./scripts/check-android-version.sh 1.14
 SING_BOX=/path/to/sing-box-1.13.21 ./scripts/check-android-version.sh 1.13
 SING_BOX=/path/to/sing-box-1.12.25 ./scripts/check-android-version.sh 1.12
+SING_BOX=/path/to/sing-box-1.14.0 python3 -B scripts/check-render.py
 ```
+
+节点渲染检查也应分别使用 1.13、1.12 检查器运行，CI 覆盖这三个版本。
 
 修改远程规则 URL 或准备发版时，再用对应检查器运行
 `./scripts/check-rule-sets.sh 1.xx`。该检查需要联网，平时由每周 CI 执行。
 
 若修改 `templates/`，先运行 `./scripts/sync-platforms.sh` 更新平台文件。
+
+## PR 与 Issue
+
+修复已有 Issue 时，在 PR 正文写 `Fixes #编号`（例如 `Fixes #1`）。PR 合并到
+默认分支后，GitHub 会自动关闭对应 Issue。跨仓库使用 `Fixes owner/repo#编号`。
+仅讨论或部分处理问题时使用 `Refs #编号`，由后续完整修复关闭。
+
+提交 PR 时说明修复内容和验证结果，并检查关联的 Issue 是否与改动相符。
 
 ## Issue 最少信息
 

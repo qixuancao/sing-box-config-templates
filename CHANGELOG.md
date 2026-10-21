@@ -11,6 +11,9 @@
 
 ### 修复
 
+- 节点生成器支持 `udp_outbounds: []`，可生成纯 TCP 配置；移除空 UDP 策略组，
+  明确拒绝需要代理的 UDP，保留既有国内及局域网直连规则。
+- 拒绝通过相对路径别名、符号链接或硬链接覆盖节点文件与模板。
 - 为 iOS FakeIP / RealIP 添加局域网、链路本地、回环、组播、有限广播和 CGNAT
   排除路由（[#1](https://github.com/qixuancao/sing-box-config-templates/issues/1)）。
   根据源模板自动扣除 TUN、虚拟 DNS 与 FakeIP 网段，不整段排除包含 TUN 的

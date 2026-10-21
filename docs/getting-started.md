@@ -35,7 +35,7 @@ sing-box version
 cp examples/nodes.example.json nodes.json
 ```
 
-编辑 `nodes.json`，把示例出站替换成你自己合法持有的 sing-box 出站。
+编辑 `nodes.json`，把示例出站替换成自己的 sing-box 出站。
 `nodes.json` 已写入 `.gitignore`。字段说明见 [`nodes.md`](nodes.md)。
 
 ## 4. 渲染并检查
