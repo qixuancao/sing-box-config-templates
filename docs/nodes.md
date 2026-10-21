@@ -37,6 +37,17 @@
 如果某些节点只支持 TCP，请显式填写 `udp_outbounds`。否则自动选择器可能把
 QUIC、语音或 DNS 流量送到不支持 UDP 的节点。
 
+全部节点都只支持 TCP 时，使用 `"udp_outbounds": []`。生成器会移除 `udp-auto`
+及其选择项，将需要代理的 UDP 改为明确拒绝；国内和局域网已有的 UDP 直连规则
+仍然生效。`udp-first` 此时改用 `auto`。常见 HTTPS 可以回退到 TCP，依赖 UDP
+的游戏和通话需要另加支持 UDP 的节点。
+
+Naive 默认使用 HTTP/2 承载 TCP；配置 `udp_over_tcp` 还需要服务端支持对应协议，
+不能仅凭节点类型或启用 QUIC 就把它列入 `udp_outbounds`。Naive 从 1.13 起提供，
+应使用支持该出站的构建；官方 Linux / Windows purego 发行包还需保留随包的
+Cronet 库。详见 [Naive 官方文档](https://sing-box.sagernet.org/configuration/outbound/naive/)
+和 [UDP over TCP](https://sing-box.sagernet.org/configuration/shared/udp-over-tcp/)。
+
 ## 保留 tag
 
 节点不能使用这些内部 tag：
@@ -45,8 +56,7 @@ QUIC、语音或 DNS 流量送到不支持 UDP 的节点。
 select auto udp-auto streaming ai telegram microsoft apple google github direct GLOBAL
 ```
 
-脚本遇到重复 tag、保留 tag、空数组或不存在的 UDP tag 会直接退出，不会生成
-一份半坏配置。
+脚本遇到重复 tag、保留 tag、空的 `outbounds` 或不存在的 UDP tag 会直接退出。
 
 ## 订阅与节点文件不是一回事
 

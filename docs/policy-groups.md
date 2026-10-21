@@ -45,6 +45,9 @@
 UDP 规则放在服务规则之前是有意的：它保证 QUIC、语音等流量只使用你在
 `udp_outbounds` 中确认过的节点。服务策略组主要决定常规 TCP / HTTPS 流量。
 
+若 `udp_outbounds` 显式设为 `[]`，生成配置会移除 `udp-auto` 和相关选择项，
+将第 5 步改为拒绝。国内与私有地址的 UDP 继续按前面的规则直连。
+
 ## 远程规则集
 
 规则通过 [MetaCubeX/meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat)

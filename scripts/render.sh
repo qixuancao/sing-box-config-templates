@@ -28,7 +28,7 @@ command -v jq >/dev/null 2>&1 || {
   printf 'error: node file not found: %s\n' "$nodes_file" >&2
   exit 1
 }
-[[ "$output" != "$template" && "$output" != "$nodes_file" ]] || {
+[[ ! "$output" -ef "$template" && ! "$output" -ef "$nodes_file" ]] || {
   printf '%s\n' 'error: output must not overwrite an input file' >&2
   exit 1
 }
@@ -55,7 +55,7 @@ jq -e --argjson reserved "$reserved" '
   and ([.outbounds[].tag] as $tags | all($tags[]; . as $tag | ($reserved | index($tag) | not)))
   and ([.outbounds[].tag] as $tags
        | (.udp_outbounds // $tags) as $udp
-       | ($udp | type == "array" and length > 0)
+       | ($udp | type == "array")
        and all($udp[]; . as $tag | ($tags | index($tag)) != null))
 ' "$nodes_file" >/dev/null || {
   printf '%s\n' 'error: invalid nodes file, duplicate/reserved tag, or invalid udp_outbounds' >&2
@@ -76,6 +76,22 @@ jq --slurpfile node_doc "$nodes_file" '
   | (.outbounds[] | select(.tag == "auto") | .outbounds) = $all_tags
   | (.outbounds[] | select(.tag == "udp-auto") | .outbounds) = $udp_tags
   | (.outbounds[] | select(.tag == "GLOBAL") | .outbounds) = (["select", "auto", "udp-auto"] + $all_tags + ["direct"])
+  | if ($udp_tags | length) == 0 then
+      .outbounds |= map(select(.tag != "udp-auto"))
+      | .outbounds |= map(
+          if (.type == "selector" or .type == "urltest") then
+            .outbounds |= map(select(. != "udp-auto"))
+            | if .default? == "udp-auto" then .default = "auto" else . end
+          else . end
+        )
+      | .route.rules |= map(
+          if .outbound? == "udp-auto" then
+            del(.outbound) | .action = "reject" | .no_drop = true
+          elif .clash_mode? == "Global" and .outbound? != null then
+            {"clash_mode": "Global", "network": "udp", "action": "reject", "no_drop": true}, .
+          else . end
+        )
+    else . end
 ' "$template" >"$tmp_file"
 
 chmod 600 "$tmp_file"
