@@ -207,4 +207,7 @@ if [[ "$mode" == "--check" ]]; then
     exit 1
   fi
   printf '%s\n' 'Platform profiles are synchronized.'
+  python3 -B "$repo_dir/scripts/sync-web-profiles.py" --check
+else
+  python3 -B "$repo_dir/scripts/sync-web-profiles.py"
 fi

@@ -8,6 +8,9 @@ command -v python3 >/dev/null 2>&1 || {
   exit 1
 }
 
+python3 -B "$repo_dir/scripts/build-pages.py" --check
+python3 -B "$repo_dir/scripts/sync-web-profiles.py" --check
+
 python3 - "$repo_dir" <<'PY'
 import json
 import re
@@ -183,25 +186,32 @@ def check_page(path, *, lang, canonical, other_hreflang):
         print(f"error: {path} JSON-LD must include SoftwareSourceCode and FAQ", file=sys.stderr)
         sys.exit(1)
 
-    # selector: platform -> core -> scenario -> raw/import/render, no credential upload
+    # Browser generator: local input -> maintained preset -> downloadable JSON.
     if info.core_versions != ["1.14", "1.13"]:
         print(f"error: {path} must offer only core versions 1.14 and 1.13", file=sys.stderr)
         sys.exit(1)
-    for need in ("platform", "core", "scenario", "out-raw", "out-uri", "out-cmd"):
+    for need in ("platform", "core", "scenario", "nodes-input", "nodes-file", "generate",
+                 "download-json", "download-nodes", "copy-json", "clear", "json-preview",
+                 "out-path", "out-raw", "out-cmd"):
         if need not in info.select_ids and need not in text:
-            print(f"error: {path} selector missing element: {need}", file=sys.stderr)
+            print(f"error: {path} generator missing element: {need}", file=sys.stderr)
             sys.exit(1)
-    joined_js = "\n".join(info.inline_scripts)
-    for token in ("raw.githubusercontent.com", "sing-box://import-remote-profile", "render.sh"):
+    module = next((s.get("src") for s in info.scripts if s.get("type") == "module"), None)
+    if not module or (path.parent / module).resolve() != (docs / "assets/app.mjs").resolve():
+        print(f"error: {path} must use the shared generator module", file=sys.stderr)
+        sys.exit(1)
+    joined_js = "\n".join(p.read_text() for p in sorted((docs / "assets").rglob("*.mjs")))
+    for token in ("raw.githubusercontent.com", "generate.mjs", "URL.createObjectURL", "anchor.download", "sing-box.json"):
         if token not in joined_js and token not in text:
-            print(f"error: {path} selector output missing: {token}", file=sys.stderr)
+            print(f"error: {path} generator output missing: {token}", file=sys.stderr)
             sys.exit(1)
-    for bad in ("fetch(", "XMLHttpRequest", "navigator.sendBeacon"):
-        if bad in joined_js:
-            print(f"error: {path} selector must be local-only, found {bad}", file=sys.stderr)
+    for bad in (r"\bfetch\s*\(", r"XMLHttpRequest", r"navigator\.sendBeacon",
+                r"\bWebSocket\s*\(", r"\blocalStorage\b", r"\bsessionStorage\b", r"\bindexedDB\b"):
+        if re.search(bad, joined_js):
+            print(f"error: {path} generator must not send or store node input: {bad}", file=sys.stderr)
             sys.exit(1)
-    if re.search(r"<input[^>]+(token|password)[^>]*>", text, re.IGNORECASE):
-        print(f"error: {path} selector must not ask for tokens/passwords", file=sys.stderr)
+    if not meta_ok(**{"http-equiv": "Content-Security-Policy"}) or "connect-src 'none'" not in text:
+        print(f"error: {path} must block runtime network requests with CSP", file=sys.stderr)
         sys.exit(1)
     if "占位" not in text and "placeholder" not in text.lower():
         print(f"error: {path} must clarify Raw JSON is a placeholder", file=sys.stderr)
@@ -211,10 +221,11 @@ def check_page(path, *, lang, canonical, other_hreflang):
     if "skip" not in text.lower() and "skip to" not in text.lower() and "跳到" not in text:
         print(f"error: {path} missing skip link for keyboard users", file=sys.stderr)
         sys.exit(1)
-    if ":focus-visible" not in text and "focus" not in text.lower():
+    styles = "\n".join((path.parent / link["href"]).read_text() for link in info.links if link.get("rel") == "stylesheet")
+    if ":focus-visible" not in styles:
         print(f"error: {path} missing focus style", file=sys.stderr)
         sys.exit(1)
-    if "@media" not in text:
+    if "@media" not in styles:
         print(f"error: {path} missing responsive CSS", file=sys.stderr)
         sys.exit(1)
 
@@ -262,5 +273,5 @@ for info, name in ((zh_info, "zh"), (en_info, "en")):
         print(f"error: {name} page has unexpected site-internal link: {href}", file=sys.stderr)
         sys.exit(1)
 
-print("Pages passed: zh + en SEO, JSON-LD, sitemap, local-only selector, site links.")
+print("Pages passed: zh + en, SEO, local JSON generator, CSP, no node network/storage APIs.")
 PY

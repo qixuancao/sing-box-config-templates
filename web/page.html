@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="$lang">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<title>$title</title>
+<meta name="description" content="$description">
+<link rel="canonical" href="$canonical">
+<link rel="alternate" hreflang="zh-CN" href="https://qixuancao.github.io/sing-box-config-templates/">
+<link rel="alternate" hreflang="en" href="https://qixuancao.github.io/sing-box-config-templates/en/">
+<link rel="alternate" hreflang="x-default" href="https://qixuancao.github.io/sing-box-config-templates/">
+<link rel="sitemap" type="application/xml" href="${prefix}sitemap.xml">
+<link rel="stylesheet" href="${prefix}assets/app.css">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="sing-box config templates">
+<meta property="og:title" content="$title">
+<meta property="og:description" content="$description">
+<meta property="og:url" content="$canonical">
+<meta property="og:locale" content="$locale">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="$title">
+<meta name="twitter:description" content="$description">
+<script type="application/ld+json">$structured_data</script>
+<script type="module" src="${prefix}assets/app.mjs"></script>
+</head>
+<body>
+<a class="skip" href="#generator">$skip</a>
+<header class="site-header"><div class="header-inner">
+<a class="brand" href="$home"><span class="mark" aria-hidden="true">&gt;_</span>sing-box <span class="muted">/ $brand</span></a>
+<nav aria-label="$nav_label"><a href="$zh_href" $zh_current>中文</a><a href="$en_href" $en_current>English</a><a href="https://github.com/qixuancao/sing-box-config-templates">GitHub ↗</a></nav>
+</div></header>
+<main>
+<div class="hero"><p class="eyebrow">SING-BOX CONFIG GENERATOR</p><h1>$heading</h1><p>$intro</p><div class="badges"><span class="badge">$local_badge</span><span class="badge">1.13 / 1.14</span><span class="badge">Android · iOS · macOS · Linux · Windows</span></div></div>
+<noscript><p class="noscript">$noscript</p></noscript>
+<div class="workspace" id="generator">
+<section class="card" aria-labelledby="nodes-heading">
+<h2 id="nodes-heading"><span class="step">1</span>$nodes_heading</h2>
+<div class="toolbar"><label for="nodes-input">$input_label</label><button type="button" class="quiet" id="example">$example_button</button></div>
+<textarea id="nodes-input" rows="10" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="input-help" placeholder="$placeholder"></textarea>
+<p class="help" id="input-help">$input_help</p>
+<div class="file-row"><label for="nodes-file">$file_label</label><input type="file" id="nodes-file" accept=".json,.txt,application/json,text/plain"></div>
+<p class="privacy-note">$privacy_note</p>
+<ul class="node-list" id="node-list" aria-label="$nodes_list_label"></ul>
+</section>
+<div class="stack">
+<section class="card" aria-labelledby="device-heading">
+<h2 id="device-heading"><span class="step">2</span>$device_heading</h2>
+<label for="platform">$platform_label</label>
+<select id="platform"><option value="android">Android / SFA</option><option value="ios">iOS / iPadOS / SFI</option><option value="macos">macOS / SFM</option><option value="linux">Linux</option><option value="windows">Windows</option></select>
+<p class="scenario-note" id="scenario-desc"></p>
+<details id="advanced"><summary>$advanced_label</summary><div class="settings">
+<div><label for="core">$core_label</label><select id="core"><option value="1.14">1.14.x</option><option value="1.13">1.13.x</option></select><p class="help">$core_help</p></div>
+<div><label for="scenario">$scenario_label</label><select id="scenario"></select></div>
+</div></details>
+<div class="actions"><button type="button" class="primary" id="generate">$generate_button</button><button type="button" id="clear">$clear_button</button></div>
+<p id="status" class="status" role="status" aria-live="polite"></p>
+</section>
+<section class="card" aria-labelledby="download-heading">
+<h2 id="download-heading"><span class="step">3</span>$download_heading</h2>
+<p class="result-empty" id="result-empty">$empty_result</p>
+<div class="result-summary" id="result-summary"></div>
+<button type="button" class="primary wide" id="download-json" disabled>$download_button</button>
+<div class="actions"><button type="button" id="copy-json" disabled>$copy_button</button><button type="button" id="download-nodes" disabled>$save_nodes_button</button></div>
+<p class="import-help" id="import-help"></p>
+<p class="hint" id="warnings" hidden></p>
+<details><summary>$preview_label</summary><label for="json-preview" class="help">$preview_help</label><textarea id="json-preview" class="output-preview" rows="10" readonly spellcheck="false" autocomplete="off"></textarea></details>
+</section>
+</div>
+</div>
+<section class="guides" aria-labelledby="guides-heading">
+<h2 id="guides-heading">$guides_heading</h2>
+<div class="guide-grid">
+<article class="guide"><h3>$first_heading</h3><ol><li>$first_1</li><li>$first_2</li><li>$first_3</li></ol><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/getting-started.md">$full_guide ↗</a></p></article>
+<article class="guide"><h3>$update_heading</h3><p>$update_body</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/update-nodes.md">$update_link ↗</a></p></article>
+<article class="guide"><h3>$trouble_heading</h3><p>$trouble_body</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/troubleshooting.md">$trouble_link ↗</a></p></article>
+</div>
+<details class="technical"><summary>$technical_heading</summary><p class="help">$technical_help</p>
+<label for="out-path">$path_label</label><input id="out-path" type="text" readonly>
+<label for="out-raw">$raw_label</label><input id="out-raw" type="text" readonly>
+<label for="out-cmd">$cmd_label</label><textarea id="out-cmd" rows="3" readonly spellcheck="false"></textarea>
+<p class="help"><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/architecture.md">$modules_link ↗</a></p>
+</details>
+</section>
+</main>
+<footer class="site-footer"><p>$footer</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/PRIVACY.md">$privacy_link</a><a href="https://sing-box.sagernet.org/">$official_link</a><a href="${prefix}sitemap.xml">Sitemap</a></p></footer>
+</body>
+</html>

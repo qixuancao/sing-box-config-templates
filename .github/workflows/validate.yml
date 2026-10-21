@@ -19,6 +19,10 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+
       - name: Install validation dependencies
         run: sudo apt-get update && sudo apt-get install -y jq ripgrep python3
 
@@ -54,6 +58,12 @@ jobs:
       - name: Validate TCP-only and mixed node rendering
         run: python3 -B scripts/check-render.py
 
+      - name: Validate shared generator and five link protocols
+        run: node --test tests/generator.test.mjs
+
+      - name: Test browser JSON downloads and local-only generation
+        run: node scripts/check-browser.mjs
+
   legacy-profiles:
     runs-on: ubuntu-latest
     strategy:
@@ -68,6 +78,10 @@ jobs:
       SING_BOX_SHA256: ${{ matrix.sing_box_sha256 }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
 
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
@@ -88,6 +102,9 @@ jobs:
 
       - name: Validate TCP-only and mixed node rendering
         run: python3 -B scripts/check-render.py
+
+      - name: Validate generated link profiles on the 1.13 core
+        run: node --test tests/generator.test.mjs
 
   rule-set-compatibility:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

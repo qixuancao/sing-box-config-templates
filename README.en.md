@@ -1,6 +1,6 @@
 # sing-box configuration tools
 
-[中文](README.md) · [Configuration selector](https://qixuancao.github.io/sing-box-config-templates/en/) · [Changelog](CHANGELOG.md)
+[中文](README.md) · [Generate configuration](https://qixuancao.github.io/sing-box-config-templates/en/) · [Changelog](CHANGELOG.md)
 
 Generate sing-box configurations for Android, iOS, macOS, Linux, and Windows, with domestic/international routing, service policy groups, FakeIP / RealIP DNS, TUN, and local HTTP/SOCKS proxy modes.
 
@@ -9,24 +9,38 @@ Generate sing-box configurations for Android, iOS, macOS, Linux, and Windows, wi
 - Merge your nodes locally into an importable JSON configuration.
 - Use versioned profiles for sing-box 1.13 and 1.14 on every platform.
 
-## Quick start
+## Generate in your browser
 
-Requires Bash, `jq`, and sing-box.
+Open the [configuration generator](https://qixuancao.github.io/sing-box-config-templates/en/):
+
+1. Paste node share links or read a nodes JSON file.
+2. Choose a device. Core version and other scenarios are in Advanced.
+3. Generate and download `sing-box.json`, then import it in your client.
+
+Supports Naive HTTPS, Hysteria2, Trojan, Shadowsocks and VLESS links. Parsing, composition
+and downloads run in your browser; nodes are not uploaded or automatically stored. Save
+`nodes.json` to reuse your nodes for the next update.
+
+## Generate with the CLI
+
+Requires Node.js 22+; running and core validation require sing-box.
 
 ```bash
 git clone https://github.com/qixuancao/sing-box-config-templates.git
 cd sing-box-config-templates
-cp examples/nodes.example.json nodes.json
 ```
 
-Edit `nodes.json` with your sing-box outbounds, then generate a configuration:
+Save share links one per line in `nodes.txt`, or use [nodes JSON](docs/nodes.md):
 
 ```bash
-./scripts/render.sh platforms/android/1.14/fakeip.json nodes.json generated/android.json
-sing-box check -c generated/android.json
+node scripts/generate.mjs --platform android --core 1.14 \
+  --input nodes.txt --output generated/sing-box.json
+sing-box check -c generated/sing-box.json
 ```
 
-Import `generated/android.json` in your client. `nodes.json` and `generated/` are Git-ignored; generated files use mode `0600`. See the [node format](docs/nodes.md).
+The browser and CLI share one parser and renderer. `nodes.txt`, `nodes.json` and `generated/`
+are Git-ignored. CLI output files use mode `0600`. The existing
+`render.sh TEMPLATE NODES OUTPUT` interface remains available and now calls the same Node.js engine.
 
 ## Choose a platform
 
@@ -61,8 +75,14 @@ sing-box run -c generated/linux.json
 | `battery-saver.json` | Less frequent probes and quieter logs |
 | `udp-first.json` | Gaming and voice; prefer designated UDP nodes |
 
+## Customize and reuse
+
+Node protocols, config composition, platform adaptation and browser interactions are independent
+modules. Supply a private template for personal policies, or call the dependency-free JavaScript API
+from another project. See [modules and customization](docs/architecture.md) for entry points.
+
 ## Documentation
 
-[Getting started](docs/getting-started.md) · [Policy groups](docs/policy-groups.md) · [Compatibility](docs/compatibility.md) · [Troubleshooting](docs/troubleshooting.md) · [Raw links](SUBSCRIPTIONS.md) · [Contributing](CONTRIBUTING.md)
+[Getting started](docs/getting-started.md) · [Update nodes](docs/update-nodes.md) · [Policy groups](docs/policy-groups.md) · [Compatibility](docs/compatibility.md) · [Troubleshooting](docs/troubleshooting.md) · [Raw links](SUBSCRIPTIONS.md) · [Contributing](CONTRIBUTING.md)
 
 Rule sets come from [MetaCubeX/meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat); policy grouping takes inspiration from [ACL4SSR](https://github.com/ACL4SSR/ACL4SSR). Code and configurations use the [MIT license](LICENSE). See [THIRD_PARTY.md](THIRD_PARTY.md) for rule-set licenses.
