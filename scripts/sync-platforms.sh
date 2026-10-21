@@ -26,6 +26,7 @@ cleanup() {
 trap cleanup EXIT
 
 changed=0
+expected_outputs=()
 
 emit() {
   local source=$1
@@ -33,6 +34,7 @@ emit() {
   local filter=$3
   local generated="$tmp_dir/$relative_output"
   local destination="$repo_dir/$relative_output"
+  expected_outputs+=("$relative_output")
 
   mkdir -p -- "$(dirname -- "$generated")"
   jq "$filter" "$repo_dir/$source" >"$generated"
@@ -80,8 +82,9 @@ android_udp_first_filter='
   del(.inbounds[0].strict_route, .route.auto_detect_interface)
   | (.outbounds[] | select(.tag == "select") | .default) = "udp-auto"
 '
-legacy_android_filter='
+legacy_filter='
   del(."$schema", .http_clients, .route.default_http_client)
+  | .inbounds |= map(del(.dns_mode, .dns_address))
   | .route.rule_set |= map(
       del(.http_client)
       | .download_detour = "direct"
@@ -93,6 +96,19 @@ legacy_android_filter='
 '
 apple_filter='del(.inbounds[0].strict_route, .route.auto_detect_interface)'
 macos_filter='.route.auto_detect_interface = true | del(.inbounds[0].strict_route)'
+
+emit_versioned() {
+  local platform=$1 variant=$2 source=$3 platform_filter=$4
+  local version version_filter
+  for version in 1.14 1.13; do
+    version_filter='.'
+    if [[ "$version" == "1.13" ]]; then
+      version_filter=$legacy_filter
+    fi
+    emit "$source" "platforms/$platform/$version/$variant.json" \
+      "$platform_filter | $version_filter | .experimental.cache_file.cache_id = \"$platform-$version-$variant\""
+  done
+}
 
 emit_android_variant() {
   local variant=$1
@@ -126,18 +142,7 @@ emit_android_variant() {
       ;;
   esac
 
-  # The top-level path is the stable alias for the current core line.
-  emit "$source" "platforms/android/$variant.json" \
-    "$variant_filter | .experimental.cache_file.cache_id = \"android-$variant\""
-
-  emit "$source" "platforms/android/1.14/$variant.json" \
-    "$variant_filter | .experimental.cache_file.cache_id = \"android-1.14-$variant\""
-
-  emit "$source" "platforms/android/1.13/$variant.json" \
-    "$variant_filter | $legacy_android_filter | .experimental.cache_file.cache_id = \"android-1.13-$variant\""
-
-  emit "$source" "platforms/android/1.12/$variant.json" \
-    "$variant_filter | $legacy_android_filter | .experimental.cache_file.cache_id = \"android-1.12-$variant\""
+  emit_versioned android "$variant" "$source" "$variant_filter"
 }
 
 for variant in \
@@ -149,10 +154,9 @@ done
 for variant in fakeip realip; do
   ios_excludes=$(python3 "$repo_dir/scripts/ios_route_excludes.py" \
     "$repo_dir/templates/$variant.json")
-  emit "templates/$variant.json" "platforms/ios/$variant.json" \
-    "$apple_filter | .inbounds[0].route_exclude_address = $ios_excludes | .experimental.cache_file.cache_id = \"ios-$variant\""
-  emit "templates/$variant.json" "platforms/macos/$variant.json" \
-    "$macos_filter | .experimental.cache_file.cache_id = \"macos-$variant\""
+  emit_versioned ios "$variant" "templates/$variant.json" \
+    "$apple_filter | .inbounds[0].route_exclude_address = $ios_excludes"
+  emit_versioned macos "$variant" "templates/$variant.json" "$macos_filter"
 done
 
 mixed_filter='
@@ -166,28 +170,36 @@ mixed_filter='
   | .route.auto_detect_interface = true
 '
 
-emit "templates/realip.json" "platforms/macos/mixed.json" \
-  "$mixed_filter | .experimental.cache_file.cache_id = \"macos-mixed\""
-emit "templates/realip.json" "platforms/linux/mixed.json" \
-  "$mixed_filter | .experimental.cache_file.cache_id = \"linux-mixed\""
-emit "templates/realip.json" "platforms/windows/mixed.json" \
-  "$mixed_filter | .experimental.cache_file.cache_id = \"windows-mixed\""
+for platform in macos linux windows; do
+  emit_versioned "$platform" mixed "templates/realip.json" "$mixed_filter"
+done
 
-emit "templates/realip.json" "platforms/linux/tun.json" '
+emit_versioned linux tun "templates/realip.json" '
   .inbounds[0].strict_route = true
   | .inbounds[0].auto_redirect = true
   | .inbounds[0].dns_mode = "hijack"
   | .route.auto_detect_interface = true
-  | .experimental.cache_file.cache_id = "linux-tun"
 '
 
-emit "templates/realip.json" "platforms/windows/tun.json" '
+emit_versioned windows tun "templates/realip.json" '
   .inbounds[0].strict_route = true
   | del(.inbounds[0].auto_redirect)
   | .inbounds[0].dns_mode = "hijack"
   | .route.auto_detect_interface = true
-  | .experimental.cache_file.cache_id = "windows-tun"
 '
+
+# Refuse aliases, retired versions, and stray profiles instead of silently
+# publishing a configuration outside the maintained platform/version matrix.
+printf '%s\n' "${expected_outputs[@]}" | LC_ALL=C sort >"$tmp_dir/expected-paths"
+while IFS= read -r path; do
+  printf '%s\n' "${path#"$repo_dir/"}"
+done < <(find "$repo_dir/platforms" -type f -name '*.json' -print) \
+  | LC_ALL=C sort >"$tmp_dir/actual-paths"
+if ! cmp -s "$tmp_dir/expected-paths" "$tmp_dir/actual-paths"; then
+  printf '%s\n' 'error: platform JSON files must live in the maintained 1.13/1.14 directories:' >&2
+  diff -u "$tmp_dir/expected-paths" "$tmp_dir/actual-paths" >&2 || true
+  exit 1
+fi
 
 if [[ "$mode" == "--check" ]]; then
   if (( changed != 0 )); then

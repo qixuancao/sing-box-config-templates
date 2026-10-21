@@ -41,6 +41,8 @@ class PageInfo(HTMLParser):
         self.lang = ""
         self.anchors = []
         self.select_ids = set()
+        self.current_select = None
+        self.core_versions = []
         self.has_viewport = False
 
     def handle_starttag(self, tag, attrs):
@@ -65,10 +67,16 @@ class PageInfo(HTMLParser):
         elif tag in ("select", "input", "textarea", "button"):
             if "id" in a:
                 self.select_ids.add(a["id"])
+            if tag == "select":
+                self.current_select = a.get("id")
+        elif tag == "option" and self.current_select == "core":
+            self.core_versions.append(a.get("value"))
 
     def handle_endtag(self, tag):
         if tag == "title":
             self.in_title = False
+        elif tag == "select":
+            self.current_select = None
         elif tag == "script" and self._cur_script is not None:
             self.inline_scripts.append("".join(self._cur_script))
             self._cur_script = None
@@ -176,6 +184,9 @@ def check_page(path, *, lang, canonical, other_hreflang):
         sys.exit(1)
 
     # selector: platform -> core -> scenario -> raw/import/render, no credential upload
+    if info.core_versions != ["1.14", "1.13"]:
+        print(f"error: {path} must offer only core versions 1.14 and 1.13", file=sys.stderr)
+        sys.exit(1)
     for need in ("platform", "core", "scenario", "out-raw", "out-uri", "out-cmd"):
         if need not in info.select_ids and need not in text:
             print(f"error: {path} selector missing element: {need}", file=sys.stderr)

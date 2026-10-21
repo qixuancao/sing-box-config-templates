@@ -26,9 +26,10 @@ def networks(values):
 
 class IOSRoutesTest(unittest.TestCase):
     def ios_profiles(self):
-        for variant in ("fakeip", "realip"):
-            profile = read_profile(f"platforms/ios/{variant}.json")
-            yield variant, profile, networks(profile["inbounds"][0].get("route_exclude_address", []))
+        for line in ("1.14", "1.13"):
+            for variant in ("fakeip", "realip"):
+                profile = read_profile(f"platforms/ios/{line}/{variant}.json")
+                yield f"{line}/{variant}", profile, networks(profile["inbounds"][0].get("route_exclude_address", []))
 
     def assert_kept(self, exclusions, reserved):
         for route in exclusions:

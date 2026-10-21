@@ -21,9 +21,9 @@ class RenderTest(unittest.TestCase):
         version = subprocess.run(
             [SING_BOX, "version"], check=True, capture_output=True, text=True
         ).stdout
-        match = re.search(r"sing-box version (1\.(?:12|13|14))\.", version)
+        match = re.search(r"sing-box version (1\.(?:13|14))\.", version)
         if match is None:
-            raise ValueError("Use a sing-box 1.12, 1.13, or 1.14 checker")
+            raise ValueError("Use a sing-box 1.13 or 1.14 checker")
         cls.line = match[1]
         cls.example = json.loads((ROOT / "examples/nodes.example.json").read_text())
         cls.tcp_node = {
@@ -55,10 +55,9 @@ class RenderTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_tcp_only_profiles_keep_direct_routes_and_reject_proxy_udp(self):
-        profiles = sorted((ROOT / f"platforms/android/{self.line}").glob("*.json"))
+        profiles = sorted((ROOT / "platforms").glob(f"*/{self.line}/*.json"))
         if self.line == "1.14":
             profiles += sorted((ROOT / "templates").glob("*.json"))
-            profiles += sorted((ROOT / "platforms").glob("*/*.json"))
         for profile in profiles:
             with self.subTest(profile=str(profile.relative_to(ROOT))):
                 result, output = self.render(

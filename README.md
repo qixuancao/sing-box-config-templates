@@ -7,7 +7,7 @@
 - 按流媒体、AI、Telegram、Microsoft、Apple、Google、GitHub 选择出口；
 - 手动选节点或通过 URLTest 按延迟自动选择；
 - 在本地合并节点，生成可直接导入客户端的 JSON；
-- Android 支持 1.12、1.13、1.14 三条内核版本线。
+- 所有平台按 1.13、1.14 两条内核版本线维护。
 
 ## 快速开始
 
@@ -22,7 +22,7 @@ cp examples/nodes.example.json nodes.json
 编辑 `nodes.json`，填入自己的 sing-box 出站，然后生成配置：
 
 ```bash
-./scripts/render.sh platforms/android/fakeip.json nodes.json generated/android.json
+./scripts/render.sh platforms/android/1.14/fakeip.json nodes.json generated/android.json
 sing-box check -c generated/android.json
 ```
 
@@ -32,18 +32,18 @@ sing-box check -c generated/android.json
 
 | 平台 | 配置 | 说明 |
 | --- | --- | --- |
-| Android / SFA | [FakeIP](platforms/android/fakeip.json) · [RealIP](platforms/android/realip.json) | [八种场景与版本选择](platforms/android/README.md) |
-| iOS / SFI | [FakeIP](platforms/ios/fakeip.json) · [RealIP](platforms/ios/realip.json) | [导入与局域网访问](platforms/ios/README.md) |
-| macOS / SFM | [FakeIP](platforms/macos/fakeip.json) · [RealIP](platforms/macos/realip.json) · [mixed](platforms/macos/mixed.json) | [使用说明](platforms/macos/README.md) |
-| Linux | [TUN](platforms/linux/tun.json) · [mixed](platforms/linux/mixed.json) | [使用说明](platforms/linux/README.md) |
-| Windows | [TUN](platforms/windows/tun.json) · [mixed](platforms/windows/mixed.json) | [使用说明](platforms/windows/README.md) |
+| Android / SFA | [FakeIP](platforms/android/1.14/fakeip.json) · [RealIP](platforms/android/1.14/realip.json) | [八种场景与版本选择](platforms/android/README.md) |
+| iOS / SFI | [FakeIP](platforms/ios/1.14/fakeip.json) · [RealIP](platforms/ios/1.14/realip.json) | [导入与局域网访问](platforms/ios/README.md) |
+| macOS / SFM | [FakeIP](platforms/macos/1.14/fakeip.json) · [RealIP](platforms/macos/1.14/realip.json) · [mixed](platforms/macos/1.14/mixed.json) | [使用说明](platforms/macos/README.md) |
+| Linux | [TUN](platforms/linux/1.14/tun.json) · [mixed](platforms/linux/1.14/mixed.json) | [使用说明](platforms/linux/README.md) |
+| Windows | [TUN](platforms/windows/1.14/tun.json) · [mixed](platforms/windows/1.14/mixed.json) | [使用说明](platforms/windows/README.md) |
 
-将生成命令的第一个参数换成对应配置路径即可。桌面与 Apple 配置使用 **sing-box 1.14.x**；Android 旧版内核使用 [1.13](platforms/android/1.13/) 或 [1.12](platforms/android/1.12/) 目录。
+所有平台都先选择内核版本，再选择配置：`platforms/<平台>/1.14/` 或 `platforms/<平台>/1.13/`。上表链接指向 1.14；使用 1.13 内核时，换成同平台 `1.13/` 目录中的同名文件。
 
 Linux / Windows 可先用 `mixed.json`，运行后将应用代理设为 `127.0.0.1:2080`：
 
 ```bash
-./scripts/render.sh platforms/linux/mixed.json nodes.json generated/linux.json
+./scripts/render.sh platforms/linux/1.14/mixed.json nodes.json generated/linux.json
 sing-box check -c generated/linux.json
 sing-box run -c generated/linux.json
 ```

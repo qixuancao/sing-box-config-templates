@@ -2,7 +2,7 @@
 
 ## 1. 安装客户端
 
-- Android：官方 SFA，先在“关于”页确认 sing-box 内核是 1.14 / 1.13 / 1.12 中的哪一条。
+- Android：官方 SFA，先在“关于”页确认 sing-box 内核是 1.14 / 1.13 中的哪一条。
 - iOS / iPadOS / tvOS：自 1.14 起请安装 App Store 新应用 sing-box MT（旧 VT 用户需重新安装），见 [sing-box v1.14.0](https://github.com/SagerNet/sing-box/releases/tag/v1.14.0)。
 - macOS：SFM standalone（不再从 macOS App Store 提供，不自动继承旧配置），或命令行 `sing-box`。
 - Linux / Windows：官方命令行版或系统包管理器；图形界面可选官方 [sing-box for Desktop](https://sing-box.sagernet.org/clients/desktop/)，命令行继续保留。
@@ -10,8 +10,8 @@
 下载入口优先使用 [SagerNet 官方项目](https://github.com/SagerNet/sing-box)
 及其文档，不要从不明网盘安装改包。
 
-桌面和 Apple 配置以 sing-box **1.14.x** 为目标；Android 另有 1.14、1.13、
-1.12 三条版本化配置。先确认实际内核：
+所有平台均维护 sing-box **1.14.x / 1.13.x** 两条版本线。先确认实际内核，
+再选择 `platforms/<平台>/<内核版本>/` 中的配置：
 
 ```bash
 sing-box version
@@ -21,7 +21,7 @@ sing-box version
 
 第一次使用时：
 
-1. Android 先按内核选择 `platforms/android/1.xx/`，再从 `fakeip.json` 开始；
+1. 所有平台先按内核选择 `1.14/` 或 `1.13/` 目录；Android 从 `fakeip.json` 开始；
 2. Apple 图形客户端先用本平台的 `fakeip.json`；
 3. Linux / Windows 命令行先用 `mixed.json`，确认节点可用；
 4. 只有确实需要全局透明代理时，再启用桌面系统的 `tun.json`。
@@ -44,7 +44,7 @@ Android 示例：
 
 ```bash
 ./scripts/render.sh \
-  platforms/android/fakeip.json \
+  platforms/android/1.14/fakeip.json \
   nodes.json \
   generated/android.json
 sing-box check -c generated/android.json
@@ -64,7 +64,7 @@ Linux 无 root 示例：
 
 ```bash
 ./scripts/render.sh \
-  platforms/linux/mixed.json \
+  platforms/linux/1.14/mixed.json \
   nodes.json \
   generated/linux-mixed.json
 sing-box check -c generated/linux-mixed.json
@@ -91,7 +91,7 @@ sing-box run -c generated/linux-mixed.json
 
 ```bash
 git pull --ff-only
-./scripts/render.sh platforms/android/fakeip.json nodes.json generated/android.json
+./scripts/render.sh platforms/android/1.14/fakeip.json nodes.json generated/android.json
 sing-box check -c generated/android.json
 ```
 

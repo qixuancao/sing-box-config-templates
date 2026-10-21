@@ -67,7 +67,9 @@
       ],
       "mtu": 9000,
       "auto_route": true,
-      "stack": "system"
+      "stack": "system",
+      "strict_route": true,
+      "auto_redirect": true
     }
   ],
   "outbounds": [
@@ -482,7 +484,8 @@
     "final": "select",
     "default_domain_resolver": {
       "server": "direct-dns"
-    }
+    },
+    "auto_detect_interface": true
   },
   "experimental": {
     "clash_api": {
@@ -490,7 +493,7 @@
     },
     "cache_file": {
       "enabled": true,
-      "cache_id": "android-1.12-realip"
+      "cache_id": "linux-1.13-tun"
     }
   }
 }

@@ -22,11 +22,6 @@
         "tag": "proxy-dns",
         "server": "8.8.8.8",
         "detour": "select"
-      },
-      {
-        "type": "fakeip",
-        "tag": "fakeip",
-        "inet4_range": "198.18.0.0/15"
       }
     ],
     "rules": [
@@ -56,11 +51,8 @@
       },
       {
         "rule_set": "geolocation-!cn",
-        "query_type": [
-          "A"
-        ],
         "action": "route",
-        "server": "fakeip"
+        "server": "proxy-dns"
       }
     ],
     "final": "proxy-dns",
@@ -68,14 +60,10 @@
   },
   "inbounds": [
     {
-      "type": "tun",
-      "tag": "tun-in",
-      "address": [
-        "172.19.0.1/30"
-      ],
-      "mtu": 9000,
-      "auto_route": true,
-      "stack": "system"
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 2080
     }
   ],
   "outbounds": [
@@ -229,19 +217,6 @@
     "rules": [
       {
         "action": "sniff"
-      },
-      {
-        "type": "logical",
-        "mode": "or",
-        "rules": [
-          {
-            "protocol": "dns"
-          },
-          {
-            "port": 53
-          }
-        ],
-        "action": "hijack-dns"
       },
       {
         "action": "resolve",
@@ -490,7 +465,8 @@
     "final": "select",
     "default_domain_resolver": {
       "server": "direct-dns"
-    }
+    },
+    "auto_detect_interface": true
   },
   "experimental": {
     "clash_api": {
@@ -498,8 +474,7 @@
     },
     "cache_file": {
       "enabled": true,
-      "cache_id": "android-1.12-fakeip",
-      "store_fakeip": true
+      "cache_id": "macos-1.13-mixed"
     }
   }
 }

@@ -23,6 +23,11 @@
         "tag": "proxy-dns",
         "server": "8.8.8.8",
         "detour": "select"
+      },
+      {
+        "type": "fakeip",
+        "tag": "fakeip",
+        "inet4_range": "198.18.0.0/15"
       }
     ],
     "rules": [
@@ -52,8 +57,30 @@
       },
       {
         "rule_set": "geolocation-!cn",
+        "query_type": [
+          "A"
+        ],
         "action": "route",
-        "server": "proxy-dns"
+        "server": "fakeip"
+      },
+      {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": "geolocation-!cn",
+            "invert": true
+          }
+        ],
+        "action": "evaluate",
+        "server": "proxy-dns",
+        "tag": "cn-probe",
+        "client_subnet": "114.114.114.0/24"
+      },
+      {
+        "match_response": "cn-probe",
+        "rule_set": "geoip-cn",
+        "action": "respond"
       }
     ],
     "final": "proxy-dns",
@@ -68,38 +95,7 @@
       ],
       "mtu": 9000,
       "auto_route": true,
-      "stack": "system",
-      "route_exclude_address": [
-        "10.0.0.0/8",
-        "100.64.0.0/10",
-        "127.0.0.0/8",
-        "169.254.0.0/16",
-        "172.16.0.0/15",
-        "172.18.0.0/16",
-        "172.19.0.4/30",
-        "172.19.0.8/29",
-        "172.19.0.16/28",
-        "172.19.0.32/27",
-        "172.19.0.64/26",
-        "172.19.0.128/25",
-        "172.19.1.0/24",
-        "172.19.2.0/23",
-        "172.19.4.0/22",
-        "172.19.8.0/21",
-        "172.19.16.0/20",
-        "172.19.32.0/19",
-        "172.19.64.0/18",
-        "172.19.128.0/17",
-        "172.20.0.0/14",
-        "172.24.0.0/13",
-        "192.168.0.0/16",
-        "224.0.0.0/4",
-        "255.255.255.255/32",
-        "::1/128",
-        "fc00::/7",
-        "fe80::/10",
-        "ff00::/8"
-      ]
+      "stack": "system"
     }
   ],
   "outbounds": [
@@ -515,7 +511,8 @@
     "default_domain_resolver": {
       "server": "direct-dns"
     },
-    "default_http_client": "rule-set-direct"
+    "default_http_client": "rule-set-direct",
+    "auto_detect_interface": true
   },
   "experimental": {
     "clash_api": {
@@ -523,7 +520,8 @@
     },
     "cache_file": {
       "enabled": true,
-      "cache_id": "ios-realip"
+      "cache_id": "macos-1.14-fakeip",
+      "store_fakeip": true
     }
   },
   "http_clients": [

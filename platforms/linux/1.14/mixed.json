@@ -61,14 +61,10 @@
   },
   "inbounds": [
     {
-      "type": "tun",
-      "tag": "tun-in",
-      "address": [
-        "172.19.0.1/30"
-      ],
-      "mtu": 9000,
-      "auto_route": true,
-      "stack": "system"
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 2080
     }
   ],
   "outbounds": [
@@ -222,19 +218,6 @@
     "rules": [
       {
         "action": "sniff"
-      },
-      {
-        "type": "logical",
-        "mode": "or",
-        "rules": [
-          {
-            "protocol": "dns"
-          },
-          {
-            "port": 53
-          }
-        ],
-        "action": "hijack-dns"
       },
       {
         "action": "resolve",
@@ -493,7 +476,7 @@
     },
     "cache_file": {
       "enabled": true,
-      "cache_id": "macos-realip"
+      "cache_id": "linux-1.14-mixed"
     }
   },
   "http_clients": [

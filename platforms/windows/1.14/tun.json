@@ -23,11 +23,6 @@
         "tag": "proxy-dns",
         "server": "8.8.8.8",
         "detour": "select"
-      },
-      {
-        "type": "fakeip",
-        "tag": "fakeip",
-        "inet4_range": "198.18.0.0/15"
       }
     ],
     "rules": [
@@ -57,30 +52,8 @@
       },
       {
         "rule_set": "geolocation-!cn",
-        "query_type": [
-          "A"
-        ],
         "action": "route",
-        "server": "fakeip"
-      },
-      {
-        "type": "logical",
-        "mode": "and",
-        "rules": [
-          {
-            "rule_set": "geolocation-!cn",
-            "invert": true
-          }
-        ],
-        "action": "evaluate",
-        "server": "proxy-dns",
-        "tag": "cn-probe",
-        "client_subnet": "114.114.114.0/24"
-      },
-      {
-        "match_response": "cn-probe",
-        "rule_set": "geoip-cn",
-        "action": "respond"
+        "server": "proxy-dns"
       }
     ],
     "final": "proxy-dns",
@@ -95,7 +68,9 @@
       ],
       "mtu": 9000,
       "auto_route": true,
-      "stack": "system"
+      "stack": "system",
+      "strict_route": true,
+      "dns_mode": "hijack"
     }
   ],
   "outbounds": [
@@ -511,7 +486,8 @@
     "default_domain_resolver": {
       "server": "direct-dns"
     },
-    "default_http_client": "rule-set-direct"
+    "default_http_client": "rule-set-direct",
+    "auto_detect_interface": true
   },
   "experimental": {
     "clash_api": {
@@ -519,8 +495,7 @@
     },
     "cache_file": {
       "enabled": true,
-      "cache_id": "android-fakeip",
-      "store_fakeip": true
+      "cache_id": "windows-1.14-tun"
     }
   },
   "http_clients": [

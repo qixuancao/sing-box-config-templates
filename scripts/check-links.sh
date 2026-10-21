@@ -41,8 +41,8 @@ done < <(
     "$subscriptions"
 )
 
-[[ ${#import_uris[@]} -eq 36 ]] || {
-  printf 'error: expected 36 import URIs, found %d\n' "${#import_uris[@]}" >&2
+[[ ${#import_uris[@]} -eq 24 ]] || {
+  printf 'error: expected 24 import URIs, found %d\n' "${#import_uris[@]}" >&2
   exit 1
 }
 
@@ -58,17 +58,19 @@ for uri in "${import_uris[@]}"; do
   }
 done
 
-for version_line in 1.14 1.13 1.12; do
-  for variant in \
-    fakeip realip tcp-stable privacy-strict \
-    dual-stack no-adblock battery-saver udp-first; do
-    expected="${raw_prefix}platforms/android/${version_line}/${variant}.json"
-    rg --fixed-strings --quiet "$expected" "$subscriptions" || {
-      printf 'error: missing versioned subscription URL: %s\n' "$expected" >&2
-      exit 1
-    }
-  done
+# Every published platform profile must have an explicit versioned Raw URL.
+for profile in "$repo_dir"/platforms/*/1.{13,14}/*.json; do
+  expected="${raw_prefix}${profile#"$repo_dir/"}"
+  rg --fixed-strings --quiet "$expected" "$subscriptions" || {
+    printf 'error: missing versioned subscription URL: %s\n' "$expected" >&2
+    exit 1
+  }
 done
+
+[[ ${#raw_urls[@]} -eq 34 ]] || {
+  printf 'error: expected 34 versioned Raw URLs, found %d\n' "${#raw_urls[@]}" >&2
+  exit 1
+}
 
 printf 'Subscription links passed: %d Raw URLs, %d import URIs.\n' \
   "${#raw_urls[@]}" "${#import_uris[@]}"

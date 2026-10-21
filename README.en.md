@@ -7,7 +7,7 @@ Generate sing-box configurations for Android, iOS, macOS, Linux, and Windows, wi
 - Choose exits for streaming, AI, Telegram, Microsoft, Apple, Google, and GitHub.
 - Select nodes manually or let URLTest choose by latency.
 - Merge your nodes locally into an importable JSON configuration.
-- Use separate Android profiles for sing-box 1.12, 1.13, and 1.14.
+- Use versioned profiles for sing-box 1.13 and 1.14 on every platform.
 
 ## Quick start
 
@@ -22,7 +22,7 @@ cp examples/nodes.example.json nodes.json
 Edit `nodes.json` with your sing-box outbounds, then generate a configuration:
 
 ```bash
-./scripts/render.sh platforms/android/fakeip.json nodes.json generated/android.json
+./scripts/render.sh platforms/android/1.14/fakeip.json nodes.json generated/android.json
 sing-box check -c generated/android.json
 ```
 
@@ -32,18 +32,18 @@ Import `generated/android.json` in your client. `nodes.json` and `generated/` ar
 
 | Platform | Profiles | Guide |
 | --- | --- | --- |
-| Android / SFA | [FakeIP](platforms/android/fakeip.json) · [RealIP](platforms/android/realip.json) | [Scenarios and core versions](platforms/android/README.md) |
-| iOS / SFI | [FakeIP](platforms/ios/fakeip.json) · [RealIP](platforms/ios/realip.json) | [Import and LAN access](platforms/ios/README.md) |
-| macOS / SFM | [FakeIP](platforms/macos/fakeip.json) · [RealIP](platforms/macos/realip.json) · [mixed](platforms/macos/mixed.json) | [Guide](platforms/macos/README.md) |
-| Linux | [TUN](platforms/linux/tun.json) · [mixed](platforms/linux/mixed.json) | [Guide](platforms/linux/README.md) |
-| Windows | [TUN](platforms/windows/tun.json) · [mixed](platforms/windows/mixed.json) | [Guide](platforms/windows/README.md) |
+| Android / SFA | [FakeIP](platforms/android/1.14/fakeip.json) · [RealIP](platforms/android/1.14/realip.json) | [Scenarios and core versions](platforms/android/README.md) |
+| iOS / SFI | [FakeIP](platforms/ios/1.14/fakeip.json) · [RealIP](platforms/ios/1.14/realip.json) | [Import and LAN access](platforms/ios/README.md) |
+| macOS / SFM | [FakeIP](platforms/macos/1.14/fakeip.json) · [RealIP](platforms/macos/1.14/realip.json) · [mixed](platforms/macos/1.14/mixed.json) | [Guide](platforms/macos/README.md) |
+| Linux | [TUN](platforms/linux/1.14/tun.json) · [mixed](platforms/linux/1.14/mixed.json) | [Guide](platforms/linux/README.md) |
+| Windows | [TUN](platforms/windows/1.14/tun.json) · [mixed](platforms/windows/1.14/mixed.json) | [Guide](platforms/windows/README.md) |
 
-Replace the first argument to `render.sh` with the selected path. Desktop and Apple profiles use **sing-box 1.14.x**. Android clients with older cores should use the [1.13](platforms/android/1.13/) or [1.12](platforms/android/1.12/) directory.
+Choose the core version on every platform: `platforms/<platform>/1.14/` or `platforms/<platform>/1.13/`. The table links to 1.14 profiles; use the same filename under `1.13/` when running a 1.13 core.
 
 On desktop systems, start with `mixed.json` and set the application proxy to `127.0.0.1:2080`:
 
 ```bash
-./scripts/render.sh platforms/linux/mixed.json nodes.json generated/linux.json
+./scripts/render.sh platforms/linux/1.14/mixed.json nodes.json generated/linux.json
 sing-box check -c generated/linux.json
 sing-box run -c generated/linux.json
 ```

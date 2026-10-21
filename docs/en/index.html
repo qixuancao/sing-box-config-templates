@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>sing-box config templates: Android SFA / iOS SFI / macOS SFM / Linux / Windows FakeIP TUN selector</title>
-<meta name="description" content="Auditable, locally rendered sing-box config templates: Android SFA with 1.12 / 1.13 / 1.14 core lines, iOS SFI, macOS SFM, Linux and Windows, with FakeIP / RealIP and TUN / mixed. Local-only selector, no credential upload.">
+<meta name="description" content="Auditable, locally rendered sing-box config templates: Android SFA, iOS SFI, macOS SFM, Linux and Windows with 1.13 / 1.14 core lines, with FakeIP / RealIP and TUN / mixed. Local-only selector, no credential upload.">
 <link rel="canonical" href="https://qixuancao.github.io/sing-box-config-templates/en/">
 <link rel="alternate" hreflang="zh-CN" href="https://qixuancao.github.io/sing-box-config-templates/">
 <link rel="alternate" hreflang="en" href="https://qixuancao.github.io/sing-box-config-templates/en/">
@@ -13,13 +13,13 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="sing-box config templates">
 <meta property="og:title" content="sing-box config templates: Android SFA / iOS SFI / macOS SFM / Linux / Windows">
-<meta property="og:description" content="Pick a sing-box profile by platform, Android core version, and scenario. Render locally without uploading credentials. Public Raw JSON files are placeholders.">
+<meta property="og:description" content="Pick a sing-box profile by platform, core version, and scenario. Render locally without uploading credentials. Public Raw JSON files are placeholders.">
 <meta property="og:url" content="https://qixuancao.github.io/sing-box-config-templates/en/">
 <meta property="og:locale" content="en_US">
 <meta property="og:locale:alternate" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="sing-box config templates: Android SFA / iOS SFI / macOS SFM / Linux / Windows">
-<meta name="twitter:description" content="Local-only selector: platform to Android core version to scenario, with Raw URL, import URI, and local render command.">
+<meta name="twitter:description" content="Local-only selector: platform to core version to scenario, with Raw URL, import URI, and local render command.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -27,11 +27,11 @@
     {
       "@type": "SoftwareSourceCode",
       "name": "sing-box-config-templates",
-      "description": "Auditable, locally rendered sing-box config templates: Android SFA (1.12 / 1.13 / 1.14), iOS SFI, macOS SFM, Linux, Windows, with FakeIP / RealIP and TUN / mixed.",
+      "description": "Auditable, locally rendered sing-box config templates for Android SFA, iOS SFI, macOS SFM, Linux, and Windows, with 1.13 / 1.14 core lines, FakeIP / RealIP, and TUN / mixed.",
       "url": "https://qixuancao.github.io/sing-box-config-templates/en/",
       "codeRepository": "https://github.com/qixuancao/sing-box-config-templates",
       "programmingLanguage": "JSON",
-      "runtimePlatform": "sing-box 1.12 / 1.13 / 1.14",
+      "runtimePlatform": "sing-box 1.13 / 1.14",
       "license": "https://github.com/qixuancao/sing-box-config-templates/blob/main/LICENSE",
       "author": {
         "@type": "Person",
@@ -51,10 +51,10 @@
         },
         {
           "@type": "Question",
-          "name": "How do I choose Android 1.12 / 1.13 / 1.14?",
+          "name": "How do I choose 1.13 / 1.14?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Use the sing-box core version shown in the SFA About page or startup log. Top-level platforms/android/*.json follows the current 1.14 semantics; older cores should use the versioned platforms/android/1.13 or 1.12 file and validate with the matching sing-box check."
+            "text": "Use the core version shown by your client or sing-box version. Every platform has 1.13 and 1.14 directories; select the matching directory and validate with the same sing-box core."
           }
         },
         {
@@ -115,13 +115,13 @@ footer{border-top:1px solid #ccc;font-size:.9rem}
 </header>
 <main>
 <h1>sing-box quick start: render locally, then import</h1>
-<p>These <strong>sing-box config templates</strong> cover <strong>Android SFA</strong> (<strong>1.12 / 1.13 / 1.14</strong> core lines), <strong>iOS SFI</strong>, <strong>macOS SFM</strong>, <strong>Linux</strong>, and <strong>Windows</strong>, with <strong>FakeIP / RealIP</strong> DNS modes and <strong>TUN / mixed</strong> modes. Desktop and Apple profiles target sing-box 1.14.x.</p>
+<p>These <strong>sing-box config templates</strong> cover <strong>Android SFA</strong> (<strong>1.13 / 1.14</strong> core lines), <strong>iOS SFI</strong>, <strong>macOS SFM</strong>, <strong>Linux</strong>, and <strong>Windows</strong>, with <strong>FakeIP / RealIP</strong> DNS modes and <strong>TUN / mixed</strong> modes. Every platform provides sing-box 1.13 and 1.14 profiles.</p>
 <div class="notice" role="note">
 <strong>Placeholder notice:</strong> every public Raw JSON file only contains <code>example.com</code> / <code>CHANGE_ME</code>. It passes <code>sing-box check</code> but <strong>cannot connect</strong>. Locate the file with the selector below, then inject your own outbounds locally with <code>render.sh</code>.
 </div>
 
 <h2 id="selector">Configuration selector (runs locally in your browser)</h2>
-<p>Three steps: platform to Android core version to scenario. The selector never asks for or uploads subscription tokens, node addresses, or passwords.</p>
+<p>Three steps: platform to core version to scenario. The selector never asks for or uploads subscription tokens, node addresses, or passwords.</p>
 <div class="grid">
 <div>
 <label for="platform">1. Platform</label>
@@ -134,12 +134,10 @@ footer{border-top:1px solid #ccc;font-size:.9rem}
 </select>
 </div>
 <div>
-<label for="core">2. Android core version (Android only)</label>
+<label for="core">2. sing-box core version</label>
 <select id="core">
 <option value="1.14">1.14.x (recommended, current)</option>
-<option value="current">Top-level stable link (follows 1.14)</option>
-<option value="1.13">1.13.x (older SFA)</option>
-<option value="1.12">1.12.x (older SFA)</option>
+<option value="1.13">1.13.x</option>
 </select>
 </div>
 <div>
@@ -151,7 +149,6 @@ footer{border-top:1px solid #ccc;font-size:.9rem}
 <h3>Output</h3>
 <p><label for="out-path">Repository path</label><input type="text" id="out-path" readonly></p>
 <p><label for="out-raw">Raw URL (main rolling entry)</label><input type="text" id="out-raw" readonly></p>
-<p><label for="out-tag">Raw URL (v0.1.0 immutable snapshot)</label><input type="text" id="out-tag" readonly></p>
 <p><label for="out-uri">One-tap import URI</label><input type="text" id="out-uri" readonly></p>
 <p><label for="out-cmd">Local render command</label><textarea id="out-cmd" rows="3" readonly></textarea></p>
 <p>
@@ -174,7 +171,7 @@ sing-box check -c generated/android.json</code></pre>
 <h2>FAQ</h2>
 <ul class="faq">
 <li><strong>Can I import the public Raw JSON and connect directly?</strong><br>No. Placeholder nodes are only for preview, validation, and local rendering.</li>
-<li><strong>How do I choose Android 1.12 / 1.13 / 1.14?</strong><br>Use the core version in the SFA About page; top-level links follow 1.14, older cores use versioned directories.</li>
+<li><strong>How do I choose 1.13 / 1.14?</strong><br>Use the core version shown by your client or sing-box version, then choose the matching platform directory.</li>
 <li><strong>FakeIP or RealIP?</strong><br>Start with FakeIP; switch to RealIP for incompatible apps.</li>
 <li><strong>Does the selector upload credentials?</strong><br>No. This page has no backend and no analytics script; everything runs locally.</li>
 </ul>
@@ -211,15 +208,9 @@ var core=document.getElementById("core");
 var scenario=document.getElementById("scenario");
 var outPath=document.getElementById("out-path");
 var outRaw=document.getElementById("out-raw");
-var outTag=document.getElementById("out-tag");
 var outUri=document.getElementById("out-uri");
 var outCmd=document.getElementById("out-cmd");
 var desc=document.getElementById("scenario-desc");
-function refreshCore(){
-var wrap=document.getElementById("core").parentElement;
-if(platform.value==="android"){wrap.style.display="";document.getElementById("core").disabled=false;}
-else{wrap.style.display="none";document.getElementById("core").disabled=true;}
-}
 function refreshScenarios(){
 var list=PLATFORM_SCENARIOS[platform.value]||[];
 var cur=scenario.value;
@@ -238,25 +229,16 @@ update();
 function profilePath(){
 var p=platform.value,s=scenario.value,c=core.value;
 var file=(SCENARIO_FILE[s]||s)+".json";
-if(p==="android"){
-if(c==="1.14")return "platforms/android/1.14/"+file;
-if(c==="1.13")return "platforms/android/1.13/"+file;
-if(c==="1.12")return "platforms/android/1.12/"+file;
-return "platforms/android/"+file;
-}
-return "platforms/"+p+"/"+file;
+return "platforms/"+p+"/"+c+"/"+file;
 }
 function update(){
-refreshCore();
 var path=profilePath();
 var rawMain="https://raw.githubusercontent.com/"+REPO+"/main/"+path;
-var rawTag="https://raw.githubusercontent.com/"+REPO+"/v0.1.0/"+path;
 var uri="sing-box://import-remote-profile?url="+encodeURIComponent(rawMain)+"#"+encodeURIComponent(path.replace("platforms/","").replace(".json","").replace(/\//g," "));
 var gen="generated/"+path.replace("platforms/","").replace(/\//g,"-");
 var cmd="./scripts/render.sh "+path+" nodes.json "+gen+"\nsing-box check -c "+gen;
 outPath.value=path;
 outRaw.value=rawMain;
-outTag.value=rawTag;
 outUri.value=uri;
 outCmd.value=cmd;
 var s=scenario.value;

@@ -1,5 +1,4 @@
 {
-  "$schema": "https://sing-box.sagernet.org/schema.json",
   "log": {
     "disabled": false,
     "level": "warn",
@@ -61,10 +60,45 @@
   },
   "inbounds": [
     {
-      "type": "mixed",
-      "tag": "mixed-in",
-      "listen": "127.0.0.1",
-      "listen_port": 2080
+      "type": "tun",
+      "tag": "tun-in",
+      "address": [
+        "172.19.0.1/30"
+      ],
+      "mtu": 9000,
+      "auto_route": true,
+      "stack": "system",
+      "route_exclude_address": [
+        "10.0.0.0/8",
+        "100.64.0.0/10",
+        "127.0.0.0/8",
+        "169.254.0.0/16",
+        "172.16.0.0/15",
+        "172.18.0.0/16",
+        "172.19.0.4/30",
+        "172.19.0.8/29",
+        "172.19.0.16/28",
+        "172.19.0.32/27",
+        "172.19.0.64/26",
+        "172.19.0.128/25",
+        "172.19.1.0/24",
+        "172.19.2.0/23",
+        "172.19.4.0/22",
+        "172.19.8.0/21",
+        "172.19.16.0/20",
+        "172.19.32.0/19",
+        "172.19.64.0/18",
+        "172.19.128.0/17",
+        "172.20.0.0/14",
+        "172.24.0.0/13",
+        "192.168.0.0/16",
+        "224.0.0.0/4",
+        "255.255.255.255/32",
+        "::1/128",
+        "fc00::/7",
+        "fe80::/10",
+        "ff00::/8"
+      ]
     }
   ],
   "outbounds": [
@@ -220,6 +254,19 @@
         "action": "sniff"
       },
       {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "protocol": "dns"
+          },
+          {
+            "port": 53
+          }
+        ],
+        "action": "hijack-dns"
+      },
+      {
         "action": "resolve",
         "strategy": "ipv4_only"
       },
@@ -348,127 +395,125 @@
         "tag": "category-ads-all",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "geosite-private",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "geoip-cn",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "geosite-cn",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "geolocation-!cn",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/geolocation-!cn.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "category-ai-!cn",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ai-!cn.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "youtube",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/youtube.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "netflix",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/netflix.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "disney",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/disney.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "spotify",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/spotify.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "tiktok",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/tiktok.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "telegram",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/telegram.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "microsoft",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/microsoft.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "onedrive",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/onedrive.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "apple",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/apple.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "google",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/google.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       },
       {
         "type": "remote",
         "tag": "github",
         "format": "binary",
         "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/github.srs",
-        "http_client": "rule-set-direct"
+        "download_detour": "direct"
       }
     ],
     "final": "select",
     "default_domain_resolver": {
       "server": "direct-dns"
-    },
-    "default_http_client": "rule-set-direct",
-    "auto_detect_interface": true
+    }
   },
   "experimental": {
     "clash_api": {
@@ -476,16 +521,7 @@
     },
     "cache_file": {
       "enabled": true,
-      "cache_id": "macos-mixed"
+      "cache_id": "ios-1.13-realip"
     }
-  },
-  "http_clients": [
-    {
-      "tag": "rule-set-direct",
-      "domain_resolver": {
-        "server": "direct-dns-bootstrap",
-        "strategy": "ipv4_only"
-      }
-    }
-  ]
+  }
 }

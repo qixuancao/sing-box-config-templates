@@ -259,6 +259,10 @@
         "outbound": "GLOBAL"
       },
       {
+        "rule_set": "category-ads-all",
+        "action": "reject"
+      },
+      {
         "rule_set": "geosite-private",
         "action": "route",
         "outbound": "direct"
@@ -355,6 +359,13 @@
       }
     ],
     "rule_set": [
+      {
+        "type": "remote",
+        "tag": "category-ads-all",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "download_detour": "direct"
+      },
       {
         "type": "remote",
         "tag": "geosite-private",
@@ -471,7 +482,8 @@
     "final": "select",
     "default_domain_resolver": {
       "server": "direct-dns"
-    }
+    },
+    "auto_detect_interface": true
   },
   "experimental": {
     "clash_api": {
@@ -479,7 +491,7 @@
     },
     "cache_file": {
       "enabled": true,
-      "cache_id": "android-1.12-no-adblock"
+      "cache_id": "macos-1.13-realip"
     }
   }
 }

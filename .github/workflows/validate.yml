@@ -51,13 +51,10 @@ jobs:
       - name: Validate every platform profile
         run: ./scripts/check.sh
 
-      - name: Validate Android 1.14 version directory
-        run: ./scripts/check-android-version.sh 1.14
-
       - name: Validate TCP-only and mixed node rendering
         run: python3 -B scripts/check-render.py
 
-  android-legacy-profiles:
+  legacy-profiles:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -66,9 +63,6 @@ jobs:
           - profile_line: "1.13"
             sing_box_version: 1.13.21
             sing_box_sha256: 24f9ef8e7234e13e71e74c3598a4164c5fe07b7b67ccc6e96cf68b54789f72cd
-          - profile_line: "1.12"
-            sing_box_version: 1.12.25
-            sing_box_sha256: a1ec76e2b6b139eb747a1b1ebee7d14b8d4be5a833596cad8070a31ef960301f
     env:
       SING_BOX_VERSION: ${{ matrix.sing_box_version }}
       SING_BOX_SHA256: ${{ matrix.sing_box_sha256 }}
@@ -89,8 +83,8 @@ jobs:
           printf 'SING_BOX=%s/%s\n' \
             "$PWD" "sing-box-${SING_BOX_VERSION}-linux-amd64/sing-box" >> "$GITHUB_ENV"
 
-      - name: Validate Android compatibility line
-        run: ./scripts/check-android-version.sh "${{ matrix.profile_line }}"
+      - name: Validate every platform on the 1.13 core
+        run: ./scripts/check-platform-version.sh "${{ matrix.profile_line }}"
 
       - name: Validate TCP-only and mixed node rendering
         run: python3 -B scripts/check-render.py
@@ -108,9 +102,6 @@ jobs:
           - profile_line: "1.13"
             sing_box_version: 1.13.21
             sing_box_sha256: 24f9ef8e7234e13e71e74c3598a4164c5fe07b7b67ccc6e96cf68b54789f72cd
-          - profile_line: "1.12"
-            sing_box_version: 1.12.25
-            sing_box_sha256: a1ec76e2b6b139eb747a1b1ebee7d14b8d4be5a833596cad8070a31ef960301f
     env:
       SING_BOX_VERSION: ${{ matrix.sing_box_version }}
       SING_BOX_SHA256: ${{ matrix.sing_box_sha256 }}

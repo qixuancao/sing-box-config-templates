@@ -6,10 +6,10 @@ sing_box=${SING_BOX:-sing-box}
 version_line=${1:-}
 
 case "$version_line" in
-  1.12|1.13|1.14)
+  1.13|1.14)
     ;;
   *)
-    printf 'Usage: %s 1.12|1.13|1.14\n' "$0" >&2
+    printf 'Usage: %s 1.13|1.14\n' "$0" >&2
     exit 2
     ;;
 esac

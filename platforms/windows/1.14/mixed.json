@@ -27,6 +27,15 @@
     ],
     "rules": [
       {
+        "query_type": [
+          "AAAA",
+          "HTTPS",
+          "SVCB"
+        ],
+        "action": "predefined",
+        "rcode": "NOERROR"
+      },
+      {
         "clash_mode": "Direct",
         "action": "route",
         "server": "direct-dns"
@@ -48,19 +57,14 @@
       }
     ],
     "final": "proxy-dns",
-    "strategy": "prefer_ipv4"
+    "strategy": "ipv4_only"
   },
   "inbounds": [
     {
-      "type": "tun",
-      "tag": "tun-in",
-      "address": [
-        "172.19.0.1/30",
-        "fdfe:dcba:9876::1/126"
-      ],
-      "mtu": 9000,
-      "auto_route": true,
-      "stack": "system"
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "127.0.0.1",
+      "listen_port": 2080
     }
   ],
   "outbounds": [
@@ -216,21 +220,12 @@
         "action": "sniff"
       },
       {
-        "type": "logical",
-        "mode": "or",
-        "rules": [
-          {
-            "protocol": "dns"
-          },
-          {
-            "port": 53
-          }
-        ],
-        "action": "hijack-dns"
+        "action": "resolve",
+        "strategy": "ipv4_only"
       },
       {
-        "action": "resolve",
-        "strategy": "prefer_ipv4"
+        "ip_version": 6,
+        "action": "reject"
       },
       {
         "ip_is_private": true,
@@ -472,7 +467,8 @@
     "default_domain_resolver": {
       "server": "direct-dns"
     },
-    "default_http_client": "rule-set-direct"
+    "default_http_client": "rule-set-direct",
+    "auto_detect_interface": true
   },
   "experimental": {
     "clash_api": {
@@ -480,7 +476,7 @@
     },
     "cache_file": {
       "enabled": true,
-      "cache_id": "android-dual-stack"
+      "cache_id": "windows-1.14-mixed"
     }
   },
   "http_clients": [
