@@ -7,7 +7,8 @@ Generate sing-box configurations for Android, iOS, macOS, Linux, and Windows, wi
 - Choose exits for streaming, AI, Telegram, Microsoft, Apple, Google, and GitHub.
 - Select nodes manually or let URLTest choose by latency.
 - Merge your nodes locally into an importable JSON configuration.
-- Use versioned profiles for sing-box 1.13 and 1.14 on every platform.
+- Use stable profiles for sing-box 1.13 / 1.14, with separate [experimental 1.15 presets](experimental/1.15/README.md).
+- Edit DNS, inbound and routing modules by category, core version and mode; see [configuration modules](modules/README.md).
 
 ## Generate in your browser
 

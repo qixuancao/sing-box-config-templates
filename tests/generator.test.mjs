@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
-import {parseNodes, validateNodes, renderConfig, profilePath, errorMessage, ConfigError, PLATFORMS} from '../docs/assets/config-core.mjs';
+import {parseNodes, validateNodes, renderConfig, profilePath, errorMessage, ConfigError, PLATFORMS, CORES} from '../docs/assets/config-core.mjs';
 import {PROFILES} from '../docs/assets/profiles.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
@@ -92,7 +92,7 @@ test('native JSON shapes, automatic UDP inference and explicit override', () => 
 });
 
 test('all presets preserve route ordering, direct UDP and TCP-only behavior', () => {
-  assert.equal(Object.keys(PROFILES).length, 34);
+  assert.equal(Object.keys(PROFILES).length, Object.values(PLATFORMS).flat().length * CORES.length);
   const nodes = {outbounds: [tcp], udp_outbounds: []};
   const snapshot = JSON.stringify(nodes);
   for (const [path, template] of Object.entries(PROFILES)) {
@@ -152,7 +152,7 @@ test('generated links pass the selected real sing-box core on every maintained p
   const core = process.env.SING_BOX;
   const version = spawnSync(core, ['version'], {encoding: 'utf8'});
   assert.equal(version.status, 0);
-  const line = version.stdout.match(/sing-box version (1\.(?:13|14))\./)?.[1];
+  const line = version.stdout.match(/sing-box version (1\.(?:13|14|15))\./)?.[1];
   assert.ok(line);
   const directory = mkdtempSync(join(tmpdir(), 'sing-box-core-'));
   try {

@@ -187,8 +187,8 @@ def check_page(path, *, lang, canonical, other_hreflang):
         sys.exit(1)
 
     # Browser generator: local input -> maintained preset -> downloadable JSON.
-    if info.core_versions != ["1.14", "1.13"]:
-        print(f"error: {path} must offer only core versions 1.14 and 1.13", file=sys.stderr)
+    if info.core_versions != list(json.loads((docs.parent / "presets/catalog.json").read_text())["versions"]):
+        print(f"error: {path} core versions must match presets/catalog.json", file=sys.stderr)
         sys.exit(1)
     for need in ("platform", "core", "scenario", "nodes-input", "nodes-file", "generate",
                  "download-json", "download-nodes", "copy-json", "clear", "json-preview",

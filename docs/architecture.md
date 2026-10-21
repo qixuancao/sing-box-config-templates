@@ -8,7 +8,9 @@ flowchart LR
   Web[网页] --> Parse[分享链接解析 / 节点校验]
   CLI[命令行] --> Parse
   Parse --> Render[配置组合]
-  Templates[通用模板与平台适配] --> Render
+  Modules[版本化 DNS / 入站 / 规则模块] --> Build[场景预设与平台组合]
+  Build --> Templates[完整平台配置]
+  Templates --> Render
   Render --> JSON[完整 JSON 文件]
 ```
 
@@ -20,12 +22,14 @@ flowchart LR
 | 节点数据 | `docs/assets/core/nodes.mjs` | 节点校验、名称处理、UDP 能力选择 |
 | 配置组合 | `docs/assets/core/render.mjs` | 注入节点、更新策略组、检查引用；不修改传入对象 |
 | 平台目录 | `docs/assets/core/catalog.mjs` | 支持的平台、内核版本与默认场景 |
-| 默认策略 | `templates/`、`scripts/policy-layout.jq` | DNS、分流规则、公共策略组 |
-| 平台适配 | `scripts/sync-platforms.sh` | 生成不同系统和内核版本的配置 |
+| 配置模块 | `modules/<类别>/<版本>/<方案>.json` | 独立维护 DNS、入站、路由、规则集；共享策略组与缓存模块 |
+| 场景预设 | `presets/scenarios/`、`presets/catalog.json` | 选择模块、平台适配、稳定与实验版本通道 |
+| 构建器 | `scripts/build-configs.py`、`scripts/sync-platforms.sh` | 从模块生成完整 JSON 和浏览器预设目录 |
 | 网页交互 | `docs/assets/app.mjs`、`app.css` | 输入、预览、下载与布局 |
 | 页面与翻译 | `web/page.html`、`web/locales/` | 一份页面结构，两份独立翻译 |
 | 命令行 | `scripts/generate.mjs` | 本地文件与 stdin 输入、原子写入、0600 文件权限 |
 
+`templates/`、`platforms/`、`experimental/1.15/platforms/`、`docs/assets/presets.mjs`、
 `docs/index.html`、`docs/en/index.html` 和 `docs/assets/profiles.mjs` 是生成产物。
 修改源文件后运行对应脚本；CI 会检查它们是否同步。
 
@@ -46,9 +50,15 @@ const json = JSON.stringify(config, null, 2);
 
 ## 修改默认规则
 
-1. 修改 `templates/` 中的对应源模板；公共策略组结构由 `policy-layout.jq` 规范化。
-2. 运行 `./scripts/sync-platforms.sh`，同时更新平台配置与浏览器模板包。
-3. 用 1.13 和 1.14 两个内核运行检查，确认版本兼容性与 UDP 路由顺序。
+1. 在 `modules/dns/1.14/fakeip.json` 等对应的类别、版本和方案中修改配置。
+2. 如需组合新场景，在 `presets/scenarios/` 选择 DNS、入站、规则等模块，再登记支持的平台；网页场景名称与说明位于 `docs/assets/app.mjs`。
+3. 运行 `./scripts/sync-platforms.sh`，更新完整配置、预设目录和浏览器模板包。
+4. 运行 `python3 -B scripts/check-modules.py`，并使用目标版本的临时检查器验证。
+
+详细目录与修改例子见[配置模块](../modules/README.md)。对象递归合并、数组保持原顺序，
+同一字段由两个模块重复定义时构建失败；各版本独立选择模块，不会自动回退到其他版本。
+1.13 / 1.14 的 38 份现有 JSON 在首次拆分后保持字节一致；1.15 在独立实验区预备，
+按[实验说明](../experimental/1.15/README.md)使用固定 alpha 检查器验证。
 
 个人规则也可以写进独立的私有模板，再用
 `node scripts/generate.mjs --template /path/to/private/template.json ...` 生成。

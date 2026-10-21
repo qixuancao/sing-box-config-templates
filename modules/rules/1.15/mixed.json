@@ -1,0 +1,136 @@
+{
+  "route": {
+    "rules": [
+      {
+        "action": "sniff"
+      },
+      {
+        "action": "resolve",
+        "strategy": "ipv4_only"
+      },
+      {
+        "ip_version": 6,
+        "action": "reject"
+      },
+      {
+        "ip_is_private": true,
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "Direct",
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "Global",
+        "action": "route",
+        "outbound": "GLOBAL"
+      },
+      {
+        "rule_set": "category-ads-all",
+        "action": "reject"
+      },
+      {
+        "rule_set": "geosite-private",
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "geosite-cn",
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": "geoip-cn"
+          },
+          {
+            "rule_set": "geolocation-!cn",
+            "invert": true
+          }
+        ],
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "network": "udp",
+        "action": "route",
+        "outbound": "udp-auto"
+      },
+      {
+        "rule_set": "category-ai-!cn",
+        "action": "route",
+        "outbound": "ai"
+      },
+      {
+        "rule_set": "youtube",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "netflix",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "disney",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "spotify",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "tiktok",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
+        "rule_set": "telegram",
+        "action": "route",
+        "outbound": "telegram"
+      },
+      {
+        "rule_set": "microsoft",
+        "action": "route",
+        "outbound": "microsoft"
+      },
+      {
+        "rule_set": "onedrive",
+        "action": "route",
+        "outbound": "microsoft"
+      },
+      {
+        "rule_set": "apple",
+        "action": "route",
+        "outbound": "apple"
+      },
+      {
+        "rule_set": "google",
+        "action": "route",
+        "outbound": "google"
+      },
+      {
+        "rule_set": "github",
+        "action": "route",
+        "outbound": "github"
+      },
+      {
+        "rule_set": "geolocation-!cn",
+        "action": "route",
+        "outbound": "select"
+      }
+    ],
+    "final": "select",
+    "default_domain_resolver": {
+      "server": "direct-dns"
+    },
+    "default_http_client": "rule-set-direct"
+  }
+}

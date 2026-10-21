@@ -74,6 +74,7 @@ function generate() {
       li.append(name, kind); byId('node-list').append(li);
     });
     const warnings = [];
+    if (core.value === '1.15') warnings.push(t('1.15 实验配置，按 1.15.0-alpha.12 验证；测试版后续更新可能需要重新适配。', 'Experimental 1.15 presets, checked against 1.15.0-alpha.12; later testing releases may need updates.'));
     if (example) warnings.push(t('当前是演示节点。请替换成自己的节点后再连接。', 'These are demonstration nodes. Replace them with your own before connecting.'));
     if (!nodes.udp_outbounds.length) warnings.push(t('这些节点仅用于 TCP；需要代理的 UDP 已设为拒绝，国内与局域网直连规则保留。', 'TCP-only nodes: proxied UDP is rejected; existing mainland China and local direct routes are retained.'));
     if (nodes.outbounds.some(node => node.tls?.insecure)) warnings.push(t('部分节点关闭了证书校验，请确认这是你的预期设置。', 'Some nodes disable TLS certificate verification; confirm this is intentional.'));

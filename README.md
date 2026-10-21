@@ -7,7 +7,8 @@
 - 按流媒体、AI、Telegram、Microsoft、Apple、Google、GitHub 选择出口；
 - 手动选节点或通过 URLTest 按延迟自动选择；
 - 在本地合并节点，生成可直接导入客户端的 JSON；
-- 所有平台按 1.13、1.14 两条内核版本线维护。
+- 稳定配置维护 1.13、1.14；[1.15 实验配置](experimental/1.15/README.md)按固定 alpha 预备。
+- DNS、入站、规则按“类别 → 版本 → 方案”独立维护，见[配置模块](modules/README.md)。
 
 ## 在线生成
 

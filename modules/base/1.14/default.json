@@ -1,0 +1,17 @@
+{
+  "$schema": "https://sing-box.sagernet.org/schema.json",
+  "log": {
+    "disabled": false,
+    "level": "warn",
+    "timestamp": true
+  },
+  "http_clients": [
+    {
+      "tag": "rule-set-direct",
+      "domain_resolver": {
+        "server": "direct-dns-bootstrap",
+        "strategy": "ipv4_only"
+      }
+    }
+  ]
+}

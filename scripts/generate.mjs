@@ -9,11 +9,12 @@ import {parseNodes, renderConfig, profilePath, errorMessage, ConfigError} from '
 const HELP = `Generate a private sing-box JSON file locally (Node.js 22+).
 
 node scripts/generate.mjs --input nodes.txt --output generated/sing-box.json
-  [--platform android|ios|macos|linux|windows] [--core 1.14|1.13]
+  [--platform android|ios|macos|linux|windows] [--core 1.14|1.13|1.15]
   [--scenario fakeip|realip|mixed|tun|...] [--template PATH]
 
 Input: node share links (one per line) or sing-box nodes JSON; --input - reads stdin.
 Defaults: Android, core 1.14, recommended scenario for the selected platform.
+Core 1.15 uses experimental presets pinned to 1.15.0-alpha.12.
 Output is written atomically with mode 0600. Input files are never overwritten.
 `;
 const root = fileURLToPath(new URL('../', import.meta.url));

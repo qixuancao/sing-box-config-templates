@@ -7,7 +7,7 @@ import {mkdtemp, readFile, writeFile, rm, mkdir} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join, resolve, extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {PLATFORMS} from '../docs/assets/config-core.mjs';
+import {PLATFORMS, CORES, profilePath} from '../docs/assets/config-core.mjs';
 
 const docs = fileURLToPath(new URL('../docs/', import.meta.url));
 const temporary = await mkdtemp(join(tmpdir(), 'sing-box-browser-'));
@@ -88,14 +88,18 @@ try {
     const before = requests.length;
     await input(sample);
     for (const [platform, scenarios] of Object.entries(PLATFORMS)) {
-      for (const core of ['1.14', '1.13']) {
+      for (const core of CORES) {
         for (const scenario of scenarios) {
           await evaluate(`for (const [id,value] of ${JSON.stringify([['platform', platform], ['core', core], ['scenario', scenario]])}) {const el=document.getElementById(id); el.value=value; el.dispatchEvent(new Event('change'));} document.getElementById('generate').click();`);
           assert.equal(await generated(), true, `${suffix} ${platform} ${core} ${scenario}`);
           const output = JSON.parse(await evaluate("document.getElementById('json-preview').value"));
           assert.deepEqual(output.outbounds.find(n => n.tag === 'udp-auto').outbounds, ['Browser-UDP']);
           assert.equal(output.outbounds.find(n => n.tag === 'Browser-TCP').type, 'naive');
-          assert.equal(await evaluate("document.getElementById('out-path').value"), `platforms/${platform}/${core}/${scenario}.json`);
+          assert.equal(await evaluate("document.getElementById('out-path').value"), profilePath(platform, core, scenario));
+          if (core === '1.15') {
+            assert.match(await evaluate("document.getElementById('warnings').textContent"), /1\.15/);
+            assert.ok(output.inbounds.every(inbound => !Object.hasOwn(inbound, 'stack')));
+          }
           combinations++;
         }
       }
@@ -155,7 +159,7 @@ try {
   // Graceful shutdown lets Chrome's child processes finish their profile writes.
   if (ws?.readyState === WebSocket.OPEN && closeBrowser) await closeBrowser().catch(() => {});
   ws?.close();
-  if (chrome && chrome.exitCode === null && chrome.signalCode === null) {
+  if (chrome?.pid && chrome.exitCode === null && chrome.signalCode === null) {
     const exited = new Promise(resolve => chrome.once('exit', resolve));
     await Promise.race([exited, pause(2000)]);
     if (chrome.exitCode === null && chrome.signalCode === null) { chrome.kill('SIGKILL'); await exited; }

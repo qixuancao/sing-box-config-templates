@@ -1,0 +1,10 @@
+{
+  "modules": {
+    "dns": "realip",
+    "inbounds": "tun",
+    "outbounds": "udp-first",
+    "rules": "standard",
+    "rule-sets": "standard",
+    "experimental": "default"
+  }
+}

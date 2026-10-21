@@ -12,6 +12,7 @@
 ```bash
 ./scripts/sync-platforms.sh --check
 python3 -B scripts/check-ios-routes.py
+python3 -B scripts/check-modules.py
 ./scripts/audit-public.sh
 ./scripts/check-links.sh
 ./scripts/check-pages.sh
@@ -19,6 +20,7 @@ node --test tests/generator.test.mjs
 node scripts/check-browser.mjs # 需要本机 Chrome，可用 CHROME 指定路径
 SING_BOX=/path/to/sing-box-1.14 ./scripts/check.sh
 SING_BOX=/path/to/sing-box-1.13.21 ./scripts/check-platform-version.sh 1.13
+SING_BOX=/path/to/temporary/sing-box-1.15.0-alpha.12 ./scripts/check-platform-version.sh 1.15
 SING_BOX=/path/to/sing-box-1.14.0 python3 -B scripts/check-render.py
 ```
 
@@ -27,7 +29,9 @@ SING_BOX=/path/to/sing-box-1.14.0 python3 -B scripts/check-render.py
 修改远程规则 URL 或准备发版时，再用对应检查器运行
 `./scripts/check-rule-sets.sh 1.xx`。该检查需要联网，平时由每周 CI 执行。
 
-若修改 `templates/`，运行 `./scripts/sync-platforms.sh`，同时更新平台文件和浏览器模板包。
+配置源位于 `modules/<类别>/<版本>/`，场景组合位于 `presets/`。修改后运行
+`./scripts/sync-platforms.sh`，同时更新通用模板、平台文件和浏览器模板包。
+`templates/`、`platforms/` 与实验配置 JSON 都由这些源生成。
 修改页面结构或翻译后运行 `python3 -B scripts/build-pages.py`。模块分工与公共 API 见
 [模块结构](docs/architecture.md)。新协议的测试应分别带 `SING_BOX` 环境变量用两个内核运行。
 
@@ -52,7 +56,8 @@ SING_BOX=/path/to/sing-box-1.14.0 python3 -B scripts/check-render.py
 ## 设计约束
 
 - 目标语法保持在 README 声明的 sing-box 版本；
-- 平台配置只放在 `1.13/` 和 `1.14/`，新变体同步生成两条版本线，并用各自固定核心检查；
+- 稳定平台配置放在 `platforms/<平台>/1.13/` 和 `1.14/`；1.15 测试配置放在
+  `experimental/1.15/platforms/<平台>/`，用固定 alpha 检查器验证；
 - 不加入真实节点、付费订阅或绕过授权的服务；
 - 平台不支持的字段不能只因为 schema 接受就写入；
 - 新规则集必须有稳定来源、清晰用途和故障退路；

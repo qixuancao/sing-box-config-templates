@@ -22,7 +22,7 @@
   "platform_label": "Where will you use sing-box?",
   "advanced_label": "Advanced · core version and scenario",
   "core_label": "sing-box core version",
-  "core_help": "Match the version in your client's About screen or sing-box version.",
+  "core_help": "Match your client core. The experimental 1.15 presets target 1.15.0-alpha.12.",
   "scenario_label": "Scenario",
   "generate_button": "Generate configuration",
   "clear_button": "Clear",
@@ -55,9 +55,22 @@
   "privacy_link": "Privacy",
   "official_link": "Official docs",
   "faq": [
-    ["Are my nodes uploaded?", "No. Node parsing, configuration composition and file export run in your browser. Nodes are not automatically stored."],
-    ["How do I export a JSON file?", "Paste your nodes, choose a device and generate. Click Download sing-box.json, then import the file as a local profile."],
-    ["How do I choose 1.13 or 1.14?", "In Advanced, match the core version shown in your client's About screen or sing-box version."],
-    ["Is public Raw JSON my personal configuration?", "Public Raw JSON uses placeholder nodes. Use the generator to download a JSON file containing your own nodes."]
-  ]
+    [
+      "Are my nodes uploaded?",
+      "No. Node parsing, configuration composition and file export run in your browser. Nodes are not automatically stored."
+    ],
+    [
+      "How do I export a JSON file?",
+      "Paste your nodes, choose a device and generate. Click Download sing-box.json, then import the file as a local profile."
+    ],
+    [
+      "How do I choose 1.13 or 1.14?",
+      "In Advanced, match the core version shown in your client's About screen or sing-box version."
+    ],
+    [
+      "Is public Raw JSON my personal configuration?",
+      "Public Raw JSON uses placeholder nodes. Use the generator to download a JSON file containing your own nodes."
+    ]
+  ],
+  "experimental_label": "Experimental · alpha.12"
 }

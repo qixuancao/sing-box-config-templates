@@ -1,0 +1,10 @@
+{
+  "modules": {
+    "dns": "privacy-strict",
+    "inbounds": "tun",
+    "outbounds": "standard",
+    "rules": "tcp-stable",
+    "rule-sets": "standard",
+    "experimental": "default"
+  }
+}
