@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """Verify module substitution, isolation, merge ownership and version boundaries."""
 import json
-import runpy
 import shutil
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
-builder = runpy.run_path(str(ROOT / "scripts/build-configs.py"))
-compose, merge, outputs = (builder[name] for name in ("compose", "merge", "outputs"))
+sys.path.insert(0, str(ROOT / "scripts"))
+from lib.configs import compose, merge, outputs
 catalog = json.loads((ROOT / "presets/catalog.json").read_text())
 
 
 class ModuleTests(unittest.TestCase):
     def test_outputs_contain_only_declared_platform_profiles_and_browser_catalog(self):
-        expected = {"docs/assets/presets.mjs"}
+        expected = {"docs/assets/presets.mjs", "docs/assets/profiles.mjs"}
         for version in catalog["versions"]:
             for platform, settings in catalog["platforms"].items():
                 for scenario in settings["scenarios"]:
@@ -39,9 +39,12 @@ class ModuleTests(unittest.TestCase):
             self.assertEqual(affected, {
                 "platforms/android/1.14/fakeip.json",
                 "platforms/ios/1.14/fakeip.json", "platforms/macos/1.14/fakeip.json",
+                "docs/assets/profiles.mjs",
             })
             for name in affected:
-                self.assertEqual(json.loads(changed[name])["dns"]["cache_capacity"], 7331)
+                if name.endswith(".json"):
+                    self.assertEqual(json.loads(changed[name])["dns"]["cache_capacity"], 7331)
+            self.assertIn('"cache_capacity":7331', changed["docs/assets/profiles.mjs"])
 
     def test_merge_preserves_rule_order_and_refuses_implicit_overrides(self):
         rules = [{"ip_is_private": True, "outbound": "direct"}, {"network": "udp", "action": "reject"}]

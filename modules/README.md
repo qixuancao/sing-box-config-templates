@@ -42,10 +42,10 @@ modules/
 
 ```bash
 # 修改模块或场景预设后，生成所有配置与网页模板包
-./scripts/sync-platforms.sh
+python3 -B scripts/build.py
 # 确认生成产物与模块一致
-./scripts/sync-platforms.sh --check
-python3 -B scripts/check-modules.py
+python3 -B scripts/build.py --check
+python3 -B scripts/check.py static
 ```
 
 生成配置统一放在 `platforms/<平台>/<版本>/`，1.13 / 1.14 为稳定兼容线，

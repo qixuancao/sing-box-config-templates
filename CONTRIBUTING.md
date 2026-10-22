@@ -5,35 +5,37 @@
 
 ## 提交前
 
-同步与检查需要 Bash、`jq`、Python 3（仅标准库）、Node.js 22+ 和带 PCRE2 的 `ripgrep`；
+开发工具只需 Python 3.10+（仅标准库）和 Node.js 22+，不需要 Bash、jq 或 ripgrep。
 网页无需安装这些工具，CLI 生成只需要 Node.js。iOS 排除路由的生成源位于
-`scripts/ios_route_excludes.py`，不要直接维护拆分后的 CIDR 列表。
+`scripts/lib/ios_routes.py`，不要直接维护拆分后的 CIDR 列表。
+
+开发入口只有两个：`scripts/build.py` 生成全部产物，`scripts/check.py` 执行验证。
+内部实现位于 `scripts/lib/`，回归测试位于 `tests/`。
 
 ```bash
-./scripts/sync-platforms.sh --check
-python3 -B scripts/check-ios-routes.py
-python3 -B scripts/check-modules.py
-./scripts/audit-public.sh
-./scripts/check-links.sh
-./scripts/check-pages.sh
-node --test tests/generator.test.mjs
-node scripts/check-browser.mjs # 需要本机 Chrome，可用 CHROME 指定路径
-SING_BOX=/path/to/sing-box-1.14 ./scripts/check.sh
-SING_BOX=/path/to/sing-box-1.13.21 ./scripts/check-platform-version.sh 1.13
-SING_BOX=/path/to/temporary/sing-box-1.15.0-alpha.12 ./scripts/check-platform-version.sh 1.15
-SING_BOX=/path/to/sing-box-1.14.0 python3 -B scripts/check-render.py
+python3 -B scripts/build.py
+python3 -B scripts/build.py --check # 只检查，不改写产物
+python3 -B scripts/check.py static # 构建同步、公共审计、链接、页面、Python/Node 单元测试
+python3 -B scripts/check.py core --core 1.14 --sing-box /path/to/sing-box-1.14.0
+python3 -B scripts/check.py core --core 1.13 --sing-box /path/to/sing-box-1.13.21
+python3 -B scripts/check.py core --core 1.15 --sing-box /path/to/sing-box-1.15.0-alpha.12
+python3 -B scripts/check.py browser # 需要本机 Chrome，可用 CHROME 指定路径
 ```
 
-节点渲染检查也应使用 1.13 检查器运行，CI 覆盖这两个版本的所有平台。
+`python3 -B scripts/check.py` 默认依次执行 `static`、`core`、`browser`，内核检查器取
+`--sing-box`、`SING_BOX` 环境变量或 PATH 中的 `sing-box`。缺少检查器或 Chrome 时明确失败，
+不会把跳过当作通过。`core` 可自动识别版本，也可用 `--core` 防止误用；CI 覆盖三套固定内核的
+公共配置、示例节点注入、TCP-only 行为与分享链接生成结果。
 
 修改远程规则 URL 或准备发版时，再用对应检查器运行
-`./scripts/check-rule-sets.sh 1.xx`。该检查需要联网，平时由每周 CI 执行。
+`python3 -B scripts/check.py rule-sets --core 1.14 --sing-box /path/to/checker`。
+这是唯一主动下载规则集的检查，不包含在默认检查中，平时由每周 CI 执行。
 
 配置源位于 `modules/<类别>/<版本>/`，场景组合位于 `presets/`。修改后运行
-`./scripts/sync-platforms.sh`，同时更新平台文件和浏览器配置包。
+`python3 -B scripts/build.py`，同时更新平台文件、浏览器配置包与中英文页面。
 `platforms/` 中的稳定与实验版 JSON 都由这些源生成；不再生成不区分平台的通用配置。
-修改页面结构或翻译后运行 `python3 -B scripts/build-pages.py`。模块分工与公共 API 见
-[模块结构](docs/architecture.md)。新协议的测试应分别带 `SING_BOX` 环境变量用两个内核运行。
+修改页面结构或翻译后使用同一构建入口。模块分工与公共 API 见
+[模块结构](docs/architecture.md)。新增协议应使用各个维护版本的 `core` 检查验证。
 
 ## PR 与 Issue
 

@@ -52,13 +52,15 @@ sing-box check -c generated/linux.json
 sing-box run -c generated/linux.json
 ```
 
-已有脚本调用可以继续使用：
+使用自己维护的私有模板：
 
 ```bash
-./scripts/render.sh platforms/android/1.14/fakeip.json nodes.json generated/android.json
+node scripts/generate.mjs --template /path/to/private/template.json \
+  --input nodes.json --output generated/android.json
 ```
 
-两种命令都调用网页使用的同一套引擎。命令行输出为 `0600`，失败时保留原有输出。
+旧 `render.sh` 包装已移除，统一使用上述 CLI。它调用网页使用的同一套引擎。
+命令行输出为 `0600`，失败时保留原有输出。
 可用 `--input -` 从 stdin 读取，个人模板用 `--template /path/to/private/template.json`。
 
 ## 4. 更新与排查

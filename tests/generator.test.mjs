@@ -2,26 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtempSync, writeFileSync, readFileSync as read, statSync, rmSync, symlinkSync, linkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
-import {join, delimiter} from 'node:path';
+import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {parseNodes, validateNodes, renderConfig, profilePath, errorMessage, ConfigError, PLATFORMS, CORES} from '../docs/assets/config-core.mjs';
 import {PROFILES} from '../docs/assets/profiles.mjs';
 import {clone, MAX_JSON_DEPTH} from '../docs/assets/core/values.mjs';
+import {uuid, links, tcp, udp, legacyPassword, legacySS} from './fixtures.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
-const uuid = '00000000-0000-4000-8000-000000000001';
-const links = {
-  naive: 'naive+https://user:p%40ss%3Aword@example.com:443?sni=example.com#Test',
-  hy2: 'hy2://user%3Apassword@example.com:443?sni=example.com&obfs=salamander&obfs-password=example-password#Test',
-  trojan: 'trojan://p%40ss%3Aword@example.com:443?security=tls&type=ws&host=example.com&path=%2Fproxy#Test',
-  ss: 'ss://' + btoa('aes-128-gcm:example-password') + '@example.com:8388#Test',
-  vless: `vless://${uuid}@example.com:443?security=tls&type=grpc&serviceName=example&encryption=none#Test`,
-};
-const tcp = {type: 'http', tag: 'tcp', server: 'example.com', server_port: 443};
-const udp = {type: 'hysteria2', tag: 'udp', server: 'example.com', server_port: 443, password: 'example-password', tls: {enabled: true}};
-const legacyPassword = 'p#?%41% +@:/\\密码';
-const legacySS = 'ss://' + Buffer.from(`aes-128-gcm:${legacyPassword}@example.com:8388`).toString('base64') + '#Legacy';
 const deepNodes = depth => '{"outbounds":[{"type":"http","tag":"test","server":"example.com","server_port":443,"extra":' + '['.repeat(depth) + '0' + ']'.repeat(depth) + '}]}';
 
 test('five link adapters preserve decoded credentials, TLS and transport', () => {
@@ -267,45 +256,5 @@ test('CLI output is private and atomic, preserves old files and refuses input al
     assert.equal(rendered.inbounds[0].type, 'mixed');
     assert.equal(rendered.outbounds.find(node => node.type === 'naive').password, 'p@ss:word');
     assert.deepEqual(JSON.parse(read(templatePath, 'utf8')), template);
-  } finally { rmSync(directory, {recursive: true, force: true}); }
-});
-
-test('platform synchronization supports empty arguments on the selected Bash', () => {
-  const directory = mkdtempSync(join(tmpdir(), 'sing-box-sync-'));
-  const log = join(directory, 'calls');
-  try {
-    writeFileSync(join(directory, 'python3'), '#!/bin/sh\nprintf "%s\\n" "$#" "$@" >> "$SYNC_LOG"\n', {mode: 0o700});
-    for (const args of [[], ['write'], ['--check']]) {
-      writeFileSync(log, '');
-      const result = spawnSync(process.env.TEST_BASH || 'bash', [join(ROOT, 'scripts/sync-platforms.sh'), ...args], {
-        encoding: 'utf8', env: {...process.env, PATH: directory + delimiter + process.env.PATH, SYNC_LOG: log},
-      });
-      assert.equal(result.status, 0, result.stderr);
-      const flags = args[0] === '--check' ? ['--check'] : [];
-      const expected = ['build-configs.py', 'sync-web-profiles.py'].flatMap(script => [String(2 + flags.length), '-B', join(ROOT, 'scripts', script), ...flags]);
-      assert.deepEqual(read(log, 'utf8').trim().split('\n'), expected);
-    }
-  } finally { rmSync(directory, {recursive: true, force: true}); }
-});
-
-test('generated links pass the selected real sing-box core on every maintained preset', {skip: !process.env.SING_BOX}, () => {
-  const core = process.env.SING_BOX;
-  const version = spawnSync(core, ['version'], {encoding: 'utf8'});
-  assert.equal(version.status, 0);
-  const line = version.stdout.match(/sing-box version (1\.(?:13|14|15))\./)?.[1];
-  assert.ok(line);
-  const profiles = Object.entries(PROFILES).filter(([path]) => path.includes(`/${line}/`));
-  assert.equal(profiles.length, 17);
-  const directory = mkdtempSync(join(tmpdir(), 'sing-box-core-'));
-  try {
-    for (const [name, link] of Object.entries({...links, legacySS})) {
-      const nodes = parseNodes(link);
-      for (const [path, template] of profiles) {
-        const file = join(directory, 'config.json');
-        writeFileSync(file, JSON.stringify(renderConfig(template, nodes)), {mode: 0o600});
-        const result = spawnSync(core, ['check', '-c', file], {cwd: directory, encoding: 'utf8'});
-        assert.equal(result.status, 0, `${name} ${path}: ${result.stdout}${result.stderr}`);
-      }
-    }
   } finally { rmSync(directory, {recursive: true, force: true}); }
 });

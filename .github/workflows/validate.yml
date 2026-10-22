@@ -23,9 +23,6 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install validation dependencies
-        run: sudo apt-get update && sudo apt-get install -y jq ripgrep python3
-
       - name: Download pinned sing-box checker
         run: |
           archive="sing-box-${SING_BOX_VERSION}-linux-amd64.tar.gz"
@@ -37,37 +34,10 @@ jobs:
           printf 'SING_BOX=%s/%s\n' \
             "$PWD" "sing-box-${SING_BOX_VERSION}-linux-amd64/sing-box" >> "$GITHUB_ENV"
 
-      - name: Audit public placeholders
-        run: ./scripts/audit-public.sh
+      - name: Validate static contracts, real core and browser downloads
+        run: python3 -B scripts/check.py --core 1.14
 
-      - name: Check subscription links
-        run: ./scripts/check-links.sh
-
-      - name: Check shell scripts
-        run: |
-          for script in scripts/*.sh; do
-            bash -n "$script"
-          done
-
-      - name: Validate Pages SEO and selector
-        run: ./scripts/check-pages.sh
-
-      - name: Validate every platform profile
-        run: ./scripts/check.sh
-
-      - name: Verify versioned module substitution and isolation
-        run: python3 -B scripts/check-modules.py
-
-      - name: Validate TCP-only and mixed node rendering
-        run: python3 -B scripts/check-render.py
-
-      - name: Validate shared generator and five link protocols
-        run: node --test tests/generator.test.mjs
-
-      - name: Test browser JSON downloads and local-only generation
-        run: node scripts/check-browser.mjs
-
-  shell-compatibility:
+  tool-portability:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -76,10 +46,8 @@ jobs:
         with:
           node-version: 24
 
-      - name: Check synchronization on macOS system Bash
-        env:
-          TEST_BASH: /bin/bash
-        run: node --test --test-name-pattern='platform synchronization' tests/generator.test.mjs
+      - name: Check build and static tests on macOS without Shell dependencies
+        run: python3 -B scripts/check.py static
 
   legacy-profiles:
     runs-on: ubuntu-latest
@@ -100,9 +68,6 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Download pinned sing-box checker
         run: |
           archive="sing-box-${SING_BOX_VERSION}-linux-amd64.tar.gz"
@@ -115,13 +80,7 @@ jobs:
             "$PWD" "sing-box-${SING_BOX_VERSION}-linux-amd64/sing-box" >> "$GITHUB_ENV"
 
       - name: Validate every platform on the 1.13 core
-        run: ./scripts/check-platform-version.sh "${{ matrix.profile_line }}"
-
-      - name: Validate TCP-only and mixed node rendering
-        run: python3 -B scripts/check-render.py
-
-      - name: Validate generated link profiles on the 1.13 core
-        run: node --test tests/generator.test.mjs
+        run: python3 -B scripts/check.py core --core "${{ matrix.profile_line }}"
 
   experimental-profiles:
     runs-on: ubuntu-latest
@@ -131,9 +90,6 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
-
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Read experimental checker pin
         run: |
@@ -157,10 +113,7 @@ jobs:
             "$PWD" "sing-box-${SING_BOX_VERSION}-linux-amd64/sing-box" >> "$GITHUB_ENV"
 
       - name: Check all experimental platform configurations without starting a proxy
-        run: ./scripts/check-platform-version.sh 1.15
-
-      - name: Check generated link configurations with the experimental core
-        run: node --test tests/generator.test.mjs
+        run: python3 -B scripts/check.py core --core 1.15
 
   rule-set-compatibility:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -181,9 +134,6 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Download pinned sing-box checker
         run: |
           archive="sing-box-${SING_BOX_VERSION}-linux-amd64.tar.gz"
@@ -196,4 +146,4 @@ jobs:
             "$PWD" "sing-box-${SING_BOX_VERSION}-linux-amd64/sing-box" >> "$GITHUB_ENV"
 
       - name: Download and parse every remote rule set
-        run: ./scripts/check-rule-sets.sh "${{ matrix.profile_line }}"
+        run: python3 -B scripts/check.py rule-sets --core "${{ matrix.profile_line }}"

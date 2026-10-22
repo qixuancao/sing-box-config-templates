@@ -21,9 +21,9 @@ class RenderTest(unittest.TestCase):
         version = subprocess.run(
             [SING_BOX, "version"], check=True, capture_output=True, text=True
         ).stdout
-        match = re.search(r"sing-box version (1\.(?:13|14))\.", version)
+        match = re.search(r"sing-box version (1\.(?:13|14|15))\.", version)
         if match is None:
-            raise ValueError("Use a sing-box 1.13 or 1.14 checker")
+            raise ValueError("Use a maintained sing-box 1.13, 1.14 or 1.15 checker")
         cls.line = match[1]
         cls.example = json.loads((ROOT / "examples/nodes.example.json").read_text())
         cls.tcp_node = {
@@ -41,7 +41,8 @@ class RenderTest(unittest.TestCase):
         source.write_text(json.dumps(nodes))
         output = self.work / "rendered.json"
         result = subprocess.run(
-            [str(ROOT / "scripts/render.sh"), str(profile or self.profile), str(source), str(output)],
+            ["node", str(ROOT / "scripts/generate.mjs"), "--template", str(profile or self.profile),
+             "--input", str(source), "--output", str(output)],
             cwd=self.work, capture_output=True, text=True,
         )
         return result, output
@@ -138,7 +139,8 @@ class RenderTest(unittest.TestCase):
             for output in (f"./{source.name}", str(symlink), str(hardlink)):
                 with self.subTest(source=source.name, output=output):
                     result = subprocess.run(
-                        [str(ROOT / "scripts/render.sh"), "template.json", "nodes.json", output],
+                        ["node", str(ROOT / "scripts/generate.mjs"), "--template", "template.json",
+                         "--input", "nodes.json", "--output", output],
                         cwd=self.work, capture_output=True, text=True,
                     )
                     self.assertNotEqual(result.returncode, 0)

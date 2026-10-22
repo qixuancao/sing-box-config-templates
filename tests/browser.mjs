@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // End-to-end checks using an isolated local Chrome profile; no npm dependencies.
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';

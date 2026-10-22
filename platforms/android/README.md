@@ -33,7 +33,7 @@ sing-box 版本为准。若你的补丁版本与表中检查器不同，请在�
 ## 3. 生成并导入
 
 1. 安装官方 [sing-box for Android](https://github.com/SagerNet/sing-box-for-android)。
-2. 用 [`../../scripts/render.sh`](../../scripts/render.sh) 注入自己的节点。
+2. 用 [`../../scripts/generate.mjs`](../../scripts/generate.mjs) 注入自己的节点。
 3. 将生成的 JSON 作为本地配置导入，或放到你控制且需要认证的 HTTPS 地址后
    添加为远程配置。
 4. 首次启动时允许 Android 创建 VPN。
@@ -41,10 +41,8 @@ sing-box 版本为准。若你的补丁版本与表中检查器不同，请在�
 例如给 1.13.x 生成 RealIP 配置：
 
 ```bash
-./scripts/render.sh \
-  platforms/android/1.13/realip.json \
-  nodes.json \
-  generated/android-1.13-realip.json
+node scripts/generate.mjs --platform android --core 1.13 --scenario realip \
+  --input nodes.json --output generated/android-1.13-realip.json
 sing-box check -c generated/android-1.13-realip.json
 ```
 

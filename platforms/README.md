@@ -14,6 +14,6 @@
 这里的 JSON 都只有公开占位节点。请先按
 [`../docs/getting-started.md`](../docs/getting-started.md) 生成私有配置。
 
-平台目录由 [`../scripts/sync-platforms.sh`](../scripts/sync-platforms.sh)
+平台目录由 [`../scripts/build.py`](../scripts/build.py)
 从[配置模块](../modules/README.md)和 `presets/` 确定性生成，CI 会拒绝未同步的修改。
 1.15 的适配差异与验证边界见[实验版说明](../docs/experimental-1.15.md)。

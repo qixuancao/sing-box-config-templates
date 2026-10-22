@@ -4,7 +4,7 @@
 **1.15 · 实验版** 同样位于 `platforms/<平台>/1.15/`，配置入口与固定 alpha
 验证说明见[实验版文档](docs/experimental-1.15.md)；下表列出稳定版本链接。
 
-公开 JSON 含占位节点；用 `render.sh` 在本地注入自己的节点后，再导入客户端。
+公开 JSON 含占位节点；用 `node scripts/generate.mjs` 在本地注入自己的节点后，再导入客户端。
 
 ## Android / SFA
 

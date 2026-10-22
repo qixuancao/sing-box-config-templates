@@ -43,6 +43,6 @@
 ## 本地生成原则
 
 - 命令行建议使用被 Git 忽略的 `nodes.json`、`nodes.txt` 与 `generated/`；
-- `generate.mjs` 和 `render.sh` 在本地解析节点、组合 JSON，不联网获取输入；
+- `scripts/generate.mjs` 在本地解析节点、组合 JSON，不联网获取输入；
 - 提交 Issue 前务必删除服务器、域名、IP、端口、密码、UUID、密钥和订阅
   token，详见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。

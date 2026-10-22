@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
 """Build iOS LAN bypass routes without excluding TUN, DNS or FakeIP addresses."""
 
 import ipaddress
-import json
-import sys
 
 
 # Policy for iOS only. In particular, do not apply this to privacy-strict.
@@ -62,8 +59,3 @@ def route_exclusions(profile):
     return [str(route) for route in sorted(
         routes, key=lambda route: (route.version, int(route.network_address), route.prefixlen)
     )]
-
-
-if __name__ == "__main__":
-    with open(sys.argv[1], encoding="utf-8") as source:
-        print(json.dumps(route_exclusions(json.load(source))))

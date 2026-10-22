@@ -39,8 +39,8 @@ sing-box check -c generated/sing-box.json
 ```
 
 网页和 CLI 共用同一套解析、生成模块。`nodes.txt`、`nodes.json` 和 `generated/`
-已加入 `.gitignore`，CLI 输出文件权限为 `0600`。原来的 `render.sh TEMPLATE NODES OUTPUT`
-命令继续可用，现在调用同一套 Node.js 引擎。
+已加入 `.gitignore`，CLI 输出文件权限为 `0600`。旧 `render.sh` 包装已移除，
+统一使用 `node scripts/generate.mjs`；私有模板通过 `--template PATH` 指定。
 
 ## 选择平台
 
@@ -60,7 +60,8 @@ sing-box check -c generated/sing-box.json
 Linux / Windows 可先用 `mixed.json`，运行后将应用代理设为 `127.0.0.1:2080`：
 
 ```bash
-./scripts/render.sh platforms/linux/1.14/mixed.json nodes.json generated/linux.json
+node scripts/generate.mjs --platform linux --core 1.14 --scenario mixed \
+  --input nodes.json --output generated/linux.json
 sing-box check -c generated/linux.json
 sing-box run -c generated/linux.json
 ```

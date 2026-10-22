@@ -24,3 +24,7 @@ cache/
 .idea/
 .vscode/
 .DS_Store
+
+# Python development-tool caches
+__pycache__/
+*.pyc

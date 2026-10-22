@@ -40,8 +40,8 @@ sing-box check -c generated/sing-box.json
 ```
 
 The browser and CLI share one parser and renderer. `nodes.txt`, `nodes.json` and `generated/`
-are Git-ignored. CLI output files use mode `0600`. The existing
-`render.sh TEMPLATE NODES OUTPUT` interface remains available and now calls the same Node.js engine.
+are Git-ignored. CLI output files use mode `0600`. The old `render.sh` wrapper has been removed;
+use `node scripts/generate.mjs`, with `--template PATH` for a private template.
 
 ## Choose a platform
 
@@ -62,7 +62,8 @@ supported through the CLI's `--template` option.
 On desktop systems, start with `mixed.json` and set the application proxy to `127.0.0.1:2080`:
 
 ```bash
-./scripts/render.sh platforms/linux/1.14/mixed.json nodes.json generated/linux.json
+node scripts/generate.mjs --platform linux --core 1.14 --scenario mixed \
+  --input nodes.json --output generated/linux.json
 sing-box check -c generated/linux.json
 sing-box run -c generated/linux.json
 ```

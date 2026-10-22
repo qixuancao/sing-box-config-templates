@@ -24,14 +24,17 @@ flowchart LR
 | 平台目录 | `docs/assets/core/catalog.mjs` | 支持的平台、内核版本与默认场景 |
 | 配置模块 | `modules/<类别>/<版本>/<方案>.json` | 独立维护 DNS、入站、路由、规则集；共享策略组与缓存模块 |
 | 场景预设 | `presets/scenarios/`、`presets/catalog.json` | 选择模块、平台适配、稳定与实验版本通道 |
-| 构建器 | `scripts/build-configs.py`、`scripts/sync-platforms.sh` | 从模块生成完整 JSON 和浏览器预设目录 |
+| 构建入口 | `scripts/build.py` | 一次生成平台 JSON、浏览器包与中英文页面；`--check` 只检查同步 |
+| 验证入口 | `scripts/check.py` | 默认执行静态、所选内核和浏览器检查；规则集下载单独触发 |
+| 开发工具内部模块 | `scripts/lib/` | 配置组合、页面、公共审计、平台契约和规则集检查；仅 Python 标准库 |
+| 回归测试 | `tests/` | Python 与 Node 单元测试、真实内核集成测试、Chrome 端到端测试 |
 | 网页交互 | `docs/assets/app.mjs`、`app.css` | 输入、预览、下载与布局 |
 | 页面与翻译 | `web/page.html`、`web/locales/` | 一份页面结构，两份独立翻译 |
 | 命令行 | `scripts/generate.mjs` | 本地文件与 stdin 输入、原子写入、0600 文件权限 |
 
 `platforms/` 中的 JSON、`docs/assets/presets.mjs`、
 `docs/index.html`、`docs/en/index.html` 和 `docs/assets/profiles.mjs` 是生成产物。
-修改源文件后运行对应脚本；CI 会检查它们是否同步。
+修改源文件后统一运行 `python3 -B scripts/build.py`；CI 会检查它们是否同步。
 
 ## 复用生成逻辑
 
@@ -52,8 +55,8 @@ const json = JSON.stringify(config, null, 2);
 
 1. 在 `modules/dns/1.14/fakeip.json` 等对应的类别、版本和方案中修改配置。
 2. 如需组合新场景，在 `presets/scenarios/` 选择 DNS、入站、规则等模块，再登记支持的平台；网页场景名称与说明位于 `docs/assets/app.mjs`。
-3. 运行 `./scripts/sync-platforms.sh`，更新完整配置、预设目录和浏览器模板包。
-4. 运行 `python3 -B scripts/check-modules.py`，并使用目标版本的临时检查器验证。
+3. 运行 `python3 -B scripts/build.py`，更新全部构建产物。
+4. 运行 `python3 -B scripts/check.py static`，再用 `check.py core --sing-box /path/to/checker` 验证目标内核。
 
 详细目录与修改例子见[配置模块](../modules/README.md)。对象递归合并、数组保持原顺序，
 同一字段由两个模块重复定义时构建失败；各版本独立选择模块，不会自动回退到其他版本。
@@ -77,9 +80,9 @@ const json = JSON.stringify(config, null, 2);
 ## 修改页面或翻译
 
 ```bash
-python3 -B scripts/build-pages.py
-./scripts/check-pages.sh
-node scripts/check-browser.mjs
+python3 -B scripts/build.py
+python3 -B scripts/check.py static
+python3 -B scripts/check.py browser
 ```
 
 页面保持纯前端，通过 GitHub Pages 发布。CSP 的 `connect-src 'none'` 阻止页面
