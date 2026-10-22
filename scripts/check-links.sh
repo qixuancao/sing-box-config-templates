@@ -58,7 +58,7 @@ for uri in "${import_uris[@]}"; do
   }
 done
 
-# Every published platform profile must have an explicit versioned Raw URL.
+# Every stable platform profile must have an explicit versioned Raw URL.
 for profile in "$repo_dir"/platforms/*/1.{13,14}/*.json; do
   expected="${raw_prefix}${profile#"$repo_dir/"}"
   rg --fixed-strings --quiet "$expected" "$subscriptions" || {

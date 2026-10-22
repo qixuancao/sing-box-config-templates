@@ -17,12 +17,10 @@ catalog = json.loads((ROOT / "presets/catalog.json").read_text())
 class ModuleTests(unittest.TestCase):
     def test_outputs_contain_only_declared_platform_profiles_and_browser_catalog(self):
         expected = {"docs/assets/presets.mjs"}
-        for version, metadata in catalog["versions"].items():
+        for version in catalog["versions"]:
             for platform, settings in catalog["platforms"].items():
                 for scenario in settings["scenarios"]:
-                    path = (f"experimental/{version}/platforms/{platform}/{scenario}.json"
-                            if metadata["channel"] == "experimental" else
-                            f"platforms/{platform}/{version}/{scenario}.json")
+                    path = f"platforms/{platform}/{version}/{scenario}.json"
                     expected.add(path)
         self.assertEqual(set(outputs()), expected)
 
@@ -68,11 +66,10 @@ class ModuleTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Unexpected fields"):
                 compose(root, catalog, "1.14", "realip", "android")
 
-    def test_experimental_profiles_are_separate_and_use_new_tun_stack(self):
+    def test_versions_share_platform_layout_and_keep_experimental_boundaries(self):
         generated = outputs()
-        for version, metadata in catalog["versions"].items():
-            prefix = f"experimental/{version}/platforms/" if metadata["channel"] == "experimental" else "platforms/"
-            paths = [name for name in generated if name.startswith(prefix) and (prefix != "platforms/" or f"/{version}/" in name)]
+        for version in catalog["versions"]:
+            paths = [name for name in generated if name.startswith("platforms/") and f"/{version}/" in name]
             self.assertEqual(len(paths), 17)
             for name in paths:
                 config = json.loads(generated[name])
@@ -81,6 +78,11 @@ class ModuleTests(unittest.TestCase):
                         self.assertEqual("stack" in inbound, version != "1.15")
         self.assertEqual(catalog["default_core"], "1.14")
         self.assertEqual(catalog["versions"]["1.15"]["channel"], "experimental")
+        self.assertFalse((ROOT / "experimental").exists())
+        for platform in catalog["platforms"]:
+            readme = (ROOT / f"platforms/{platform}/1.15/README.md").read_text()
+            self.assertIn("实验版", readme)
+            self.assertIn(catalog["versions"]["1.15"]["checker"], readme)
 
 
 if __name__ == "__main__":

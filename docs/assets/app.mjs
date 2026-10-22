@@ -63,7 +63,8 @@ function generate() {
     config = result; parsed = nodes;
     byId('json-preview').value = JSON.stringify(result, null, 2) + '\n';
     byId('result-empty').hidden = true;
-    [t(`${nodes.outbounds.length} 个节点`, `${nodes.outbounds.length} nodes`), `${nodes.udp_outbounds.length} UDP`, `${core.value} · ${platform.value}`].forEach(text => {
+    const coreLabel = core.value === '1.15' ? t('1.15 · 实验版', '1.15 · Experimental') : core.value;
+    [t(`${nodes.outbounds.length} 个节点`, `${nodes.outbounds.length} nodes`), `${nodes.udp_outbounds.length} UDP`, `${coreLabel} · ${platform.value}`].forEach(text => {
       const badge = document.createElement('span'); badge.textContent = text; byId('result-summary').append(badge);
     });
     nodes.outbounds.forEach(node => {

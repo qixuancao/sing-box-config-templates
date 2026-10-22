@@ -1,15 +1,17 @@
-# sing-box 1.15 实验配置
+# sing-box 1.15 · 实验版
 
 按官方 **1.15.0-alpha.12** 预备，稳定配置继续维护 1.13 / 1.14。
 网页的“高级设置”中可主动选择 1.15；默认仍是 1.14。
+配置与稳定版使用同一目录结构：`platforms/<平台>/1.15/<场景>.json`，
+实验状态由版本目录说明、网页标签和 `presets/catalog.json` 的 `channel` 标记。
 
 | 平台 | 配置 |
 | --- | --- |
-| Android | [FakeIP](platforms/android/fakeip.json) · [RealIP](platforms/android/realip.json)，另含六种场景 |
-| iOS | [FakeIP](platforms/ios/fakeip.json) · [RealIP](platforms/ios/realip.json) |
-| macOS | [FakeIP](platforms/macos/fakeip.json) · [RealIP](platforms/macos/realip.json) · [mixed](platforms/macos/mixed.json) |
-| Linux | [mixed](platforms/linux/mixed.json) · [TUN](platforms/linux/tun.json) |
-| Windows | [mixed](platforms/windows/mixed.json) · [TUN](platforms/windows/tun.json) |
+| Android | [FakeIP](../platforms/android/1.15/fakeip.json) · [RealIP](../platforms/android/1.15/realip.json)，另含六种场景 |
+| iOS | [FakeIP](../platforms/ios/1.15/fakeip.json) · [RealIP](../platforms/ios/1.15/realip.json) |
+| macOS | [FakeIP](../platforms/macos/1.15/fakeip.json) · [RealIP](../platforms/macos/1.15/realip.json) · [mixed](../platforms/macos/1.15/mixed.json) |
+| Linux | [mixed](../platforms/linux/1.15/mixed.json) · [TUN](../platforms/linux/1.15/tun.json) |
+| Windows | [mixed](../platforms/windows/1.15/mixed.json) · [TUN](../platforms/windows/1.15/tun.json) |
 
 ## 已适配的差异
 
@@ -31,7 +33,7 @@ node scripts/generate.mjs --platform android --core 1.15 \
 /path/to/temporary/sing-box check -c generated/sing-box-1.15.json
 ```
 
-固定检查器版本和归档 SHA-256 位于 [`presets/catalog.json`](../../presets/catalog.json)。
+固定检查器版本和归档 SHA-256 位于 [`presets/catalog.json`](../presets/catalog.json)。
 CI 下载该版本到临时 runner，只执行 `version` / `check`，验证 17 份平台配置、
 节点填入后的配置及五种分享链接的生成结果。
 

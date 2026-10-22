@@ -7,7 +7,7 @@
 - 按流媒体、AI、Telegram、Microsoft、Apple、Google、GitHub 选择出口；
 - 手动选节点或通过 URLTest 按延迟自动选择；
 - 在本地合并节点，生成可直接导入客户端的 JSON；
-- 稳定配置维护 1.13、1.14；[1.15 实验配置](experimental/1.15/README.md)按固定 alpha 预备。
+- 稳定配置维护 1.13、1.14；[1.15 · 实验版](docs/experimental-1.15.md)按固定 alpha 预备。
 - DNS、入站、规则按“类别 → 版本 → 方案”独立维护，见[配置模块](modules/README.md)。
 
 ## 在线生成
@@ -52,7 +52,7 @@ sing-box check -c generated/sing-box.json
 | Linux | [TUN](platforms/linux/1.14/tun.json) · [mixed](platforms/linux/1.14/mixed.json) | [使用说明](platforms/linux/README.md) |
 | Windows | [TUN](platforms/windows/1.14/tun.json) · [mixed](platforms/windows/1.14/mixed.json) | [使用说明](platforms/windows/README.md) |
 
-所有平台都先选择内核版本，再选择配置：`platforms/<平台>/1.14/` 或 `platforms/<平台>/1.13/`。上表链接指向 1.14；使用 1.13 内核时，换成同平台 `1.13/` 目录中的同名文件。
+所有平台都先选择内核版本，再选择配置：`platforms/<平台>/<版本>/`。上表链接指向 1.14；使用 1.13 内核时，换成同平台 `1.13/` 目录中的同名文件。`1.15/` 为**实验版**，仅按 `1.15.0-alpha.12` 验证。
 
 原 `templates/*.json` 已移除并停止维护，旧 Raw 链接不再可用；请改用对应平台的版本化配置。
 私有模板仍可通过 CLI 的 `--template` 参数传入。

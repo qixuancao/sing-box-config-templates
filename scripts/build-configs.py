@@ -87,9 +87,7 @@ def compose(root, catalog, version, scenario, platform):
     return {key: config[key] for key in ORDER if key in config}
 
 
-def profile_path(catalog, platform, version, scenario):
-    if catalog["versions"][version]["channel"] == "experimental":
-        return f"experimental/{version}/platforms/{platform}/{scenario}.json"
+def profile_path(platform, version, scenario):
     return f"platforms/{platform}/{version}/{scenario}.json"
 
 
@@ -99,7 +97,7 @@ def outputs(root=ROOT):
     for version in catalog["versions"]:
         for platform, settings in catalog["platforms"].items():
             for scenario in settings["scenarios"]:
-                result[profile_path(catalog, platform, version, scenario)] = encode(compose(root, catalog, version, scenario, platform))
+                result[profile_path(platform, version, scenario)] = encode(compose(root, catalog, version, scenario, platform))
     client_catalog = {
         "default_core": catalog["default_core"], "versions": catalog["versions"],
         "platforms": {name: settings["scenarios"] for name, settings in catalog["platforms"].items()},
@@ -114,7 +112,7 @@ def main():
     args = parser.parse_args()
     generated = outputs()
     expected = {name for name in generated if name.endswith(".json")}
-    actual = {str(path.relative_to(ROOT)) for directory in ("platforms", "experimental") for path in (ROOT / directory).rglob("*.json")}
+    actual = {str(path.relative_to(ROOT)) for path in (ROOT / "platforms").rglob("*.json")}
     unexpected = actual - expected
     if unexpected:
         raise SystemExit("Unexpected generated profiles: " + ", ".join(sorted(unexpected)))

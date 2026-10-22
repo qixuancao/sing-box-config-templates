@@ -7,7 +7,7 @@ Generate sing-box configurations for Android, iOS, macOS, Linux, and Windows, wi
 - Choose exits for streaming, AI, Telegram, Microsoft, Apple, Google, and GitHub.
 - Select nodes manually or let URLTest choose by latency.
 - Merge your nodes locally into an importable JSON configuration.
-- Use stable profiles for sing-box 1.13 / 1.14, with separate [experimental 1.15 presets](experimental/1.15/README.md).
+- Use stable profiles for sing-box 1.13 / 1.14, or opt into [1.15 · Experimental](docs/experimental-1.15.md).
 - Edit DNS, inbound and routing modules by category, core version and mode; see [configuration modules](modules/README.md).
 
 ## Generate in your browser
@@ -53,7 +53,7 @@ are Git-ignored. CLI output files use mode `0600`. The existing
 | Linux | [TUN](platforms/linux/1.14/tun.json) · [mixed](platforms/linux/1.14/mixed.json) | [Guide](platforms/linux/README.md) |
 | Windows | [TUN](platforms/windows/1.14/tun.json) · [mixed](platforms/windows/1.14/mixed.json) | [Guide](platforms/windows/README.md) |
 
-Choose the core version on every platform: `platforms/<platform>/1.14/` or `platforms/<platform>/1.13/`. The table links to 1.14 profiles; use the same filename under `1.13/` when running a 1.13 core.
+Choose the core version on every platform: `platforms/<platform>/<version>/`. The table links to 1.14 profiles; use the same filename under `1.13/` when running a 1.13 core. The `1.15/` profiles are **Experimental**, checked only against `1.15.0-alpha.12`.
 
 The former `templates/*.json` files have been removed and are no longer maintained; their old
 Raw URLs no longer work. Use the versioned profile for your platform. Private templates remain

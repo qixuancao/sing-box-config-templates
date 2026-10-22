@@ -5,7 +5,7 @@
 - Android、iOS、macOS、Linux、Windows 均维护 1.14、1.13 两条兼容线；
 - 路径统一为 `platforms/<平台>/<内核版本>/<配置>.json`；
 - CI 检查器：官方 1.14.0、1.13.21 Linux amd64 发布包；
-- 另有 [1.15 实验配置](../experimental/1.15/README.md)，固定在 `1.15.0-alpha.12` 验证，默认选择仍为 1.14；
+- 同一平台目录下的 `1.15/` 为[实验版](experimental-1.15.md)，固定在 `1.15.0-alpha.12` 验证，默认选择仍为 1.14；
 - 默认 DNS：仅 IPv4；`dual-stack.json` 改为双栈并优先 IPv4；
 - 规则：MetaCubeX `sing` 分支远程 `.srs`。
 
@@ -53,7 +53,7 @@ Android/iOS 的字段省略是平台适配，不是功能缺失造成的遗漏�
 
 ### iOS 局域网绕行
 
-稳定配置 `platforms/ios/{1.13,1.14}/{fakeip,realip}.json` 和独立的 1.15 实验 iOS 配置默认添加 `route_exclude_address`，
+`platforms/ios/{1.13,1.14,1.15}/{fakeip,realip}.json`（1.15 为实验版）默认添加 `route_exclude_address`，
 排除常见本地 IPv4/IPv6 地址及 CGNAT。生成时从排除范围中扣除 TUN 子网、
 虚拟 DNS 与 FakeIP 地址池，避免绕过 `172.19.0.2` 或误排 IPv6 FakeIP。
 其他平台与 Android `privacy-strict` 保持原有接管策略。
@@ -69,7 +69,7 @@ Android/iOS 的字段省略是平台适配，不是功能缺失造成的遗漏�
 - 公共占位配置和注入示例节点后的配置都通过 `sing-box check`；
 - 平台字段符合上表约束；
 - iOS 局域网排除范围完整，且不重叠 TUN、虚拟 DNS 或 FakeIP；
-- 五个平台各自只有 1.13、1.14 两个配置目录，无同层 JSON 别名；
+- 五个平台各自使用 1.13、1.14、1.15 版本目录，无同层 JSON 别名；1.15 保留实验标签；
 - 八种 Android 用途差异符合各自契约；
 - 配置不包含真实节点凭据或明显私有网络标记；
 - 每周实际下载 17 个远程规则集，并用两套固定核心解析其二进制内容。

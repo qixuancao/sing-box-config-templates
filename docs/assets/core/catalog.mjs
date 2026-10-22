@@ -8,7 +8,5 @@ export function profilePath(platform, core = '1.14', scenario = '') {
   requireValue(Object.hasOwn(PLATFORMS, platform) && CORES.includes(core), 'profile');
   const selected = scenario || PLATFORMS[platform][0];
   requireValue(PLATFORMS[platform].includes(selected), 'profile');
-  return PRESETS.versions[core].channel === 'experimental'
-    ? `experimental/${core}/platforms/${platform}/${selected}.json`
-    : `platforms/${platform}/${core}/${selected}.json`;
+  return `platforms/${platform}/${core}/${selected}.json`;
 }

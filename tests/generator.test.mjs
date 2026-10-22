@@ -209,7 +209,16 @@ test('all presets preserve route ordering, direct UDP and TCP-only behavior', ()
 });
 
 test('profile selection rejects path traversal and unsupported combinations', () => {
-  for (const platform of Object.keys(PLATFORMS)) assert.ok(PROFILES[profilePath(platform)]);
+  for (const [platform, scenarios] of Object.entries(PLATFORMS)) {
+    assert.ok(PROFILES[profilePath(platform)]);
+    for (const core of CORES) {
+      for (const scenario of scenarios) {
+        const path = `platforms/${platform}/${core}/${scenario}.json`;
+        assert.equal(profilePath(platform, core, scenario), path);
+        assert.deepEqual(PROFILES[path], JSON.parse(read(join(ROOT, path), 'utf8')));
+      }
+    }
+  }
   for (const args of [['../../private'], ['android', '1.12'], ['ios', '1.14', 'mixed'], ['__proto__']]) assert.throws(() => profilePath(...args), {code: 'profile'});
 });
 
@@ -285,11 +294,13 @@ test('generated links pass the selected real sing-box core on every maintained p
   assert.equal(version.status, 0);
   const line = version.stdout.match(/sing-box version (1\.(?:13|14|15))\./)?.[1];
   assert.ok(line);
+  const profiles = Object.entries(PROFILES).filter(([path]) => path.includes(`/${line}/`));
+  assert.equal(profiles.length, 17);
   const directory = mkdtempSync(join(tmpdir(), 'sing-box-core-'));
   try {
     for (const [name, link] of Object.entries({...links, legacySS})) {
       const nodes = parseNodes(link);
-      for (const [path, template] of Object.entries(PROFILES).filter(([path]) => path.includes(`/${line}/`))) {
+      for (const [path, template] of profiles) {
         const file = join(directory, 'config.json');
         writeFileSync(file, JSON.stringify(renderConfig(template, nodes)), {mode: 0o600});
         const result = spawnSync(core, ['check', '-c', file], {cwd: directory, encoding: 'utf8'});

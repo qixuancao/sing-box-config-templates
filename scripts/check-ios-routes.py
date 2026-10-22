@@ -29,7 +29,7 @@ class IOSRoutesTest(unittest.TestCase):
     def ios_profiles(self):
         for line in ("1.14", "1.13", "1.15"):
             for variant in ("fakeip", "realip"):
-                path = f"experimental/1.15/platforms/ios/{variant}.json" if line == "1.15" else f"platforms/ios/{line}/{variant}.json"
+                path = f"platforms/ios/{line}/{variant}.json"
                 profile = read_profile(path)
                 yield f"{line}/{variant}", profile, networks(profile["inbounds"][0].get("route_exclude_address", []))
 
@@ -121,7 +121,7 @@ class PublicAuditTest(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(prefix="sing-box-audit-")
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
-        for name in ("scripts", "platforms", "experimental", "modules", "presets", "examples"):
+        for name in ("scripts", "platforms", "modules", "presets", "examples"):
             (self.root / name).mkdir()
         self.audit = self.root / "scripts/audit-public.sh"
         shutil.copyfile(ROOT / "scripts/audit-public.sh", self.audit)

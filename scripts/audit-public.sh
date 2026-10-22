@@ -15,7 +15,7 @@ json_files=()
 while IFS= read -r file; do
   json_files+=("$file")
 done < <(
-  find platforms experimental modules presets examples -type f -name '*.json' -print | LC_ALL=C sort
+  find platforms modules presets examples -type f -name '*.json' -print | LC_ALL=C sort
 )
 
 for file in "${json_files[@]}"; do

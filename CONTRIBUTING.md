@@ -31,7 +31,7 @@ SING_BOX=/path/to/sing-box-1.14.0 python3 -B scripts/check-render.py
 
 配置源位于 `modules/<类别>/<版本>/`，场景组合位于 `presets/`。修改后运行
 `./scripts/sync-platforms.sh`，同时更新平台文件和浏览器配置包。
-`platforms/` 与实验配置 JSON 都由这些源生成；不再生成不区分平台的通用配置。
+`platforms/` 中的稳定与实验版 JSON 都由这些源生成；不再生成不区分平台的通用配置。
 修改页面结构或翻译后运行 `python3 -B scripts/build-pages.py`。模块分工与公共 API 见
 [模块结构](docs/architecture.md)。新协议的测试应分别带 `SING_BOX` 环境变量用两个内核运行。
 
@@ -56,8 +56,8 @@ SING_BOX=/path/to/sing-box-1.14.0 python3 -B scripts/check-render.py
 ## 设计约束
 
 - 目标语法保持在 README 声明的 sing-box 版本；
-- 稳定平台配置放在 `platforms/<平台>/1.13/` 和 `1.14/`；1.15 测试配置放在
-  `experimental/1.15/platforms/<平台>/`，用固定 alpha 检查器验证；
+- 所有配置统一放在 `platforms/<平台>/<版本>/`；1.13 / 1.14 为稳定兼容线，
+  1.15 在目录说明与网页中标记为实验版，用固定 alpha 检查器验证；
 - 不加入真实节点、付费订阅或绕过授权的服务；
 - 平台不支持的字段不能只因为 schema 接受就写入；
 - 新规则集必须有稳定来源、清晰用途和故障退路；

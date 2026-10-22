@@ -83,6 +83,9 @@ try {
   for (const suffix of ['', 'en/']) {
     console.log(`Checking browser ${suffix ? 'English' : 'Chinese'} page...`);
     await navigate(suffix);
+    assert.equal(await evaluate("document.getElementById('core').value"), '1.14');
+    const experimentalLabel = suffix ? /Experimental/ : /实验版/;
+    assert.match(await evaluate("document.querySelector('#core option[value=\"1.15\"]').textContent"), experimentalLabel);
     assert.equal(await evaluate("document.getElementById('nodes-input').value"), '');
     assert.equal(await evaluate("document.getElementById('download-json').disabled"), true);
     const before = requests.length;
@@ -95,9 +98,13 @@ try {
           const output = JSON.parse(await evaluate("document.getElementById('json-preview').value"));
           assert.deepEqual(output.outbounds.find(n => n.tag === 'udp-auto').outbounds, ['Browser-UDP']);
           assert.equal(output.outbounds.find(n => n.tag === 'Browser-TCP').type, 'naive');
-          assert.equal(await evaluate("document.getElementById('out-path').value"), profilePath(platform, core, scenario));
+          const path = `platforms/${platform}/${core}/${scenario}.json`;
+          assert.equal(profilePath(platform, core, scenario), path);
+          assert.equal(await evaluate("document.getElementById('out-path').value"), path);
+          assert.equal(await evaluate("document.getElementById('out-raw').value"), `https://raw.githubusercontent.com/qixuancao/sing-box-config-templates/main/${path}`);
           if (core === '1.15') {
             assert.match(await evaluate("document.getElementById('warnings').textContent"), /1\.15/);
+            assert.match(await evaluate("document.getElementById('result-summary').textContent"), experimentalLabel);
             assert.ok(output.inbounds.every(inbound => !Object.hasOwn(inbound, 'stack')));
           }
           combinations++;

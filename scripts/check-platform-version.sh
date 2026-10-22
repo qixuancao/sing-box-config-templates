@@ -43,15 +43,10 @@ trap cleanup EXIT
 
 profiles=()
 profile_root="$repo_dir/platforms"
-if [[ "$version_line" == "1.15" ]]; then profile_root="$repo_dir/experimental/1.15/platforms"; fi
 while IFS= read -r profile; do
   profiles+=("$profile")
 done < <(
-  if [[ "$version_line" == "1.15" ]]; then
-    find "$profile_root" -type f -name '*.json' -print | LC_ALL=C sort
-  else
-    find "$profile_root" -type f -path "*/$version_line/*.json" -print | LC_ALL=C sort
-  fi
+  find "$profile_root" -type f -path "*/$version_line/*.json" -print | LC_ALL=C sort
 )
 
 [[ ${#profiles[@]} -eq 17 ]] || {
@@ -90,7 +85,7 @@ for profile in "${profiles[@]}"; do
         and (.route | has("auto_detect_interface") | not)
       ' "$profile" >/dev/null
       ;;
-    */linux/*/tun.json|*/linux/tun.json)
+    */linux/*/tun.json)
       jq -e '
         (.inbounds[0].type == "tun")
         and (.inbounds[0].strict_route == true)
@@ -98,7 +93,7 @@ for profile in "${profiles[@]}"; do
         and (.route.auto_detect_interface == true)
       ' "$profile" >/dev/null
       ;;
-    */windows/*/tun.json|*/windows/tun.json)
+    */windows/*/tun.json)
       jq -e '
         (.inbounds[0].type == "tun")
         and (.inbounds[0].strict_route == true)
@@ -183,7 +178,6 @@ for profile in "${profiles[@]}"; do
 done
 
 android_dir="$repo_dir/platforms/android/$version_line"
-if [[ "$version_line" == "1.15" ]]; then android_dir="$profile_root/android"; fi
 for variant in \
   fakeip realip tcp-stable privacy-strict \
   dual-stack no-adblock battery-saver udp-first; do
