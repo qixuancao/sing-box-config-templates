@@ -8,6 +8,8 @@
 | 1.13.x | [`1.13/`](1.13/) | 1.13.21 |
 | 1.15 · **实验版** | [`1.15/`](1.15/) | 1.15.0-alpha.12 |
 
+TUN 默认绕行常见 LAN、链路本地及组播目标，并保留 TUN、虚拟 DNS 和 FakeIP 地址；`mixed.json` 不受影响。见[跨平台局域网绕行](../../docs/lan-bypass.md)。
+
 - `fakeip.json`：SFM 图形客户端 TUN 首选。
 - `realip.json`：SFM TUN 兼容模式。
 - `mixed.json`：命令行本地 HTTP/SOCKS，监听 `127.0.0.1:2080`，不会自动接管

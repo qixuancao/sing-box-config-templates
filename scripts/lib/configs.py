@@ -4,7 +4,8 @@ import json
 import re
 
 from .common import ROOT, read_json
-from .ios_routes import route_exclusions
+from .lan_routes import route_exclusions
+from .tun_profiles import apply_tun_overlays
 
 
 KINDS = {
@@ -64,15 +65,17 @@ def compose(root, catalog, version, scenario, platform):
     settings = catalog["platforms"][platform]
     if scenario not in settings["scenarios"]:
         raise ValueError("Scenario unavailable on this platform")
-    selections["inbounds"] = settings.get("inbound_overrides", {}).get(scenario, selections["inbounds"])
     config = {}
     merge(config, load_module(root, "base", version, "default"))
     for kind, name in selections.items():
         merge(config, load_module(root, kind, version, name))
+    apply_tun_overlays(config, version, platform, recipe, settings)
     if settings.get("auto_detect_interface"):
         config["route"]["auto_detect_interface"] = True
-    if settings.get("ios_lan_bypass"):
-        config["inbounds"][0]["route_exclude_address"] = route_exclusions(config)
+    if settings.get("lan_bypass") and recipe.get("lan_bypass", True):
+        for inbound in config["inbounds"]:
+            if inbound["type"] == "tun":
+                inbound["route_exclude_address"] = route_exclusions(config, platform)
     if "log_level" in recipe:
         config["log"]["level"] = recipe["log_level"]
     config["experimental"]["cache_file"]["cache_id"] = f"{platform}-{version}-{scenario}"

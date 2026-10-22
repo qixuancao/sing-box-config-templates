@@ -30,6 +30,11 @@ sing-box 版本为准。若你的补丁版本与表中检查器不同，请在�
 选择顺序建议：先用 `fakeip`；应用异常换 `realip`；只有症状明确时再用其他
 专项配置。不要同时改节点、DNS 和用途配置，否则无法判断是哪一项起作用。
 
+### 局域网绕行兼容性
+
+TUN 默认绕行常见 LAN、CGNAT 和链路本地地址，但**不排除 `127.0.0.0/8` 和 `::1/128`**，避免 Android VpnService 的 `Bad address`。
+Android 双栈在排除条目过多时保留 ULA 由 TUN 内直连规则处理；`privacy-strict` 不继承此默认策略。见[各平台说明](../../docs/lan-bypass.md)。
+
 ## 3. 生成并导入
 
 1. 安装官方 [sing-box for Android](https://github.com/SagerNet/sing-box-for-android)。

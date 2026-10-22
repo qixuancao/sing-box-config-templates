@@ -53,6 +53,10 @@ sing-box check -c generated/sing-box.json
 `nodes.txt`, `nodes.json` and `generated/` are Git-ignored. CLI output files use mode `0600`.
 Use `--template PATH` for a private template.
 
+TUN profiles are composed from a [versioned base and platform-specific deltas](docs/architecture.md).
+The [LAN bypass policy](docs/lan-bypass.en.md) omits loopback exclusions on Android;
+HTTP/SOCKS listener profiles and Android `privacy-strict` do not inherit bypass routes.
+
 ## Choose a platform
 
 | Platform | Profiles | Guide |

@@ -50,6 +50,10 @@ sing-box check -c generated/sing-box.json
 `nodes.txt`、`nodes.json` 和 `generated/` 已加入 `.gitignore`，CLI 输出文件权限为 `0600`。
 私有模板通过 `--template PATH` 指定。
 
+各平台 TUN 从同一版本的[基础模板 + 平台差异层](docs/architecture.md)生成。
+默认的[局域网绕行策略](docs/lan-bypass.md)按平台适配：Android 不排除回环地址；
+HTTP/SOCKS 本地端口及 Android `privacy-strict` 不应用该绕行策略。
+
 ## 选择平台
 
 | 平台 | 配置 | 说明 |

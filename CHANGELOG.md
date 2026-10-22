@@ -6,6 +6,9 @@
 
 ### 新增与调整
 
+- 基于按版本维护的单份 TUN 基础模块叠加平台与场景差异；Linux/Windows 不再复制整份 TUN，Android 双栈只覆盖地址字段，构建时验证核心版本和平台兼容性。
+- 局域网绕行推广至 Android、macOS、Linux、Windows TUN；Android 跳过回环排除，并防止双栈 ULA 路由数量过多；TUN、虚拟 DNS、FakeIP 保留，mixed 与 privacy-strict 不变。
+
 - 网页区分“仅监听本地代理 / 自动设置系统代理 / TUN”，对 mixed 入站实际写入
   `set_system_proxy` 和用户选择的监听端口，并展示模式限制与对应导入说明。
 - 高级设置可覆盖预设 DNS：RealIP / FakeIP、直连与代理 DoH 地址，自定义 IPv4

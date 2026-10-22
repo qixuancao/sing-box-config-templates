@@ -26,14 +26,15 @@
         "no-adblock",
         "battery-saver",
         "udp-first"
-      ]
+      ],
+      "lan_bypass": true
     },
     "ios": {
       "scenarios": [
         "fakeip",
         "realip"
       ],
-      "ios_lan_bypass": true
+      "lan_bypass": true
     },
     "macos": {
       "scenarios": [
@@ -41,7 +42,8 @@
         "realip",
         "mixed"
       ],
-      "auto_detect_interface": true
+      "auto_detect_interface": true,
+      "lan_bypass": true
     },
     "linux": {
       "scenarios": [
@@ -49,8 +51,18 @@
         "tun"
       ],
       "auto_detect_interface": true,
-      "inbound_overrides": {
-        "tun": "linux-tun"
+      "lan_bypass": true,
+      "tun_options": {
+        "strict_route": true,
+        "auto_redirect": true
+      },
+      "tun_options_by_core": {
+        "1.14": {
+          "dns_mode": "hijack"
+        },
+        "1.15": {
+          "dns_mode": "hijack"
+        }
       }
     },
     "windows": {
@@ -59,8 +71,17 @@
         "tun"
       ],
       "auto_detect_interface": true,
-      "inbound_overrides": {
-        "tun": "windows-tun"
+      "lan_bypass": true,
+      "tun_options": {
+        "strict_route": true
+      },
+      "tun_options_by_core": {
+        "1.14": {
+          "dns_mode": "hijack"
+        },
+        "1.15": {
+          "dns_mode": "hijack"
+        }
       }
     }
   },
@@ -79,11 +100,17 @@
     "dual-stack": {
       "modules": {
         "dns": "dual-stack",
-        "inbounds": "dual-stack",
+        "inbounds": "tun",
         "outbounds": "standard",
         "rules": "dual-stack",
         "rule-sets": "standard",
         "experimental": "default"
+      },
+      "tun_options": {
+        "address": [
+          "172.19.0.1/30",
+          "fdfe:dcba:9876::1/126"
+        ]
       }
     },
     "fakeip": {
@@ -124,7 +151,8 @@
         "rules": "tcp-stable",
         "rule-sets": "standard",
         "experimental": "default"
-      }
+      },
+      "lan_bypass": false
     },
     "realip": {
       "modules": {

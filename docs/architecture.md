@@ -25,6 +25,8 @@ flowchart LR
 | 平台目录 | `docs/assets/core/catalog.mjs` | 支持的平台、内核版本与默认场景 |
 | 配置模块 | `modules/<类别>/<版本>/<方案>.json` | 独立维护 DNS、入站、路由、规则集；共享策略组与缓存模块 |
 | 构建目录与场景组合 | `modules/catalog.json` | 声明版本、平台适配与全部场景选用的模块 |
+| TUN 基础与差异层 | `modules/inbounds/<版本>/tun.json`、`scripts/lib/tun_profiles.py` | 每个内核维护一份 TUN 基础模板；叠加受校验的平台和场景字段 |
+| 局域网绕行 | `scripts/lib/lan_routes.py` | 分平台生成 LAN 排除路由，自动保护 TUN、DNS、FakeIP 地址 |
 | 构建入口 | `scripts/build.py` | 一次生成平台 JSON、浏览器包与中英文页面；`--check` 只检查同步 |
 | 验证入口 | `scripts/check.py` | 默认执行静态、所选内核和浏览器检查；规则集下载单独触发 |
 | 开发工具内部模块 | `scripts/lib/` | 配置组合、页面、公共审计、平台契约和规则集检查；仅 Python 标准库 |

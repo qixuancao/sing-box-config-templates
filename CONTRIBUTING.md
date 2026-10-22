@@ -6,8 +6,8 @@
 ## 提交前
 
 构建和静态检查需要 Python 3.10+（仅标准库）与 Node.js 22+；内核测试需要对应的
-sing-box，浏览器测试需要 Chrome。iOS 排除路由由 `scripts/lib/ios_routes.py` 生成，
-不要直接维护拆分后的 CIDR 列表。
+sing-box，浏览器测试需要 Chrome。跨平台 LAN 路由排除由 `scripts/lib/lan_routes.py` 生成，
+不要直接维护拆分后的 CIDR 列表（详见 [LAN 绕行说明](docs/lan-bypass.md)）。
 
 开发入口只有两个：`scripts/build.py` 生成全部产物，`scripts/check.py` 执行验证。
 内部实现位于 `scripts/lib/`，回归测试位于 `tests/`。
