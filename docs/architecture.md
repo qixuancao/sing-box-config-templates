@@ -28,6 +28,7 @@ flowchart LR
 | 验证入口 | `scripts/check.py` | 默认执行静态、所选内核和浏览器检查；规则集下载单独触发 |
 | 开发工具内部模块 | `scripts/lib/` | 配置组合、页面、公共审计、平台契约和规则集检查；仅 Python 标准库 |
 | 回归测试 | `tests/` | Python 与 Node 单元测试、真实内核集成测试、Chrome 端到端测试 |
+| 测试数据 | `tests/fixtures/` | 内核测试共用的公开占位节点；用户格式示例见 [nodes.md](nodes.md) |
 | 网页交互 | `docs/assets/app.mjs`、`app.css` | 输入、预览、下载与布局 |
 | 页面与翻译 | `web/page.html`、`web/locales/` | 一份页面结构，两份独立翻译 |
 | 命令行 | `scripts/generate.mjs` | 本地文件与 stdin 输入、原子写入、0600 文件权限 |

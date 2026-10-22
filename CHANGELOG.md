@@ -31,6 +31,7 @@
 - 移除并停止维护 `templates/` 下的四份无平台通用配置，旧 `main/templates/*.json` Raw 链接不再可用，改用 `platforms/<平台>/<内核版本>/` 下的同名场景。
 - 清理构建器的无平台分支、通用配置检查循环与测试依赖；场景组合与私有 `--template` 功能继续保留。
 - 移除 `presets/`，将原有目录配置和十份场景配方合并到 `modules/catalog.json`，减少十个 JSON 文件；平台配置路径、组合结果和网页/CLI 接口不变。
+- 移除仅存测试节点的顶层 `examples/`，占位数据归入 `tests/fixtures/` 并继续执行凭据审计；用户格式示例统一由 `docs/nodes.md` 提供。
 
 ### 开发工具收敛
 

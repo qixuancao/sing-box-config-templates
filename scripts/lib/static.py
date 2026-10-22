@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from .common import ROOT, read_json, require
 
-PUBLIC_DIRECTORIES = ("platforms", "modules", "examples", "docs", "scripts", "tests", "web", ".github")
+PUBLIC_DIRECTORIES = ("platforms", "modules", "docs", "scripts", "tests", "web", ".github")
 PUBLIC_FILES = ("README.md", "README.en.md", "CHANGELOG.md", "CONTRIBUTING.md", "PRIVACY.md",
                 "SECURITY.md", "SUBSCRIPTIONS.md", "THIRD_PARTY.md", "LICENSE", ".gitignore")
 PRIVATE_MARKER = re.compile(
@@ -53,7 +53,8 @@ def audit(root=ROOT):
         name = path.relative_to(root).as_posix()
         text = path.read_text(encoding="utf-8")
         require(not PRIVATE_MARKER.search(text), f"Forbidden private marker in {name}")
-        if path.suffix != ".json" or path.relative_to(root).parts[0] not in ("platforms", "modules", "examples"):
+        parts = path.relative_to(root).parts
+        if path.suffix != ".json" or not (parts[0] in ("platforms", "modules") or parts[:2] == ("tests", "fixtures")):
             continue
         document = read_json(path)
         for value in objects(document):

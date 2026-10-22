@@ -11,6 +11,8 @@
 
 开发入口只有两个：`scripts/build.py` 生成全部产物，`scripts/check.py` 执行验证。
 内部实现位于 `scripts/lib/`，回归测试位于 `tests/`。
+`tests/fixtures/nodes.example.json` 是内核测试共用的占位节点，继续接受公共凭据审计；
+用户节点格式示例统一见 [docs/nodes.md](docs/nodes.md)，不要将测试占位节点作为真实连接配置。
 
 ```bash
 python3 -B scripts/build.py

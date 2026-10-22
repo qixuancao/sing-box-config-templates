@@ -82,7 +82,8 @@ class PublicAuditTest(TemporaryRepoTest):
         super().setUp()
         for name in PUBLIC_DIRECTORIES:
             (self.root / name).mkdir()
-        self.fixture = self.root / "examples/example.json"
+        self.fixture = self.root / "tests/fixtures/nodes.example.json"
+        self.fixture.parent.mkdir()
         self.fixture.write_text("{}", encoding="utf-8")
 
     def test_only_the_exact_cgnat_network_is_allowed(self):

@@ -100,7 +100,7 @@ def check_profiles(binary, line, version, root=ROOT):
             run([binary, "check", "-c", str(path)], cwd=work)
             rendered = work / "rendered.json"
             run([node, str(root / "scripts/generate.mjs"), "--template", str(path), "--input",
-                 str(root / "examples/nodes.example.json"), "--output", str(rendered)], cwd=work, capture=True)
+                 str(root / "tests/fixtures/nodes.example.json"), "--output", str(rendered)], cwd=work, capture=True)
             if os.name != "nt":
                 require(stat.S_IMODE(rendered.stat().st_mode) == 0o600, "Rendered profile is not mode 600")
             run([binary, "check", "-c", str(rendered)], cwd=work)

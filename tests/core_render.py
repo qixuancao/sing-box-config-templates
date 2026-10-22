@@ -25,7 +25,7 @@ class RenderTest(unittest.TestCase):
         if match is None:
             raise ValueError("Use a maintained sing-box 1.13, 1.14 or 1.15 checker")
         cls.line = match[1]
-        cls.example = json.loads((ROOT / "examples/nodes.example.json").read_text())
+        cls.example = json.loads((ROOT / "tests/fixtures/nodes.example.json").read_text())
         cls.tcp_node = {
             "type": "http", "tag": "tcp-node", "server": "example.com", "server_port": 443,
         }
