@@ -8,7 +8,6 @@ Generate sing-box configurations for Android, iOS, macOS, Linux, and Windows, wi
 - Select nodes manually or let URLTest choose by latency.
 - Merge your nodes locally into an importable JSON configuration.
 - Use stable profiles for sing-box 1.13 / 1.14, or opt into [1.15 · Experimental](docs/experimental-1.15.md).
-- Edit DNS, inbound and routing modules by category, core version and mode. Versions, platforms and scenario recipes live in [`modules/catalog.json`](modules/catalog.json); see [configuration modules](modules/README.md).
 
 ## Generate in your browser
 
@@ -39,9 +38,8 @@ node scripts/generate.mjs --platform android --core 1.14 \
 sing-box check -c generated/sing-box.json
 ```
 
-The browser and CLI share one parser and renderer. `nodes.txt`, `nodes.json` and `generated/`
-are Git-ignored. CLI output files use mode `0600`. The old `render.sh` wrapper has been removed;
-use `node scripts/generate.mjs`, with `--template PATH` for a private template.
+`nodes.txt`, `nodes.json` and `generated/` are Git-ignored. CLI output files use mode `0600`.
+Use `--template PATH` for a private template.
 
 ## Choose a platform
 
@@ -54,10 +52,6 @@ use `node scripts/generate.mjs`, with `--template PATH` for a private template.
 | Windows | [TUN](platforms/windows/1.14/tun.json) · [mixed](platforms/windows/1.14/mixed.json) | [Guide](platforms/windows/README.md) |
 
 Choose the core version on every platform: `platforms/<platform>/<version>/`. The table links to 1.14 profiles; use the same filename under `1.13/` when running a 1.13 core. The `1.15/` profiles are **Experimental**, checked only against `1.15.0-alpha.12`.
-
-The former `templates/*.json` files have been removed and are no longer maintained; their old
-Raw URLs no longer work. Use the versioned profile for your platform. Private templates remain
-supported through the CLI's `--template` option.
 
 On desktop systems, start with `mixed.json` and set the application proxy to `127.0.0.1:2080`:
 
@@ -83,9 +77,9 @@ sing-box run -c generated/linux.json
 
 ## Customize and reuse
 
-Node protocols, config composition, platform adaptation and browser interactions are independent
-modules. Supply a private template for personal policies, or call the dependency-free JavaScript API
-from another project. See [modules and customization](docs/architecture.md) for entry points.
+Configuration sources live in [`modules/`](modules/README.md), with versions, platforms and scenarios
+in [`modules/catalog.json`](modules/catalog.json). The `platforms/` files are generated output.
+See [Contributing](CONTRIBUTING.md) for build commands and [architecture](docs/architecture.md) for the JavaScript API and private templates.
 
 ## Documentation
 

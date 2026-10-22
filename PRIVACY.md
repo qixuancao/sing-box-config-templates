@@ -18,10 +18,10 @@
     负责国外域名与最终解析。
 - **连通性探测**：
   - `https://www.gstatic.com/generate_204`：普通版两个 `urltest`（`auto`、
-    `udp-auto`）默认每 3 分钟探测一次，用于自动测速与故障切换。
+    `udp-auto`）默认每 3 分钟探测一次，`battery-saver` 为每 15 分钟。
 - **远程规则集**：
   - `https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/...`：
-    启动与更新时下载 17 个 MetaCubeX `.srs` 二进制规则集（详见
+    启动与更新时下载 MetaCubeX `.srs` 规则集：标准场景 17 个，`no-adblock` 为 16 个（详见
     [`THIRD_PARTY.md`](THIRD_PARTY.md)）。
 - **本地状态**：
   - `cache_file`（含 `cache_id`）与 FakeIP 映射保存在本地，用于重启后复用

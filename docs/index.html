@@ -34,7 +34,7 @@
 </div></header>
 <main>
 <div class="hero"><p class="eyebrow">SING-BOX CONFIG GENERATOR</p><h1>生成你的 sing-box 配置</h1><p>粘贴节点，选择设备，下载 JSON 后导入客户端。默认规则与策略组已经配好。</p><div class="badges"><span class="badge">浏览器本地生成</span><span class="badge">1.13 / 1.14</span><span class="badge">Android · iOS · macOS · Linux · Windows</span></div></div>
-<noscript><p class="noscript">生成器需要 JavaScript。也可以从 GitHub 仓库下载模板，用命令行在本地生成配置。</p></noscript>
+<noscript><p class="noscript">生成器需要 JavaScript，也可使用仓库提供的命令行工具。</p></noscript>
 <div class="workspace" id="generator">
 <section class="card" aria-labelledby="nodes-heading">
 <h2 id="nodes-heading"><span class="step">1</span>放入你的节点</h2>
@@ -73,15 +73,15 @@
 </div>
 </div>
 <section class="guides" aria-labelledby="guides-heading">
-<h2 id="guides-heading">从第一次使用，到下次更新</h2>
+<h2 id="guides-heading">使用指南</h2>
 <div class="guide-grid">
 <article class="guide"><h3>第一次使用</h3><ol><li>安装官方客户端，确认内核版本。</li><li>粘贴自己的节点，选择设备并生成。</li><li>下载 JSON，作为本地配置导入。</li></ol><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/getting-started.md">查看导入说明 ↗</a></p></article>
-<article class="guide"><h3>更换或增加节点</h3><p>读取上次保存的 nodes.json，修改节点后重新生成，替换客户端里的本地配置。模板升级时也可沿用同一份节点文件。</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/update-nodes.md">查看更新方法 ↗</a></p></article>
+<article class="guide"><h3>更换或增加节点</h3><p>读取保存的 nodes.json，修改节点并重新生成，替换客户端配置。更新默认规则时也可复用节点文件。</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/update-nodes.md">查看更新方法 ↗</a></p></article>
 <article class="guide"><h3>配置导入后连接异常</h3><p>先核对内核版本和节点信息。应用兼容问题可尝试 RealIP；Linux / Windows 先用本地 HTTP / SOCKS 模式检查节点。</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/troubleshooting.md">查看排查步骤 ↗</a></p></article>
 </div>
-<details class="technical"><summary>模板来源与命令行</summary><p class="help">公开 Raw JSON 使用占位节点，用于查看默认策略。命令行与本网页共用同一套节点解析和配置生成模块，需要 Node.js 22+。</p>
-<label for="out-path">当前模板路径</label><input id="out-path" type="text" readonly>
-<label for="out-raw">模板 Raw URL（占位节点）</label><input id="out-raw" type="text" readonly>
+<details class="technical"><summary>默认配置与命令行</summary><p class="help">公开 Raw JSON 使用占位节点，用于查看默认策略。命令行与本网页共用同一套节点解析和配置生成模块，需要 Node.js 22+。</p>
+<label for="out-path">平台配置路径</label><input id="out-path" type="text" readonly>
+<label for="out-raw">配置 Raw URL（占位节点）</label><input id="out-raw" type="text" readonly>
 <label for="out-cmd">本地生成与检查</label><textarea id="out-cmd" rows="3" readonly spellcheck="false"></textarea>
 <p class="help"><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/architecture.md">模块结构与修改入口 ↗</a></p>
 </details>

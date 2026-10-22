@@ -65,16 +65,15 @@ const json = JSON.stringify(config, null, 2);
 1.13 / 1.14 为稳定兼容线；1.15 标记为**实验版**，
 按[实验说明](experimental-1.15.md)使用固定 alpha 检查器验证。
 
-构建器只生成声明了平台的配置，不再提供无平台通用配置。个人规则可以从相应平台配置
-复制到独立的私有模板中修改，再用
+个人规则可以从相应平台配置复制到独立的私有模板中修改，再用
 `node scripts/generate.mjs --template /path/to/private/template.json ...` 生成。
 
 ## 增加节点协议
 
-1. 在 `core/protocols/` 新增一个适配器，返回 sing-box 出站对象。
-2. 在 `core/share-links.mjs` 注册 URI scheme。
-3. 在 `core/nodes.mjs` 声明节点类型、必要字段及 UDP 能力。
-4. 为合法链接、无效参数、编码和凭据保护增加测试；用两个真实内核验证输出。
+1. 在 `docs/assets/core/protocols/` 新增适配器，返回 sing-box 出站对象。
+2. 在 `docs/assets/core/share-links.mjs` 注册 URI scheme。
+3. 在 `docs/assets/core/nodes.mjs` 声明节点类型、必要字段及 UDP 能力。
+4. 增加解析和凭据保护测试，再用三套维护内核的 `check.py core` 检查输出。
 
 不支持的链接参数应明确报错，避免默默丢弃 TLS、证书或传输设置。
 
@@ -89,9 +88,9 @@ python3 -B scripts/check.py browser
 页面保持纯前端，通过 GitHub Pages 发布。CSP 的 `connect-src 'none'` 阻止页面
 脚本发送运行时请求；模板包随网页一起提供。节点不放入 URL、浏览器持久存储或日志。
 
-## 私人仓如何复用
+## 外部项目复用
 
-保持两个 Git 仓库独立，只调用公开工具并把输入输出路径指向私人仓：
+调用 CLI 时，将输入和输出指向自己的项目：
 
 ```bash
 node /path/to/public/scripts/generate.mjs --platform android --core 1.14 \
@@ -99,5 +98,4 @@ node /path/to/public/scripts/generate.mjs --platform android --core 1.14 \
   --output /path/to/private/generated/sing-box.json
 ```
 
-工具不执行 Git 操作，不复制节点到公开仓。可在私人项目中固定公共工具的版本，
-验证后再升级。此处提供复用接口，现有私人仓的配置、部署与提交流程由其自身管理。
+建议固定本工具版本，验证后再升级。CLI 不执行 Git 操作或部署。

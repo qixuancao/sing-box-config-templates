@@ -8,7 +8,6 @@
 - 手动选节点或通过 URLTest 按延迟自动选择；
 - 在本地合并节点，生成可直接导入客户端的 JSON；
 - 稳定配置维护 1.13、1.14；[1.15 · 实验版](docs/experimental-1.15.md)按固定 alpha 预备。
-- DNS、入站、规则按“类别 → 版本 → 方案”独立维护，版本、平台和场景组合统一在 [`modules/catalog.json`](modules/catalog.json)，见[配置模块](modules/README.md)。
 
 ## 在线生成
 
@@ -38,9 +37,8 @@ node scripts/generate.mjs --platform android --core 1.14 \
 sing-box check -c generated/sing-box.json
 ```
 
-网页和 CLI 共用同一套解析、生成模块。`nodes.txt`、`nodes.json` 和 `generated/`
-已加入 `.gitignore`，CLI 输出文件权限为 `0600`。旧 `render.sh` 包装已移除，
-统一使用 `node scripts/generate.mjs`；私有模板通过 `--template PATH` 指定。
+`nodes.txt`、`nodes.json` 和 `generated/` 已加入 `.gitignore`，CLI 输出文件权限为 `0600`。
+私有模板通过 `--template PATH` 指定。
 
 ## 选择平台
 
@@ -53,9 +51,6 @@ sing-box check -c generated/sing-box.json
 | Windows | [TUN](platforms/windows/1.14/tun.json) · [mixed](platforms/windows/1.14/mixed.json) | [使用说明](platforms/windows/README.md) |
 
 所有平台都先选择内核版本，再选择配置：`platforms/<平台>/<版本>/`。上表链接指向 1.14；使用 1.13 内核时，换成同平台 `1.13/` 目录中的同名文件。`1.15/` 为**实验版**，仅按 `1.15.0-alpha.12` 验证。
-
-原 `templates/*.json` 已移除并停止维护，旧 Raw 链接不再可用；请改用对应平台的版本化配置。
-私有模板仍可通过 CLI 的 `--template` 参数传入。
 
 Linux / Windows 可先用 `mixed.json`，运行后将应用代理设为 `127.0.0.1:2080`：
 
@@ -81,8 +76,9 @@ sing-box run -c generated/linux.json
 
 ## 修改与复用
 
-节点协议、配置组合、平台适配与网页交互分别维护。个人规则可通过私有模板传入，
-其他项目可以直接调用纯 JavaScript API。修改入口和例子见[模块结构](docs/architecture.md)。
+配置源位于 [`modules/`](modules/README.md)，版本、平台与场景组合在
+[`modules/catalog.json`](modules/catalog.json)，`platforms/` 是生成结果。
+构建与检查见[参与开发](CONTRIBUTING.md)，JavaScript API 与私有模板见[模块结构](docs/architecture.md)。
 
 ## 文档
 

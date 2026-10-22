@@ -21,7 +21,7 @@ from lib.common import CheckError, read_json
 from lib.configs import outputs
 from lib.core import checker, check_rule_sets, validate_profile
 from lib.pages import check as check_pages
-from lib.static import PUBLIC_DIRECTORIES, audit, check_links
+from lib.static import PUBLIC_DIRECTORIES, audit, check_links, public_files
 
 
 class TemporaryRepoTest(unittest.TestCase):
@@ -135,6 +135,15 @@ class LinksAndPagesTest(TemporaryRepoTest):
         shutil.copytree(ROOT / "docs/assets", self.root / "docs/assets", dirs_exist_ok=True)
         for name in ("sitemap.xml", ".nojekyll"):
             shutil.copyfile(ROOT / "docs" / name, self.root / "docs" / name)
+        shutil.copytree(ROOT / "scripts", self.root / "scripts")
+        shutil.copyfile(ROOT / "LICENSE", self.root / "LICENSE")
+        for name in PUBLIC_DIRECTORIES:
+            (self.root / name).mkdir(exist_ok=True)
+        for source in public_files(ROOT):
+            if source.suffix == ".md":
+                target = self.root / source.relative_to(ROOT)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source, target)
 
     def test_links_match_the_catalog_and_reject_missing_or_duplicate_targets(self):
         with redirect_stdout(self.quiet):
@@ -165,6 +174,20 @@ class LinksAndPagesTest(TemporaryRepoTest):
             output.write("\nfetch('https://example.com');\n")
         with self.assertRaises(CheckError):
             check_pages(self.root)
+
+    def test_documentation_links_cover_local_targets_and_ignore_external_links_and_code(self):
+        target = self.root / "docs/file with spaces.md"
+        target.write_text("# Example\n", encoding="utf-8")
+        document = self.root / "docs/link-check.md"
+        document.write_text('[local](file%20with%20spaces.md#example)\n[external](https://example.com/missing)\n'
+                            '[anchor](#example)\n```markdown\n[snippet](missing.md)\n```\n', encoding="utf-8")
+        with redirect_stdout(self.quiet):
+            check_links(self.root)
+        for invalid in ('[broken](missing.md)', '[outside](../../outside.md)',
+                        '[private](../proxy-config-backup/config.json)'):
+            document.write_text(invalid, encoding="utf-8")
+            with self.subTest(link=invalid), self.assertRaises(CheckError):
+                check_links(self.root)
 
 
 class CoreContractsTest(unittest.TestCase):

@@ -19,7 +19,7 @@ body:
         - macOS / SFM profile
         - Linux profile
         - Windows profile
-        - Documentation / selector / Pages
+        - Documentation / generator / Pages
         - Scripts / CI
     validations:
       required: true

@@ -13,8 +13,8 @@
 
 - `fakeip.json`：日常首选。国外 A 查询走 FakeIP，减少真实 DNS 往返；极少数
   应用不接受 FakeIP 地址时再换。
-- `realip.json`：兼容模式。所有查询返回真实 IP，适合银行、局域网或对 FakeIP
-  敏感的应用；1.13 版使用与 1.14 等价但更保守的 DNS 判定。
+- `realip.json`：兼容模式，不使用 FakeIP，适合银行、局域网或对 FakeIP
+  敏感的应用。
 - 若 FakeIP 下某个应用异常，先换同平台同版本目录的 `realip.json`，并清除
   应用缓存或等待 DNS 缓存过期，详见
   [`troubleshooting.md`](troubleshooting.md)。
@@ -25,16 +25,11 @@
 `match_response`，并提供 [JSON Schema](https://sing-box.sagernet.org/configuration/schema/)
 （顶层 `$schema`，见
 [sing-box v1.14.0](https://github.com/SagerNet/sing-box/releases/tag/v1.14.0)）。
-1.13 不认识这些字段或动作。因此 `modules/<类别>/1.13/` 使用独立的兼容配置：
+1.13 不支持这些字段或动作，其模块使用 `download_detour: direct`、兼容的 FakeIP
+判定和路由级 DNS 劫持。1.15 的 TUN 栈变化见[实验版说明](experimental-1.15.md)。
 
-- 删除 1.14 的共享 HTTP 客户端字段和顶层 `$schema`；
-- 用每个远程规则集的 `download_detour: direct` 下载规则；
-- 将 FakeIP 的 1.14 DNS 评估流程降级为可在旧核心解析的规则；
-- 从桌面 TUN 配置中删除 1.14 才新增的 `dns_mode` / `dns_address`，保留路由级 DNS 劫持。
-
-这些不是仅改目录名的副本。同步脚本从版本模块确定性组合配置，CI 再用两个真实版本分别
-检查公共配置和注入示例节点后的配置。版本目录按 minor 兼容线命名；表中固定的
-patch 是实际自动验证点，不等于所有历史 ROM/patch 都做过实机测试。
+版本目录按 minor 兼容线命名，CI 使用固定 patch 检查公共配置和节点注入结果，
+不代表所有 patch 与客户端都经过实机测试。
 
 ## 平台差异
 
@@ -69,18 +64,12 @@ Android/iOS 的字段省略是平台适配，不是功能缺失造成的遗漏�
 - 公共占位配置和注入示例节点后的配置都通过 `sing-box check`；
 - 平台字段符合上表约束；
 - iOS 局域网排除范围完整，且不重叠 TUN、虚拟 DNS 或 FakeIP；
-- 五个平台各自使用 1.13、1.14、1.15 版本目录，无同层 JSON 别名；1.15 保留实验标签；
+- 五个平台的版本、场景与 `modules/catalog.json` 一致；
 - 八种 Android 用途差异符合各自契约；
 - 配置不包含真实节点凭据或明显私有网络标记；
 - 每周实际下载 17 个远程规则集，并用两套固定核心解析其二进制内容。
 
-## 尚未声称验证
+## 验证边界
 
-- 所有 Android 厂商 ROM、iOS / macOS 版本均实机运行；
-- 每家运营商、校园网、企业网和 IPv6 环境；
-- 任意第三方节点协议组合；
-- 远程规则 CDN 在所有地区始终可访问；
-- 服务分组永远不会因上游规则更新而误判。
-
-因此请把 CI 绿灯理解为“配置可复现且 schema 合法”，不要理解为端到端网络
-已经替你验收。实机反馈请附平台、客户端版本、所用模板与脱敏日志。
+CI 验证配置结构、生成逻辑和内核解析，不验证真实节点、设备 TUN、运营商网络、
+CDN 地区可达性或上游规则分类。实机反馈请附平台、客户端版本、配置路径与脱敏日志。

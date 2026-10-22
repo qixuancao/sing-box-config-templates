@@ -73,15 +73,15 @@ Or paste native sing-box nodes JSON"></textarea>
 </div>
 </div>
 <section class="guides" aria-labelledby="guides-heading">
-<h2 id="guides-heading">From your first import to your next update</h2>
+<h2 id="guides-heading">Usage guides</h2>
 <div class="guide-grid">
 <article class="guide"><h3>First time here?</h3><ol><li>Install an official client and check its core version.</li><li>Paste your nodes, choose a device and generate.</li><li>Download the JSON and import it as a local profile.</li></ol><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/getting-started.md">Read the import guide ↗</a></p></article>
-<article class="guide"><h3>Change or add nodes</h3><p>Read your saved nodes.json, update the nodes and generate again. Replace the local profile in your client. Keep the same nodes file when updating templates.</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/update-nodes.md">Read the update guide ↗</a></p></article>
+<article class="guide"><h3>Change or add nodes</h3><p>Read your saved nodes.json, edit the nodes and generate again. Replace the client profile. Reuse the nodes file when updating default rules.</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/update-nodes.md">Read the update guide ↗</a></p></article>
 <article class="guide"><h3>Connection trouble after import?</h3><p>Check the core version and node details first. Try RealIP for app compatibility issues. On Linux / Windows, start with local HTTP / SOCKS mode to check your nodes.</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/troubleshooting.md">Read troubleshooting steps ↗</a></p></article>
 </div>
-<details class="technical"><summary>Template source and command line</summary><p class="help">Public Raw JSON uses placeholder nodes so you can inspect the default policies. The CLI shares its node parser and renderer with this page and requires Node.js 22+.</p>
-<label for="out-path">Current template path</label><input id="out-path" type="text" readonly>
-<label for="out-raw">Template Raw URL (placeholder nodes)</label><input id="out-raw" type="text" readonly>
+<details class="technical"><summary>Default profile and command line</summary><p class="help">Public Raw JSON uses placeholder nodes so you can inspect the default policies. The CLI shares its node parser and renderer with this page and requires Node.js 22+.</p>
+<label for="out-path">Platform profile path</label><input id="out-path" type="text" readonly>
+<label for="out-raw">Profile Raw URL (placeholder nodes)</label><input id="out-raw" type="text" readonly>
 <label for="out-cmd">Generate and check locally</label><textarea id="out-cmd" rows="3" readonly spellcheck="false"></textarea>
 <p class="help"><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/architecture.md">Modules and customization ↗</a></p>
 </details>

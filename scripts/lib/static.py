@@ -1,7 +1,7 @@
 """Public-data audits and subscription-link checks using only the standard library."""
 import fnmatch
 import re
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 
 from .common import ROOT, read_json, require
 
@@ -13,6 +13,7 @@ PRIVATE_MARKER = re.compile(
     r"|[a-z0-9-]+\.ts\.net|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|eyJ[a-zA-Z0-9_-]{20,}\."
 )
 RAW_PREFIX = "https://raw.githubusercontent.com/qixuancao/sing-box-config-templates/main/"
+MARKDOWN_LINK = re.compile(r'!?\[[^\]\n]*\]\(\s*(?:<([^>\n]+)>|([^\s)]+))(?:\s+"[^"]*")?\s*\)')
 
 
 def public_files(root):
@@ -94,4 +95,21 @@ def check_links(root=ROOT):
         require(set(query) == {"url"} and len(query["url"]) == 1 and parsed.fragment, "Malformed import URI")
         imported.append(query["url"][0])
     require(len(imported) == len(expected_imports) and set(imported) == expected_imports, "Import URIs must exactly match mobile stable profiles")
+    documentation_links = 0
+    for path in public_files(root):
+        if path.suffix != ".md":
+            continue
+        text = path.read_text(encoding="utf-8")
+        text = re.sub(r"(?ms)^(`{3,}|~{3,})[^\n]*\n.*?^\1[ \t]*$", "", text)
+        for match in MARKDOWN_LINK.finditer(text):
+            url = urlsplit(match[1] or match[2])
+            if url.scheme or url.netloc or not url.path:
+                continue
+            target = (path.parent / unquote(url.path)).resolve()
+            require(target.is_relative_to(root.resolve()), f"Documentation link leaves repository: {path.relative_to(root)}")
+            require(target.relative_to(root.resolve()).parts[:1] != ("proxy-config-backup",),
+                    f"Documentation links to private repository: {path.relative_to(root)}")
+            require(target.exists(), f"Missing documentation target in {path.relative_to(root)}: {url.path}")
+            documentation_links += 1
     print(f"Subscription links passed: {len(raw_urls)} Raw URLs, {len(uris)} import URIs.", flush=True)
+    print(f"Documentation links passed: {documentation_links} local targets.", flush=True)

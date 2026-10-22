@@ -5,19 +5,18 @@
 
 ## 提交前
 
-开发工具只需 Python 3.10+（仅标准库）和 Node.js 22+，不需要 Bash、jq 或 ripgrep。
-网页无需安装这些工具，CLI 生成只需要 Node.js。iOS 排除路由的生成源位于
-`scripts/lib/ios_routes.py`，不要直接维护拆分后的 CIDR 列表。
+构建和静态检查需要 Python 3.10+（仅标准库）与 Node.js 22+；内核测试需要对应的
+sing-box，浏览器测试需要 Chrome。iOS 排除路由由 `scripts/lib/ios_routes.py` 生成，
+不要直接维护拆分后的 CIDR 列表。
 
 开发入口只有两个：`scripts/build.py` 生成全部产物，`scripts/check.py` 执行验证。
 内部实现位于 `scripts/lib/`，回归测试位于 `tests/`。
-`tests/fixtures/nodes.example.json` 是内核测试共用的占位节点，继续接受公共凭据审计；
-用户节点格式示例统一见 [docs/nodes.md](docs/nodes.md)，不要将测试占位节点作为真实连接配置。
+测试占位节点位于 `tests/fixtures/`，用户节点格式见 [docs/nodes.md](docs/nodes.md)。
 
 ```bash
 python3 -B scripts/build.py
 python3 -B scripts/build.py --check # 只检查，不改写产物
-python3 -B scripts/check.py static # 构建同步、公共审计、链接、页面、Python/Node 单元测试
+python3 -B scripts/check.py static # 构建同步、公共审计、文档/订阅链接、页面、单元测试
 python3 -B scripts/check.py core --core 1.14 --sing-box /path/to/sing-box-1.14.0
 python3 -B scripts/check.py core --core 1.13 --sing-box /path/to/sing-box-1.13.21
 python3 -B scripts/check.py core --core 1.15 --sing-box /path/to/sing-box-1.15.0-alpha.12
@@ -31,11 +30,11 @@ python3 -B scripts/check.py browser # 需要本机 Chrome，可用 CHROME 指定
 
 修改远程规则 URL 或准备发版时，再用对应检查器运行
 `python3 -B scripts/check.py rule-sets --core 1.14 --sing-box /path/to/checker`。
-这是唯一主动下载规则集的检查，不包含在默认检查中，平时由每周 CI 执行。
+规则集下载检查需联网，不包含在默认检查中，每周 CI 使用 1.13.21 / 1.14.0 执行。
 
 配置源位于 `modules/<类别>/<版本>/`，版本、平台与全部场景组合统一在 `modules/catalog.json`。修改后运行
 `python3 -B scripts/build.py`，同时更新平台文件、浏览器配置包与中英文页面。
-`platforms/` 中的稳定与实验版 JSON 都由这些源生成；不再生成不区分平台的通用配置。
+`platforms/` 中的稳定与实验版 JSON 都由这些源生成。
 修改页面结构或翻译后使用同一构建入口。模块分工与公共 API 见
 [模块结构](docs/architecture.md)。新增协议应使用各个维护版本的 `core` 检查验证。
 

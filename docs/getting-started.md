@@ -2,16 +2,16 @@
 
 ## 1. 安装客户端
 
-- Android：官方 SFA，先在“关于”页确认 sing-box 内核是 1.14 / 1.13 中的哪一条。
-- iOS / iPadOS / tvOS：自 1.14 起请安装 App Store 新应用 sing-box MT（旧 VT 用户需重新安装），见 [sing-box v1.14.0](https://github.com/SagerNet/sing-box/releases/tag/v1.14.0)。
-- macOS：SFM standalone（不再从 macOS App Store 提供，不自动继承旧配置），或命令行 `sing-box`。
-- Linux / Windows：官方命令行版或系统包管理器；图形界面可选官方 [sing-box for Desktop](https://sing-box.sagernet.org/clients/desktop/)，命令行继续保留。
+- Android：[官方 SFA](https://sing-box.sagernet.org/clients/android/)。
+- iOS / iPadOS / tvOS：[官方 Apple 客户端](https://sing-box.sagernet.org/clients/apple/)，1.14 使用 App Store 的 sing-box MT。
+- macOS：官方 Apple 客户端的 standalone 版本，或命令行 `sing-box`。
+- Linux / Windows：官方命令行版，或 [sing-box for Desktop](https://sing-box.sagernet.org/clients/desktop/)。
 
 下载入口优先使用 [SagerNet 官方项目](https://github.com/SagerNet/sing-box)
 及其文档，不要从不明网盘安装改包。
 
-所有平台均维护 sing-box **1.14.x / 1.13.x** 两条版本线。先确认实际内核，
-再选择 `platforms/<平台>/<内核版本>/` 中的配置：
+稳定配置支持 **1.14.x / 1.13.x**，另有[1.15 实验版](experimental-1.15.md)。
+在客户端“关于”页或命令行确认内核版本，再选择相应配置：
 
 ```bash
 sing-box version
@@ -22,7 +22,7 @@ sing-box version
 打开[配置生成器](https://qixuancao.github.io/sing-box-config-templates/)：
 
 1. 粘贴自己的节点分享链接，每行一个；也可读取节点 JSON / TXT 文件。
-2. 选择设备，在高级设置中核对实际内核是 1.13 还是 1.14。
+2. 选择设备，在高级设置中选择与客户端一致的内核版本。
 3. 点击“生成配置”，再点击“下载 sing-box.json”。
 4. 在 SFA / SFI / SFM 的配置页面导入本地文件，然后启用连接。
 
@@ -59,12 +59,10 @@ node scripts/generate.mjs --template /path/to/private/template.json \
   --input nodes.json --output generated/android.json
 ```
 
-旧 `render.sh` 包装已移除，统一使用上述 CLI。它调用网页使用的同一套引擎。
-命令行输出为 `0600`，失败时保留原有输出。
-可用 `--input -` 从 stdin 读取，个人模板用 `--template /path/to/private/template.json`。
+命令行输出为 `0600`，失败时保留原有输出；`--input -` 可从 stdin 读取。
 
 ## 4. 更新与排查
 
 更换节点或模板升级见[更新节点](update-nodes.md)。导入或连接异常见[故障排查](troubleshooting.md)。
 网页检查输入格式、节点名称与配置引用；客户端仍需验证完整字段及实际连接。
-仓库 CI 使用 1.13.21 / 1.14.0 内核检查生成结果，静态检查通过不等于节点在线。
+内核检查版本与验证范围见[版本兼容](compatibility.md)。配置检查通过不等于节点在线。

@@ -25,8 +25,8 @@
 }
 ```
 
-上面仍是格式示例，不是真实节点。`outbounds` 中每个对象就是标准 sing-box
-出站；可使用 Hysteria2、VLESS、Trojan 等官方支持类型，但具体字段应以当前
+上面是格式示例，请替换为自己的节点。`outbounds` 接受生成器支持的 sing-box
+出站类型，如 Hysteria2、VLESS、Trojan；完整字段以对应内核版本的
 [官方出站文档](https://sing-box.sagernet.org/configuration/outbound/) 为准。
 
 输入上限为 1 MB、200 个节点；标准化后的节点文档与模板最多嵌套 100 层对象或数组。
@@ -41,7 +41,6 @@
 
 生成器只能识别配置所声明的能力，不能替你确认服务端是否启用了 UDP。
 需要进一步限制时显式填写 `udp_outbounds`；其名称必须存在且不重复。
-原版脚本“省略即全部支持 UDP”的行为已改为上述能力推断。
 
 全部节点都只支持 TCP 时，使用 `"udp_outbounds": []`。生成器会移除 `udp-auto`
 及其选择项，将需要代理的 UDP 改为明确拒绝；国内和局域网已有的 UDP 直连规则

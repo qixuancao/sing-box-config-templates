@@ -10,8 +10,8 @@ them. Their own licenses remain authoritative.
 | [SagerNet/sing-box-for-apple](https://github.com/SagerNet/sing-box-for-apple) | Apple client behavior | See upstream repository |
 | [ACL4SSR/ACL4SSR](https://github.com/ACL4SSR/ACL4SSR) | Credited inspiration for task-oriented groups; no rule files copied | CC BY-SA 4.0 |
 | [MetaCubeX/meta-rules-dat](https://github.com/MetaCubeX/meta-rules-dat) | Runtime URLs for remote `.srs` rule sets; no rule data vendored | GPL-3.0 |
-| [jsDelivr / testingcf.jsdelivr.net](https://www.jsdelivr.com/) | CDN used at runtime to download the 17 MetaCubeX `.srs` files | See CDN terms |
-| [Google Connectivity Check (gstatic)](https://www.gstatic.com/generate_204) | Default `urltest` target (`auto`, `udp-auto`, every 3 minutes) | See Google terms |
+| [jsDelivr / testingcf.jsdelivr.net](https://www.jsdelivr.com/) | Runtime CDN for MetaCubeX `.srs` files (17 by default; 16 without ad blocking) | See CDN terms |
+| [Google Connectivity Check (gstatic)](https://www.gstatic.com/generate_204) | `urltest` target (every 3 minutes by default; 15 in battery-saver mode) | See Google terms |
 | [AliDNS (223.5.5.5)](https://www.alidns.com/) | Default `direct-dns` / bootstrap resolver | See provider terms |
 | [Google Public DNS (8.8.8.8)](https://developers.google.com/speed/public-dns) | Default `proxy-dns` resolver | See provider terms |
 

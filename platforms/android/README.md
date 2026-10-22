@@ -7,7 +7,7 @@
 | 内核 | 目录 | 实际 CI 检查器 | 说明 |
 | --- | --- | --- | --- |
 | 1.14.x | [`1.14/`](1.14/) | 1.14.0 | 当前版，使用共享 HTTP 客户端和新版 FakeIP DNS 评估 |
-| 1.13.x | [`1.13/`](1.13/) | 1.13.21 | 规则集下载改用旧版 `download_detour`，FakeIP 不使用 1.14 动作 |
+| 1.13.x | [`1.13/`](1.13/) | 1.13.21 | 使用 `download_detour` 与兼容的 FakeIP DNS 判定 |
 | 1.15 · **实验版** | [`1.15/`](1.15/) | 1.15.0-alpha.12 | 移除 TUN `stack`，仅适配固定 alpha，非默认推荐 |
 
 SFA 应用版本与内核版本通常接近，但排障时以“关于”页或启动日志实际显示的
@@ -23,7 +23,7 @@ sing-box 版本为准。若你的补丁版本与表中检查器不同，请在�
 | `tcp-stable.json` | UDP/QUIC 经常失败的校园网、公司网、移动网络 | 阻断 DoT、QUIC、STUN；游戏、通话可能降级或不可用 |
 | `privacy-strict.json` | 更重视 DNS 隔离 | A 查询走代理 DNS，不发送 ECS；同时阻断 DoT、QUIC、STUN |
 | `dual-stack.json` | 本地与节点都有稳定 IPv6 | 允许 AAAA/IPv6；IPv6 路径有问题时反而可能变慢 |
-| `no-adblock.json` | 登录、支付、跳转或 App 因广告规则误杀 | 不再提供域名级广告拦截 |
+| `no-adblock.json` | 登录、支付、跳转或 App 因广告规则误杀 | 不拦截广告域名 |
 | `battery-saver.json` | 墨水屏、备用机、后台长期开启 | 测速改为 15 分钟一次，节点故障切换可能更慢 |
 | `udp-first.json` | 游戏、语音、视频通话 | 必须在 `nodes.json` 正确维护 `udp_outbounds` |
 

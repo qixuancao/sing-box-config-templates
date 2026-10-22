@@ -17,9 +17,8 @@ SFI 导入生成后的本地文件或远程 HTTPS 配置，并允许系统创建
 [sing-box for Apple platforms](https://sing-box.sagernet.org/clients/apple/)，
 版本说明见 [sing-box v1.14.0](https://github.com/SagerNet/sing-box/releases/tag/v1.14.0)。
 
-Apple NetworkExtension 没有实现 `strict_route`，也不支持 Android 的包名分流，
-所以本目录不伪装提供这些能力。是否可从 App Store 或 TestFlight 安装可能随
-时间和地区变化，请以官方页面为准。
+Apple NetworkExtension 未实现 `strict_route`，也不支持 Android 包名分流。
+客户端安装渠道与地区限制以官方页面为准。
 
 ## 局域网与链路本地流量
 

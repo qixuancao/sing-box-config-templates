@@ -1,9 +1,7 @@
 # sing-box 1.15 · 实验版
 
-按官方 **1.15.0-alpha.12** 预备，稳定配置继续维护 1.13 / 1.14。
-网页的“高级设置”中可主动选择 1.15；默认仍是 1.14。
-配置与稳定版使用同一目录结构：`platforms/<平台>/1.15/<场景>.json`，
-实验状态由版本目录说明、网页标签和 `modules/catalog.json` 的 `channel` 标记。
+仅按官方 **1.15.0-alpha.12** 验证，在网页高级设置或 CLI `--core 1.15` 中选择。
+配置位于 `platforms/<平台>/1.15/`；默认推荐 1.14。
 
 | 平台 | 配置 |
 | --- | --- |
@@ -19,7 +17,6 @@
   `stack` 字段，采用 1.15 的新默认栈。1.13 / 1.14 模块保留原设置。
 - DNS、路由和规则集各有独立的 `modules/<类别>/1.15/` 来源，初始策略沿用 1.14。
 - Android 保持无需 root 的客户端使用方式；新增的 root `auto_redirect` 能力不作为默认前提。
-- 测试版新增的 Tailcat、MASQUE 等功能不影响现有默认场景，后续可按需要增加独立模块。
 
 依据：[官方发布](https://github.com/SagerNet/sing-box/releases/tag/v1.15.0-alpha.12)、
 [变更记录](https://sing-box.sagernet.org/changelog/)、

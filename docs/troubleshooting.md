@@ -26,15 +26,15 @@ sing-box check -c generated/your-config.json
 
 ## 登录、支付或跳转被拦截
 
-先换成同版本目录的 `no-adblock.json`。若问题立刻消失，通常是
+Android 可换成同版本的 `no-adblock.json`。若问题立刻消失，通常是
 `category-ads-all` 的误判；不要把整套国内/国外分流一起删掉。提交反馈时提供
 脱敏后的目标域名和规则集版本即可。
 
 ## IPv6 网站或局域网不可用
 
-默认配置主动抑制 AAAA 并拒绝 IPv6，适合 IPv6 路径不稳定的网络。只有手机、
-接入网络和节点都确认支持 IPv6 时才测试 `dual-stack.json`。若延迟变高或出现
-间歇超时，退回同版本的 `realip.json`。
+默认配置抑制 AAAA 并拒绝公网 IPv6；iOS 的本地 IPv6 绕行见[iOS 说明](../platforms/ios/README.md#局域网与链路本地流量)。
+Android 在接入网络和节点均支持 IPv6 时可测试 `dual-stack.json`；若出现超时，
+退回同版本的 `realip.json`。
 
 ## 视频卡顿、QUIC 或 UDP 反复失败
 
@@ -42,7 +42,7 @@ sing-box check -c generated/your-config.json
 进一步测试 `tcp-stable.json`；它会阻断 DoT、QUIC 和 STUN，让常见 HTTPS
 回退到 TCP，但语音、视频通话和部分实时功能也可能降级。
 
-若恰好相反——TCP 正常但你需要游戏、语音、视频通话——可测试
+Android 游戏、语音或视频通话可测试
 `udp-first.json`，并确认 `nodes.json` 的 `udp_outbounds` 没有混入不支持 UDP
 的节点。
 

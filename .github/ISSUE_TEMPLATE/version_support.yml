@@ -7,9 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use this form when SagerNet publishes a new stable core and the
-        pinned checkers in README/docs need an update. Do not paste
-        private configurations.
+        Request validation for an upstream stable or prerelease core.
+        Current checker pins are in modules/catalog.json.
+        Do not paste private configurations.
   - type: input
     id: upstream_version
     attributes:
