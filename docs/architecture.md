@@ -29,7 +29,7 @@ flowchart LR
 | 页面与翻译 | `web/page.html`、`web/locales/` | 一份页面结构，两份独立翻译 |
 | 命令行 | `scripts/generate.mjs` | 本地文件与 stdin 输入、原子写入、0600 文件权限 |
 
-`templates/`、`platforms/`、`experimental/1.15/platforms/`、`docs/assets/presets.mjs`、
+`platforms/`、`experimental/1.15/platforms/`、`docs/assets/presets.mjs`、
 `docs/index.html`、`docs/en/index.html` 和 `docs/assets/profiles.mjs` 是生成产物。
 修改源文件后运行对应脚本；CI 会检查它们是否同步。
 
@@ -57,10 +57,11 @@ const json = JSON.stringify(config, null, 2);
 
 详细目录与修改例子见[配置模块](../modules/README.md)。对象递归合并、数组保持原顺序，
 同一字段由两个模块重复定义时构建失败；各版本独立选择模块，不会自动回退到其他版本。
-1.13 / 1.14 的 38 份现有 JSON 在首次拆分后保持字节一致；1.15 在独立实验区预备，
+稳定平台配置共 34 份，1.13 / 1.14 各 17 份；1.15 在独立实验区预备，
 按[实验说明](../experimental/1.15/README.md)使用固定 alpha 检查器验证。
 
-个人规则也可以写进独立的私有模板，再用
+构建器只生成声明了平台的配置，不再提供无平台通用配置。个人规则可以从相应平台配置
+复制到独立的私有模板中修改，再用
 `node scripts/generate.mjs --template /path/to/private/template.json ...` 生成。
 
 ## 增加节点协议

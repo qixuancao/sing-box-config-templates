@@ -85,7 +85,7 @@ class IOSRoutesTest(unittest.TestCase):
                     )
 
     def test_generator_protects_changed_tun_explicit_dns_and_ipv6_fakeip(self):
-        profile = read_profile("templates/fakeip.json")
+        profile = read_profile("platforms/android/1.14/fakeip.json")
         profile["inbounds"][0]["address"] = ["10.12.0.1/30", "fdfe:dcba:9876::1/126"]
         profile["inbounds"][0]["dns_address"] = ["192.168.3.53", "fd00::53"]
         fakeip = next(server for server in profile["dns"]["servers"] if server["type"] == "fakeip")
@@ -101,14 +101,14 @@ class IOSRoutesTest(unittest.TestCase):
         ])
 
     def test_default_dns_is_protected_even_outside_a_host_prefix(self):
-        profile = read_profile("templates/realip.json")
+        profile = read_profile("platforms/android/1.14/realip.json")
         profile["inbounds"][0]["address"] = ["10.0.0.1/32", "fd00::1/128"]
         exclusions = networks(route_exclusions(profile))
         self.assert_kept(exclusions, ["10.0.0.1/32", "10.0.0.2/32", "fd00::1/128", "fd00::2/128"])
         self.assert_bypassed(exclusions, ["10.0.0.3", "fd00::3"])
 
     def test_other_platforms_and_privacy_profiles_do_not_gain_bypass(self):
-        for directory in ("templates", "platforms/android", "platforms/macos",
+        for directory in ("platforms/android", "platforms/macos",
                           "platforms/linux", "platforms/windows"):
             for path in (ROOT / directory).rglob("*.json"):
                 with self.subTest(path=path.relative_to(ROOT)):
@@ -121,11 +121,11 @@ class PublicAuditTest(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory(prefix="sing-box-audit-")
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
-        for name in ("scripts", "templates", "platforms", "experimental", "modules", "presets", "examples"):
+        for name in ("scripts", "platforms", "experimental", "modules", "presets", "examples"):
             (self.root / name).mkdir()
         self.audit = self.root / "scripts/audit-public.sh"
         shutil.copyfile(ROOT / "scripts/audit-public.sh", self.audit)
-        self.fixture = self.root / "templates/example.json"
+        self.fixture = self.root / "examples/example.json"
         self.fixture.write_text("{}\n", encoding="utf-8")
         self.bash = shutil.which("bash")
         self.assertIsNotNone(self.bash, "bash is required for audit tests")

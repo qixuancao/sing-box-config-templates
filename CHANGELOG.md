@@ -27,7 +27,8 @@
 - 所有平台统一使用 `platforms/<平台>/{1.13,1.14}/`，共 34 份平台配置。
 - 删除平台同层无版本号的 JSON 别名和 Android `1.12/`；原无版本号链接需改为同平台 `1.14/` 路径。
 - iOS、macOS、Linux、Windows 增加 1.13 兼容配置，生成器、选择器、Raw 链接及 CI 同步调整。
-- `templates/` 保留通用配置接口；当前由 `modules/` 和 `presets/` 生成。
+- 移除并停止维护 `templates/` 下的四份无平台通用配置，旧 `main/templates/*.json` Raw 链接不再可用，改用 `platforms/<平台>/<内核版本>/` 下的同名场景。
+- 清理构建器的无平台分支、通用配置检查循环与测试依赖；`presets/` 组合配方、私有 `--template` 与 `render.sh` 接口继续保留。
 
 ### 修复
 
@@ -78,7 +79,7 @@ https://raw.githubusercontent.com/qixuancao/sing-box-config-templates/v0.1.0/pla
 sing-box://import-remote-profile?url=https%3A%2F%2Fraw.githubusercontent.com%2Fqixuancao%2Fsing-box-config-templates%2Fv0.1.0%2Fplatforms%2Fandroid%2F1.14%2Ffakeip.json#Android%201.14%20FakeIP
 ```
 
-旧路径未删除，`templates/*.json` 继续可用。
+在 v0.1.0 发布时，旧路径未删除，`templates/*.json` 继续可用；当前移除说明见 Unreleased。
 
 ### 验证
 

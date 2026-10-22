@@ -56,8 +56,6 @@ class RenderTest(unittest.TestCase):
 
     def test_tcp_only_profiles_keep_direct_routes_and_reject_proxy_udp(self):
         profiles = sorted((ROOT / "platforms").glob(f"*/{self.line}/*.json"))
-        if self.line == "1.14":
-            profiles += sorted((ROOT / "templates").glob("*.json"))
         for profile in profiles:
             with self.subTest(profile=str(profile.relative_to(ROOT))):
                 result, output = self.render(

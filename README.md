@@ -54,6 +54,9 @@ sing-box check -c generated/sing-box.json
 
 所有平台都先选择内核版本，再选择配置：`platforms/<平台>/1.14/` 或 `platforms/<平台>/1.13/`。上表链接指向 1.14；使用 1.13 内核时，换成同平台 `1.13/` 目录中的同名文件。
 
+原 `templates/*.json` 已移除并停止维护，旧 Raw 链接不再可用；请改用对应平台的版本化配置。
+私有模板仍可通过 CLI 的 `--template` 参数传入。
+
 Linux / Windows 可先用 `mixed.json`，运行后将应用代理设为 `127.0.0.1:2080`：
 
 ```bash

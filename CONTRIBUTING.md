@@ -30,8 +30,8 @@ SING_BOX=/path/to/sing-box-1.14.0 python3 -B scripts/check-render.py
 `./scripts/check-rule-sets.sh 1.xx`。该检查需要联网，平时由每周 CI 执行。
 
 配置源位于 `modules/<类别>/<版本>/`，场景组合位于 `presets/`。修改后运行
-`./scripts/sync-platforms.sh`，同时更新通用模板、平台文件和浏览器模板包。
-`templates/`、`platforms/` 与实验配置 JSON 都由这些源生成。
+`./scripts/sync-platforms.sh`，同时更新平台文件和浏览器配置包。
+`platforms/` 与实验配置 JSON 都由这些源生成；不再生成不区分平台的通用配置。
 修改页面结构或翻译后运行 `python3 -B scripts/build-pages.py`。模块分工与公共 API 见
 [模块结构](docs/architecture.md)。新协议的测试应分别带 `SING_BOX` 环境变量用两个内核运行。
 

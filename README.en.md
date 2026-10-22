@@ -55,6 +55,10 @@ are Git-ignored. CLI output files use mode `0600`. The existing
 
 Choose the core version on every platform: `platforms/<platform>/1.14/` or `platforms/<platform>/1.13/`. The table links to 1.14 profiles; use the same filename under `1.13/` when running a 1.13 core.
 
+The former `templates/*.json` files have been removed and are no longer maintained; their old
+Raw URLs no longer work. Use the versioned profile for your platform. Private templates remain
+supported through the CLI's `--template` option.
+
 On desktop systems, start with `mixed.json` and set the application proxy to `127.0.0.1:2080`:
 
 ```bash

@@ -55,7 +55,7 @@ def load_module(root, kind, version, name):
     return fragment
 
 
-def compose(root, catalog, version, scenario, platform=None):
+def compose(root, catalog, version, scenario, platform):
     if version not in catalog["versions"]:
         raise ValueError("Unknown version")
     if not re.fullmatch(r"[a-z][a-z0-9-]*", scenario):
@@ -64,8 +64,8 @@ def compose(root, catalog, version, scenario, platform=None):
     selections = dict(recipe["modules"])
     if set(selections) != set(KINDS) - {"base"}:
         raise ValueError(f"Incomplete recipe: {scenario}")
-    settings = catalog["platforms"][platform] if platform else {}
-    if platform and scenario not in settings["scenarios"]:
+    settings = catalog["platforms"][platform]
+    if scenario not in settings["scenarios"]:
         raise ValueError("Scenario unavailable on this platform")
     selections["inbounds"] = settings.get("inbound_overrides", {}).get(scenario, selections["inbounds"])
     config = {}
@@ -78,8 +78,7 @@ def compose(root, catalog, version, scenario, platform=None):
         config["inbounds"][0]["route_exclude_address"] = route_exclusions(config)
     if "log_level" in recipe:
         config["log"]["level"] = recipe["log_level"]
-    cache_id = f"{platform}-{version}-{scenario}" if platform else f"template-{scenario}"
-    config["experimental"]["cache_file"]["cache_id"] = cache_id
+    config["experimental"]["cache_file"]["cache_id"] = f"{platform}-{version}-{scenario}"
     cache = config["experimental"]["cache_file"]
     cache_order = dict.fromkeys(("enabled", "cache_id", *cache))
     config["experimental"]["cache_file"] = {key: cache[key] for key in cache_order if key in cache}
@@ -101,8 +100,6 @@ def outputs(root=ROOT):
         for platform, settings in catalog["platforms"].items():
             for scenario in settings["scenarios"]:
                 result[profile_path(catalog, platform, version, scenario)] = encode(compose(root, catalog, version, scenario, platform))
-    for scenario in ("fakeip", "realip", "tcp-stable", "privacy-strict"):
-        result[f"templates/{scenario}.json"] = encode(compose(root, catalog, catalog["default_core"], scenario))
     client_catalog = {
         "default_core": catalog["default_core"], "versions": catalog["versions"],
         "platforms": {name: settings["scenarios"] for name, settings in catalog["platforms"].items()},
@@ -117,7 +114,7 @@ def main():
     args = parser.parse_args()
     generated = outputs()
     expected = {name for name in generated if name.endswith(".json")}
-    actual = {str(path.relative_to(ROOT)) for directory in ("templates", "platforms", "experimental") for path in (ROOT / directory).rglob("*.json")}
+    actual = {str(path.relative_to(ROOT)) for directory in ("platforms", "experimental") for path in (ROOT / directory).rglob("*.json")}
     unexpected = actual - expected
     if unexpected:
         raise SystemExit("Unexpected generated profiles: " + ", ".join(sorted(unexpected)))

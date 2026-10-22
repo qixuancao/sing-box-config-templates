@@ -56,7 +56,7 @@ Android/iOS 的字段省略是平台适配，不是功能缺失造成的遗漏�
 稳定配置 `platforms/ios/{1.13,1.14}/{fakeip,realip}.json` 和独立的 1.15 实验 iOS 配置默认添加 `route_exclude_address`，
 排除常见本地 IPv4/IPv6 地址及 CGNAT。生成时从排除范围中扣除 TUN 子网、
 虚拟 DNS 与 FakeIP 地址池，避免绕过 `172.19.0.2` 或误排 IPv6 FakeIP。
-其他平台、通用模板与 `privacy-strict` 保持原有接管策略。
+其他平台与 Android `privacy-strict` 保持原有接管策略。
 
 这允许本地 IPv6 通信绕过 TUN，但不启用公网 IPv6。绕行的流量（包括应用向
 局域网 DNS 发起的查询）不受 sing-box 规则控制；需要代理内网或严格 DNS

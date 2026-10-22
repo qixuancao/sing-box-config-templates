@@ -15,6 +15,17 @@ catalog = json.loads((ROOT / "presets/catalog.json").read_text())
 
 
 class ModuleTests(unittest.TestCase):
+    def test_outputs_contain_only_declared_platform_profiles_and_browser_catalog(self):
+        expected = {"docs/assets/presets.mjs"}
+        for version, metadata in catalog["versions"].items():
+            for platform, settings in catalog["platforms"].items():
+                for scenario in settings["scenarios"]:
+                    path = (f"experimental/{version}/platforms/{platform}/{scenario}.json"
+                            if metadata["channel"] == "experimental" else
+                            f"platforms/{platform}/{version}/{scenario}.json")
+                    expected.add(path)
+        self.assertEqual(set(outputs()), expected)
+
     def test_dns_edit_updates_matching_profiles_and_keeps_versions_isolated(self):
         baseline = outputs()
         with tempfile.TemporaryDirectory(prefix="sing-box-module-") as temporary:
@@ -28,7 +39,7 @@ class ModuleTests(unittest.TestCase):
             changed = outputs(root)
             affected = {path for path in baseline if baseline[path] != changed[path]}
             self.assertEqual(affected, {
-                "templates/fakeip.json", "platforms/android/1.14/fakeip.json",
+                "platforms/android/1.14/fakeip.json",
                 "platforms/ios/1.14/fakeip.json", "platforms/macos/1.14/fakeip.json",
             })
             for name in affected:

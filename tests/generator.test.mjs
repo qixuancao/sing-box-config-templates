@@ -247,6 +247,17 @@ test('CLI output is private and atomic, preserves old files and refuses input al
     }
     assert.equal(run(['--input', '-', '--output', output, '--platform', 'linux'], links.hy2).status, 0);
     assert.equal(JSON.parse(read(output, 'utf8')).inbounds[0].type, 'mixed');
+    const templatePath = join(directory, 'private-template.json');
+    const template = structuredClone(PROFILES[profilePath('linux', '1.14', 'mixed')]);
+    template.log.level = 'debug';
+    writeFileSync(templatePath, JSON.stringify(template), {mode: 0o600});
+    const privateResult = run(['--template', templatePath, '--input', source, '--output', output]);
+    assert.equal(privateResult.status, 0, privateResult.stderr);
+    const rendered = JSON.parse(read(output, 'utf8'));
+    assert.equal(rendered.log.level, 'debug');
+    assert.equal(rendered.inbounds[0].type, 'mixed');
+    assert.equal(rendered.outbounds.find(node => node.type === 'naive').password, 'p@ss:word');
+    assert.deepEqual(JSON.parse(read(templatePath, 'utf8')), template);
   } finally { rmSync(directory, {recursive: true, force: true}); }
 });
 

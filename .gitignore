@@ -20,6 +20,7 @@ cache/
 *.key
 
 # Editor and operating-system files
+/AGENTS.md
 .idea/
 .vscode/
 .DS_Store
