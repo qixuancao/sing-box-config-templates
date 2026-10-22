@@ -52,10 +52,20 @@
 <h2 id="device-heading"><span class="step">2</span>选择设备</h2>
 <label for="platform">你在哪个平台使用？</label>
 <select id="platform"><option value="android">Android / SFA</option><option value="ios">iOS / iPadOS / SFI</option><option value="macos">macOS / SFM</option><option value="linux">Linux</option><option value="windows">Windows</option></select>
+<div id="access-setting"><label for="access-mode">流量接入方式</label>
+<select id="access-mode"><option value="local">仅监听端口 · 应用手动配置代理</option><option value="system">自动开启系统代理 · 非 TUN</option><option value="tun">TUN · 接管系统流量</option></select>
+<p class="help" id="access-desc"></p></div>
 <p class="scenario-note" id="scenario-desc"></p>
-<details id="advanced"><summary>高级设置 · 内核版本与使用场景</summary><div class="settings">
+<details id="advanced"><summary>高级设置 · 内核、DNS 和端口</summary><div class="settings">
 <div><label for="core">sing-box 内核版本</label><select id="core"><option value="1.14">1.14.x</option><option value="1.13">1.13.x</option><option value="1.15">1.15 · 实验版 · alpha.12</option></select><p class="help">与客户端的内核版本保持一致。1.15 是实验配置，按 1.15.0-alpha.12 验证。</p></div>
-<div><label for="scenario">使用场景</label><select id="scenario"></select></div>
+<div id="scenario-setting"><label for="scenario">使用场景</label><select id="scenario"></select></div>
+<div><label for="dns-mode">DNS 返回方式</label><select id="dns-mode"><option value="auto">跟随预设</option><option value="realip">RealIP · 返回真实地址</option><option value="fakeip">FakeIP · 返回虚拟地址</option></select><p class="help" id="dns-desc">RealIP 兼容性优先；FakeIP 仅适合能接管 DNS 查询的 TUN/VPN 模式。</p></div>
+<div class="dns-grid">
+<div><label for="direct-dns">直连 DNS（默认 AliDNS）</label><select id="direct-dns"><option value="default">跟随预设</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="custom">自定义 IPv4</option></select><input type="text" id="direct-custom" inputmode="decimal" autocomplete="off" placeholder="IPv4 · 1.1.1.1" hidden></div>
+<div><label for="proxy-dns">代理 DNS（默认 Google）</label><select id="proxy-dns"><option value="default">跟随预设</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="custom">自定义 IPv4</option></select><input type="text" id="proxy-custom" inputmode="decimal" autocomplete="off" placeholder="IPv4 · 8.8.8.8" hidden></div>
+</div>
+<p class="help">直连和代理 DNS 分别使用 DoH（HTTPS）。自定义仅接受 IPv4 地址；域名解析及完整 DNS 劫持效果取决于客户端和运行方式。</p>
+<div id="port-setting"><label for="listen-port">本地监听端口</label><input type="number" id="listen-port" min="1" max="65535" step="1" value="2080"><p class="help">只监听 127.0.0.1，避免无认证代理暴露到局域网。</p></div>
 </div></details>
 <div class="actions"><button type="button" class="primary" id="generate">生成配置</button><button type="button" id="clear">清空</button></div>
 <p id="status" class="status" role="status" aria-live="polite"></p>
@@ -79,7 +89,7 @@
 <article class="guide"><h3>更换或增加节点</h3><p>读取保存的 nodes.json，修改节点并重新生成，替换客户端配置。更新默认规则时也可复用节点文件。</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/update-nodes.md">查看更新方法 ↗</a></p></article>
 <article class="guide"><h3>配置导入后连接异常</h3><p>先核对内核版本和节点信息。应用兼容问题可尝试 RealIP；Linux / Windows 先用本地 HTTP / SOCKS 模式检查节点。</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/troubleshooting.md">查看排查步骤 ↗</a></p></article>
 </div>
-<details class="technical"><summary>默认配置与命令行</summary><p class="help">公开 Raw JSON 使用占位节点，用于查看默认策略。命令行与本网页共用同一套节点解析和配置生成模块，需要 Node.js 22+。</p>
+<details class="technical"><summary>默认配置与命令行</summary><p class="help">Raw JSON 是默认占位模板。自定义选项只应用于网页下载的 JSON；下面的 CLI 命令仅在未自定义时等价。</p>
 <label for="out-path">平台配置路径</label><input id="out-path" type="text" readonly>
 <label for="out-raw">配置 Raw URL（占位节点）</label><input id="out-raw" type="text" readonly>
 <label for="out-cmd">本地生成与检查</label><textarea id="out-cmd" rows="3" readonly spellcheck="false"></textarea>

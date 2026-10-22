@@ -4,7 +4,7 @@ import {mkdtempSync, writeFileSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {parseNodes, renderConfig} from '../docs/assets/config-core.mjs';
+import {parseNodes, renderConfig, customizeTemplate, profilePath} from '../docs/assets/config-core.mjs';
 import {PROFILES} from '../docs/assets/profiles.mjs';
 import {links, legacySS} from './fixtures.mjs';
 
@@ -27,6 +27,20 @@ test('generated links pass the selected real sing-box core on every maintained p
         const result = spawnSync(core, ['check', '-c', file], {cwd: directory, encoding: 'utf8'});
         assert.equal(result.status, 0, `${name} ${path}: ${result.stdout}${result.stderr}`);
       }
+    }
+    // Real kernel validates the advanced UI's new combinations as well as public presets.
+    for (const [name, platform, scenario, options] of [
+      ['system', 'linux', 'mixed', {systemProxy: true, listenPort: 3128}],
+      ['mac-system', 'macos', 'mixed', {systemProxy: true, listenPort: 3128}],
+      ['fakeip-tun', 'linux', 'tun', {dnsTemplate: PROFILES[profilePath('android', line, 'fakeip')]}],
+      ['custom-dns', 'windows', 'mixed', {directDns: '1.1.1.1', proxyDns: '8.8.8.8'}],
+    ]) {
+      const template = customizeTemplate(PROFILES[profilePath(platform, line, scenario)], options);
+      const result = renderConfig(template, parseNodes(Object.values(links)[0]));
+      const file = join(directory, 'config.json');
+      writeFileSync(file, JSON.stringify(result), {mode: 0o600});
+      const checked = spawnSync(core, ['check', '-c', file], {cwd: directory, encoding: 'utf8'});
+      assert.equal(checked.status, 0, `${name}: ${checked.stdout}${checked.stderr}`);
     }
   } finally { rmSync(directory, {recursive: true, force: true}); }
 });

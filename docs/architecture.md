@@ -21,6 +21,7 @@ flowchart LR
 | 协议注册 | `docs/assets/core/share-links.mjs` | 把 URI scheme 分派给协议适配器 |
 | 节点数据 | `docs/assets/core/nodes.mjs` | 节点校验、名称处理、UDP 能力选择 |
 | 配置组合 | `docs/assets/core/render.mjs` | 注入节点、更新策略组、检查引用；不修改传入对象 |
+| 网页高级选项 | `docs/assets/core/customize.mjs` | 纯函数修改模板的 mixed 系统代理、端口和 DNS，不改变公开模板 |
 | 平台目录 | `docs/assets/core/catalog.mjs` | 支持的平台、内核版本与默认场景 |
 | 配置模块 | `modules/<类别>/<版本>/<方案>.json` | 独立维护 DNS、入站、路由、规则集；共享策略组与缓存模块 |
 | 构建目录与场景组合 | `modules/catalog.json` | 声明版本、平台适配与全部场景选用的模块 |

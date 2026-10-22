@@ -52,10 +52,20 @@ Or paste native sing-box nodes JSON"></textarea>
 <h2 id="device-heading"><span class="step">2</span>Choose your device</h2>
 <label for="platform">Where will you use sing-box?</label>
 <select id="platform"><option value="android">Android / SFA</option><option value="ios">iOS / iPadOS / SFI</option><option value="macos">macOS / SFM</option><option value="linux">Linux</option><option value="windows">Windows</option></select>
+<div id="access-setting"><label for="access-mode">Traffic capture method</label>
+<select id="access-mode"><option value="local">Local proxy listener only · configure apps manually</option><option value="system">Set OS system proxy automatically · not TUN</option><option value="tun">TUN · route system traffic</option></select>
+<p class="help" id="access-desc"></p></div>
 <p class="scenario-note" id="scenario-desc"></p>
-<details id="advanced"><summary>Advanced · core version and scenario</summary><div class="settings">
+<details id="advanced"><summary>Advanced · core, DNS and port</summary><div class="settings">
 <div><label for="core">sing-box core version</label><select id="core"><option value="1.14">1.14.x</option><option value="1.13">1.13.x</option><option value="1.15">1.15 · Experimental · alpha.12</option></select><p class="help">Match your client core. The experimental 1.15 presets target 1.15.0-alpha.12.</p></div>
-<div><label for="scenario">Scenario</label><select id="scenario"></select></div>
+<div id="scenario-setting"><label for="scenario">Scenario</label><select id="scenario"></select></div>
+<div><label for="dns-mode">DNS response mode</label><select id="dns-mode"><option value="auto">Use preset</option><option value="realip">RealIP · return actual addresses</option><option value="fakeip">FakeIP · return synthetic addresses</option></select><p class="help" id="dns-desc">RealIP is more compatible. FakeIP requires DNS capture through a TUN / VPN mode.</p></div>
+<div class="dns-grid">
+<div><label for="direct-dns">Direct DNS (default: AliDNS)</label><select id="direct-dns"><option value="default">Use preset</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="custom">Custom IPv4</option></select><input type="text" id="direct-custom" inputmode="decimal" autocomplete="off" placeholder="IPv4 · 1.1.1.1" hidden></div>
+<div><label for="proxy-dns">Proxy DNS (default: Google)</label><select id="proxy-dns"><option value="default">Use preset</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="custom">Custom IPv4</option></select><input type="text" id="proxy-custom" inputmode="decimal" autocomplete="off" placeholder="IPv4 · 8.8.8.8" hidden></div>
+</div>
+<p class="help">Direct and proxied upstreams use DNS over HTTPS. Custom servers require IPv4 addresses. DNS capture depends on the runtime environment.</p>
+<div id="port-setting"><label for="listen-port">Local listen port</label><input type="number" id="listen-port" min="1" max="65535" step="1" value="2080"><p class="help">Bound to 127.0.0.1 to avoid exposing an unauthenticated proxy to the LAN.</p></div>
 </div></details>
 <div class="actions"><button type="button" class="primary" id="generate">Generate configuration</button><button type="button" id="clear">Clear</button></div>
 <p id="status" class="status" role="status" aria-live="polite"></p>
@@ -79,7 +89,7 @@ Or paste native sing-box nodes JSON"></textarea>
 <article class="guide"><h3>Change or add nodes</h3><p>Read your saved nodes.json, edit the nodes and generate again. Replace the client profile. Reuse the nodes file when updating default rules.</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/update-nodes.md">Read the update guide ↗</a></p></article>
 <article class="guide"><h3>Connection trouble after import?</h3><p>Check the core version and node details first. Try RealIP for app compatibility issues. On Linux / Windows, start with local HTTP / SOCKS mode to check your nodes.</p><p><a href="https://github.com/qixuancao/sing-box-config-templates/blob/main/docs/troubleshooting.md">Read troubleshooting steps ↗</a></p></article>
 </div>
-<details class="technical"><summary>Default profile and command line</summary><p class="help">Public Raw JSON uses placeholder nodes so you can inspect the default policies. The CLI shares its node parser and renderer with this page and requires Node.js 22+.</p>
+<details class="technical"><summary>Default profile and command line</summary><p class="help">Raw JSON is a public placeholder preset. Custom options affect the web-downloaded JSON only; the CLI command below matches presets without customization.</p>
 <label for="out-path">Platform profile path</label><input id="out-path" type="text" readonly>
 <label for="out-raw">Profile Raw URL (placeholder nodes)</label><input id="out-raw" type="text" readonly>
 <label for="out-cmd">Generate and check locally</label><textarea id="out-cmd" rows="3" readonly spellcheck="false"></textarea>

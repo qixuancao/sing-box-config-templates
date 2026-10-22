@@ -270,6 +270,33 @@ input[type=file] {
   display:grid;
   gap:14px
 }
+#access-setting {
+  margin-top:16px
+}
+#access-setting .help {
+  line-height:1.65
+}
+.dns-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px
+}
+.dns-grid input {
+  margin-top:8px
+}
+#listen-port {
+  max-width:190px
+}
+input[type=number] {
+  display:block;
+  width:100%;
+  min-height:45px;
+  border:1px solid #bdcdbf;
+  border-radius:9px;
+  background:#fdfefd;
+  color:var(--ink);
+  padding:11px 12px
+}
 details {
   border-top:1px solid var(--line);
   padding-top:14px;
@@ -439,6 +466,9 @@ details>.settings {
   .workspace {
     grid-template-columns:1fr
   }
+  .dns-grid {
+    grid-template-columns:1fr
+  }
   .hero {
     padding-top:30px
   }
@@ -499,7 +529,7 @@ details>.settings {
   button.primary:hover:not(:disabled) {
     background:#2c7b5b
   }
-  textarea,select,input[type=text] {
+  textarea,select,input[type=text],input[type=number] {
     background:#15271e;
     border-color:#526c5a
   }

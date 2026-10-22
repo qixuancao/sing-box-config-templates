@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawnSync} from 'node:child_process';
-import {parseNodes, validateNodes, renderConfig, profilePath, errorMessage, ConfigError, PLATFORMS, CORES} from '../docs/assets/config-core.mjs';
+import {parseNodes, validateNodes, renderConfig, customizeTemplate, profilePath, errorMessage, ConfigError, PLATFORMS, CORES} from '../docs/assets/config-core.mjs';
 import {PROFILES} from '../docs/assets/profiles.mjs';
 import {clone, MAX_JSON_DEPTH} from '../docs/assets/core/values.mjs';
 import {uuid, links, tcp, udp, legacyPassword, legacySS} from './fixtures.mjs';
@@ -257,4 +257,38 @@ test('CLI output is private and atomic, preserves old files and refuses input al
     assert.equal(rendered.outbounds.find(node => node.type === 'naive').password, 'p@ss:word');
     assert.deepEqual(JSON.parse(read(templatePath, 'utf8')), template);
   } finally { rmSync(directory, {recursive: true, force: true}); }
+});
+
+
+test('advanced ingress and DNS configuration is real, isolated and validated', () => {
+  const sample = PROFILES[profilePath('linux', '1.14', 'mixed')];
+  const original = JSON.stringify(sample);
+  const edited = customizeTemplate(sample, {
+    systemProxy: true, listenPort: 3128, directDns: '1.1.1.1', proxyDns: '8.8.8.8',
+    dnsTemplate: PROFILES[profilePath('android', '1.14', 'realip')]
+  });
+  assert.equal(edited.inbounds[0].set_system_proxy, true);
+  assert.equal(edited.inbounds[0].listen_port, 3128);
+  assert.equal(edited.dns.servers.find(item => item.tag === 'direct-dns').server, '1.1.1.1');
+  assert.equal(edited.dns.servers.find(item => item.tag === 'direct-dns-bootstrap').server, '1.1.1.1');
+  assert.equal(edited.dns.servers.find(item => item.tag === 'proxy-dns').server, '8.8.8.8');
+  assert.equal(JSON.stringify(sample), original, 'preset must not be mutated');
+  assert.equal(renderConfig(edited, {outbounds: [udp]}).inbounds[0].set_system_proxy, true);
+  const local = customizeTemplate(sample);
+  assert.equal(local.inbounds[0].set_system_proxy, false);
+  assert.equal(local.inbounds[0].listen_port, 2080);
+  for (const invalid of [0, -1, 65536, 100.5, '2080']) {
+    assert.throws(() => customizeTemplate(sample, {listenPort: invalid}), ConfigError);
+  }
+  for (const invalid of ['999.1.1.1', 'a.example', '127.0.0.1:53', '1.1.1.1\n0.0.0.0', '01.1.1.1']) {
+    assert.throws(() => customizeTemplate(sample, {directDns: invalid}), ConfigError);
+  }
+  assert.throws(() => customizeTemplate(sample, {systemProxy: true, listenPort: 3000,
+    dnsTemplate: PROFILES[profilePath('android', '1.14', 'fakeip')]}), ConfigError);
+  const tun = PROFILES[profilePath('linux', '1.14', 'tun')];
+  const fake = customizeTemplate(tun, {dnsTemplate: PROFILES[profilePath('android', '1.14', 'fakeip')]});
+  assert.equal(fake.experimental.cache_file.store_fakeip, true);
+  assert.equal(fake.dns.servers.some(server => server.type === 'fakeip'), true);
+  assert.equal(renderConfig(fake, {outbounds: [udp]}).inbounds[0].type, 'tun');
+  assert.throws(() => customizeTemplate(tun, {systemProxy: true}), ConfigError);
 });

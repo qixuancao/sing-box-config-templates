@@ -92,8 +92,10 @@ try {
     for (const [platform, scenarios] of Object.entries(PLATFORMS)) {
       for (const core of CORES) {
         for (const scenario of scenarios) {
-          await evaluate(`for (const [id,value] of ${JSON.stringify([['platform', platform], ['core', core], ['scenario', scenario]])}) {const el=document.getElementById(id); el.value=value; el.dispatchEvent(new Event('change'));} document.getElementById('generate').click();`);
-          assert.equal(await generated(), true, `${suffix} ${platform} ${core} ${scenario}`);
+          const mode = scenario === 'mixed' ? 'local' : 'tun';
+          const dnsMode = platform === 'macos' && scenario === 'realip' ? 'realip' : 'auto';
+          await evaluate(`for (const [id,value] of ${JSON.stringify([['platform', platform], ['core', core], ['scenario', scenario], ['access-mode', mode], ['dns-mode', dnsMode]])}) {const el=document.getElementById(id); el.value=value; el.dispatchEvent(new Event('change'));} document.getElementById('generate').click();`);
+          assert.equal(await generated(), true, `${suffix} ${platform} ${core} ${scenario}: ${await evaluate("document.getElementById('status').textContent")} | ${await evaluate("document.getElementById('dns-mode').value")} | ${await evaluate("document.getElementById('access-mode').value")}`);
           const output = JSON.parse(await evaluate("document.getElementById('json-preview').value"));
           assert.deepEqual(output.outbounds.find(n => n.tag === 'udp-auto').outbounds, ['Browser-UDP']);
           assert.equal(output.outbounds.find(n => n.tag === 'Browser-TCP').type, 'naive');
@@ -110,6 +112,36 @@ try {
         }
       }
     }
+    // Advanced settings must affect the JSON, not only on-screen descriptions.
+    await evaluate("document.getElementById('platform').value='linux'; document.getElementById('platform').dispatchEvent(new Event('change'))");
+    await evaluate("document.getElementById('core').value='1.14'; document.getElementById('core').dispatchEvent(new Event('change'))");
+    await evaluate("document.getElementById('access-mode').value='system'; document.getElementById('access-mode').dispatchEvent(new Event('change'))");
+    await evaluate("document.getElementById('dns-mode').value='realip'; document.getElementById('dns-mode').dispatchEvent(new Event('change'))");
+    await evaluate("document.getElementById('direct-dns').value='custom'; document.getElementById('direct-dns').dispatchEvent(new Event('change'))");
+    await evaluate("document.getElementById('direct-custom').value='1.1.1.1'; document.getElementById('direct-custom').dispatchEvent(new Event('input'))");
+    await evaluate("document.getElementById('proxy-dns').value='8.8.8.8'; document.getElementById('proxy-dns').dispatchEvent(new Event('change'))");
+    await evaluate("document.getElementById('listen-port').value='3128'; document.getElementById('listen-port').dispatchEvent(new Event('input'))");
+    assert.equal(await evaluate("document.getElementById('dns-mode').querySelector('[value=fakeip]').disabled"), true);
+    await evaluate("document.getElementById('generate').click()");
+    assert.equal(await generated(), true);
+    const customized = JSON.parse(await evaluate("document.getElementById('json-preview').value"));
+    assert.equal(customized.inbounds[0].set_system_proxy, true);
+    assert.equal(customized.inbounds[0].listen_port, 3128);
+    assert.equal(customized.dns.servers.find(server => server.tag === 'direct-dns').server, '1.1.1.1');
+    assert.equal(customized.dns.servers.find(server => server.tag === 'direct-dns-bootstrap').server, '1.1.1.1');
+    assert.equal(customized.dns.servers.find(server => server.tag === 'proxy-dns').server, '8.8.8.8');
+    assert.match(await evaluate("document.getElementById('import-help').textContent"), /3128/);
+    await evaluate("document.getElementById('direct-custom').value='999.999.999.999';document.getElementById('direct-custom').dispatchEvent(new Event('input')); document.getElementById('generate').click()");
+    assert.equal(await evaluate("document.getElementById('download-json').disabled"), true);
+    await evaluate("document.getElementById('direct-custom').value='1.1.1.1'; document.getElementById('direct-custom').dispatchEvent(new Event('input'))");
+    await evaluate("document.getElementById('access-mode').value='local';document.getElementById('access-mode').dispatchEvent(new Event('change'));document.getElementById('generate').click()");
+    const listener = JSON.parse(await evaluate("document.getElementById('json-preview').value"));
+    assert.equal(listener.inbounds[0].set_system_proxy, false);
+    await evaluate("document.getElementById('access-mode').value='tun';document.getElementById('access-mode').dispatchEvent(new Event('change'));document.getElementById('dns-mode').value='fakeip';document.getElementById('dns-mode').dispatchEvent(new Event('change'));document.getElementById('generate').click()");
+    const tunFake = JSON.parse(await evaluate("document.getElementById('json-preview').value"));
+    assert.equal(tunFake.inbounds[0].type, 'tun');
+    assert.ok(tunFake.dns.servers.some(server => server.type === 'fakeip'));
+    assert.equal(tunFake.experimental.cache_file.store_fakeip, true);
     assert.equal(requests.length, before, 'Generation must make no network requests');
     // A changed input or device must invalidate an earlier successful result.
     const deep = '{"type":"http","tag":"DO-NOT-ECHO","server":"example.com","server_port":443,"extra":' + '['.repeat(60000) + '0' + ']'.repeat(60000) + '}';

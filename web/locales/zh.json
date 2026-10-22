@@ -20,7 +20,7 @@
   "nodes_list_label": "已解析节点",
   "device_heading": "选择设备",
   "platform_label": "你在哪个平台使用？",
-  "advanced_label": "高级设置 · 内核版本与使用场景",
+  "advanced_label": "高级设置 · 内核、DNS 和端口",
   "core_label": "sing-box 内核版本",
   "core_help": "与客户端的内核版本保持一致。1.15 是实验配置，按 1.15.0-alpha.12 验证。",
   "scenario_label": "使用场景",
@@ -46,7 +46,7 @@
   "trouble_body": "先核对内核版本和节点信息。应用兼容问题可尝试 RealIP；Linux / Windows 先用本地 HTTP / SOCKS 模式检查节点。",
   "trouble_link": "查看排查步骤",
   "technical_heading": "默认配置与命令行",
-  "technical_help": "公开 Raw JSON 使用占位节点，用于查看默认策略。命令行与本网页共用同一套节点解析和配置生成模块，需要 Node.js 22+。",
+  "technical_help": "Raw JSON 是默认占位模板。自定义选项只应用于网页下载的 JSON；下面的 CLI 命令仅在未自定义时等价。",
   "path_label": "平台配置路径",
   "raw_label": "配置 Raw URL（占位节点）",
   "cmd_label": "本地生成与检查",
@@ -72,5 +72,20 @@
       "公开 Raw JSON 使用占位节点。使用生成器导出加入自己节点后的 JSON 文件。"
     ]
   ],
-  "experimental_label": "实验版 · alpha.12"
+  "experimental_label": "实验版 · alpha.12",
+  "access_label": "流量接入方式",
+  "access_local": "仅监听端口 · 应用手动配置代理",
+  "access_system": "自动开启系统代理 · 非 TUN",
+  "access_tun": "TUN · 接管系统流量",
+  "dns_mode_label": "DNS 返回方式",
+  "dns_default": "跟随预设",
+  "dns_realip": "RealIP · 返回真实地址",
+  "dns_fakeip": "FakeIP · 返回虚拟地址",
+  "dns_help": "RealIP 兼容性优先；FakeIP 仅适合能接管 DNS 查询的 TUN/VPN 模式。",
+  "direct_dns_label": "直连 DNS（默认 AliDNS）",
+  "proxy_dns_label": "代理 DNS（默认 Google）",
+  "dns_custom": "自定义 IPv4",
+  "dns_upstream_help": "直连和代理 DNS 分别使用 DoH（HTTPS）。自定义仅接受 IPv4 地址；域名解析及完整 DNS 劫持效果取决于客户端和运行方式。",
+  "port_label": "本地监听端口",
+  "port_help": "只监听 127.0.0.1，避免无认证代理暴露到局域网。"
 }

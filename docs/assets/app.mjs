@@ -1,10 +1,20 @@
-import {PLATFORMS, profilePath, parseNodes, renderConfig, ConfigError, errorMessage} from './config-core.mjs';
+import {PLATFORMS, profilePath, parseNodes, renderConfig, customizeTemplate, ConfigError, errorMessage} from './config-core.mjs';
 import {PROFILES} from './profiles.mjs';
 
 const english = document.documentElement.lang === 'en';
 const t = (zh, en) => english ? en : zh;
 const byId = id => document.getElementById(id);
 const input = byId('nodes-input'), platform = byId('platform'), core = byId('core'), scenario = byId('scenario');
+const access = byId('access-mode'), dnsMode = byId('dns-mode'), directDns = byId('direct-dns'), proxyDns = byId('proxy-dns'), listenPort = byId('listen-port');
+const desktop = () => ['linux', 'windows', 'macos'].includes(platform.value);
+const chosenScenario = () => desktop() ? (access.value === 'tun' ? (platform.value === 'macos' ? (dnsMode.value === 'realip' ? 'realip' : 'fakeip') : 'tun') : 'mixed') : scenario.value;
+const resolvedDNS = select => select.value === 'default' ? null : select.value === 'custom' ? byId(select.id === 'direct-dns' ? 'direct-custom' : 'proxy-custom').value.trim() : select.value;
+const customSettings = () => access.value === 'system' && desktop() || dnsMode.value !== 'auto' || directDns.value !== 'default' || proxyDns.value !== 'default' || desktop() && access.value !== 'tun' && listenPort.value !== '2080';
+const dnsTemplateFor = () => {
+  if (dnsMode.value === 'auto') return null;
+  const from = PLATFORMS[platform.value].includes(dnsMode.value) ? platform.value : 'android';
+  return PROFILES[profilePath(from, core.value, dnsMode.value)];
+};
 const status = byId('status'), download = byId('download-json'), copy = byId('copy-json');
 let config = null, parsed = null, example = false, revision = 0;
 const scenarios = {
@@ -37,34 +47,71 @@ function updatePreset(reset = false) {
     option.textContent = scenarios[key][english ? 1 : 0]; scenario.append(option);
   });
   if (!reset && PLATFORMS[platform.value].includes(current)) scenario.value = current;
+  if (reset) { access.value = platform.value === 'macos' ? 'tun' : 'local'; dnsMode.value = 'auto'; }
   updateDetails();
 }
 function updateDetails() {
   invalidate();
-  const path = profilePath(platform.value, core.value, scenario.value);
-  byId('scenario-desc').textContent = scenarios[scenario.value][english ? 3 : 2];
+  const isDesktop = desktop(), isTun = !isDesktop || access.value === 'tun';
+  byId('access-setting').hidden = !isDesktop;
+  byId('scenario-setting').hidden = isDesktop;
+  byId('port-setting').hidden = isTun;
+  byId('listen-port').disabled = isTun;
+  byId('access-desc').textContent = access.value === 'system'
+    ? t('启动 sing-box 时自动写入系统 HTTP 代理，退出时恢复。并非 TUN，未遵循系统代理的应用和 UDP 不保证接管。', 'sing-box sets the OS HTTP proxy on startup and restores it on shutdown. This is not TUN; applications that ignore OS proxy settings and UDP may bypass it.')
+    : access.value === 'tun'
+      ? t('使用虚拟网卡接管流量，需系统权限或客户端 VPN 授权；不等同于系统 HTTP 代理。', 'Routes traffic through a virtual interface. Requires OS privileges or VPN authorization; it does not toggle the HTTP system proxy.')
+      : t('只在 127.0.0.1 监听 HTTP / SOCKS，既不设置系统代理，也不接管全局流量。', 'Only listens for HTTP / SOCKS on 127.0.0.1; does not enable OS proxy or capture all traffic.');
+  const fakeOption = dnsMode.querySelector('option[value="fakeip"]');
+  fakeOption.disabled = isDesktop && !isTun;
+  if (fakeOption.disabled && dnsMode.value === 'fakeip') dnsMode.value = 'realip';
+  byId('dns-desc').textContent = fakeOption.disabled
+    ? t('纯端口 / 系统代理模式不接管系统 DNS，因此禁用 FakeIP；可以选择 RealIP 和上游 DNS。', 'Local / system proxy does not capture OS DNS, so FakeIP is disabled. RealIP and upstream DNS remain configurable.')
+    : t('RealIP 返回真实地址，FakeIP 返回虚拟地址。TUN / VPN 模式需要正确接管 DNS 才能使用 FakeIP。', 'RealIP returns real addresses; FakeIP returns synthetic addresses and requires working TUN / VPN DNS capture.');
+  for (const select of [directDns, proxyDns]) {
+    byId(select.id === 'direct-dns' ? 'direct-custom' : 'proxy-custom').hidden = select.value !== 'custom';
+  }
+  const selected = chosenScenario(), path = profilePath(platform.value, core.value, selected);
+  byId('scenario-desc').textContent = isDesktop ? '' : scenarios[selected][english ? 3 : 2];
   byId('out-path').value = path;
   byId('out-raw').value = `https://raw.githubusercontent.com/qixuancao/sing-box-config-templates/main/${path}`;
-  byId('out-cmd').value = `node scripts/generate.mjs --platform ${platform.value} --core ${core.value} --scenario ${scenario.value} --input nodes.txt --output generated/sing-box.json\nsing-box check -c generated/sing-box.json`;
-  const mobile = ['android', 'ios', 'macos'].includes(platform.value) && scenario.value !== 'mixed';
-  byId('import-help').textContent = mobile
-    ? t('下载后，在 sing-box 客户端的配置页面导入本地 JSON 文件，再启用连接。', 'Download the JSON, import it as a local profile in your sing-box client, then connect.')
-    : scenario.value === 'mixed'
-      ? t('运行 sing-box run -c sing-box.json，然后将应用 HTTP / SOCKS 代理设为 127.0.0.1:2080。', 'Run sing-box run -c sing-box.json, then set your app HTTP / SOCKS proxy to 127.0.0.1:2080.')
-      : t('先运行 sing-box check -c sing-box.json 检查，再以系统所需权限运行 sing-box run -c sing-box.json。', 'Run sing-box check -c sing-box.json, then run sing-box run -c sing-box.json with the required system privileges.');
+  byId('out-cmd').value = customSettings()
+    ? 'sing-box check -c sing-box.json\nsing-box run -c sing-box.json'
+    : `node scripts/generate.mjs --platform ${platform.value} --core ${core.value} --scenario ${selected} --input nodes.txt --output generated/sing-box.json\nsing-box check -c generated/sing-box.json`;
+  const port = listenPort.value || '2080';
+  byId('import-help').textContent = isDesktop && !isTun
+    ? access.value === 'system'
+      ? t(`启动 sing-box run -c sing-box.json，会尝试将系统 HTTP 代理指向 127.0.0.1:${port}，停止时恢复；具体取决于操作系统与桌面环境。`, `Start sing-box run -c sing-box.json to set the OS proxy to 127.0.0.1:${port} (restored on shutdown); support depends on your OS and desktop environment.`)
+      : t(`启动 sing-box run -c sing-box.json，并手动将应用代理设置为 127.0.0.1:${port}；不会自动修改系统代理。`, `Start sing-box run -c sing-box.json and manually configure app HTTP / SOCKS proxy to 127.0.0.1:${port}. No OS proxy is changed.`)
+    : isDesktop && platform.value !== 'macos'
+      ? t('先使用 sing-box check 检查，再以系统所需权限启动 TUN；远程设备必须保留其他管理通道。', 'Run sing-box check first, then start TUN with the required privileges; keep another management channel for remote devices.')
+      : t('下载并在 sing-box 客户端中导入 JSON，随后授予 VPN / TUN 权限并连接。', 'Import the JSON into your sing-box client, grant VPN / TUN permissions, and connect.');
 }
 
 function generate() {
   invalidate();
   try {
     const nodes = parseNodes(input.value);
-    const path = profilePath(platform.value, core.value, scenario.value);
-    const result = renderConfig(PROFILES[path], nodes);
+    const path = profilePath(platform.value, core.value, chosenScenario());
+    const port = desktop() && access.value !== 'tun' ? Number(listenPort.value) : 2080;
+    if (desktop() && access.value !== 'tun' &&
+      (!/^\d+$/.test(listenPort.value) || !Number.isInteger(port) || port < 1 || port > 65535)) throw new Error('bad-port');
+    const ipv4 = value => typeof value === 'string' && /^(?:0|[1-9]\d{0,2})(?:\.(?:0|[1-9]\d{0,2})){3}$/.test(value) &&
+      value.split('.').every(part => Number(part) <= 255);
+    const direct = resolvedDNS(directDns), proxy = resolvedDNS(proxyDns);
+    if ([direct, proxy].some(value => value !== null && !ipv4(value))) throw new Error('bad-dns');
+    const template = customizeTemplate(PROFILES[path], {
+      dnsTemplate: dnsTemplateFor(), systemProxy: desktop() && access.value === 'system',
+      listenPort: port, directDns: direct, proxyDns: proxy
+    });
+    const result = renderConfig(template, nodes);
     config = result; parsed = nodes;
     byId('json-preview').value = JSON.stringify(result, null, 2) + '\n';
     byId('result-empty').hidden = true;
     const coreLabel = core.value === '1.15' ? t('1.15 · 实验版', '1.15 · Experimental') : core.value;
-    [t(`${nodes.outbounds.length} 个节点`, `${nodes.outbounds.length} nodes`), `${nodes.udp_outbounds.length} UDP`, `${coreLabel} · ${platform.value}`].forEach(text => {
+    const modeText = desktop() ? (access.value === 'tun' ? 'TUN' : access.value === 'system' ? t('自动系统代理', 'Auto OS proxy') : t('仅监听端口', 'Listener only')) : 'VPN / TUN';
+    const fake = result.dns.servers.some(server => server.type === 'fakeip');
+    [t(`${nodes.outbounds.length} 个节点`, `${nodes.outbounds.length} nodes`), `${nodes.udp_outbounds.length} UDP`, `${coreLabel} · ${platform.value}`, modeText, fake ? 'FakeIP' : 'RealIP'].forEach(text => {
       const badge = document.createElement('span'); badge.textContent = text; byId('result-summary').append(badge);
     });
     nodes.outbounds.forEach(node => {
@@ -83,7 +130,14 @@ function generate() {
     byId('warnings').textContent = warnings.join(' '); byId('warnings').hidden = !warnings.length;
     download.disabled = false; copy.disabled = false; byId('download-nodes').disabled = false;
     showStatus(t('配置已生成，可以下载 JSON。', 'Configuration ready. Download the JSON file.'), 'success');
-  } catch (error) { showStatus(errorMessage(error, english ? 'en' : 'zh'), 'error'); input.focus(); }
+  } catch (error) {
+    const message = error.message === 'bad-dns'
+      ? t('自定义 DNS 仅接受有效的 IPv4 地址（例如 1.1.1.1）。', 'Custom DNS must be a valid IPv4 address (e.g. 1.1.1.1).')
+      : error.message === 'bad-port'
+        ? t('监听端口必须是 1 到 65535 的整数。', 'Listener port must be an integer from 1 to 65535.')
+        : errorMessage(error, english ? 'en' : 'zh');
+    showStatus(message, 'error');
+  }
 }
 function saveJSON(value, filename) {
   const blob = new Blob([JSON.stringify(value, null, 2) + '\n'], {type: 'application/json;charset=utf-8'});
@@ -98,6 +152,9 @@ function clear() {
 input.addEventListener('input', () => { example = false; byId('nodes-file').value = ''; invalidate(); });
 platform.addEventListener('change', () => updatePreset(true));
 core.addEventListener('change', updateDetails); scenario.addEventListener('change', updateDetails);
+access.addEventListener('change', updateDetails); dnsMode.addEventListener('change', updateDetails);
+for (const select of [directDns, proxyDns]) select.addEventListener('change', updateDetails);
+for (const item of [listenPort, byId('direct-custom'), byId('proxy-custom')]) item.addEventListener('input', updateDetails);
 byId('generate').addEventListener('click', generate);
 download.addEventListener('click', () => { if (config) saveJSON(config, 'sing-box.json'); });
 byId('download-nodes').addEventListener('click', () => { if (parsed) saveJSON(parsed, 'nodes.json'); });

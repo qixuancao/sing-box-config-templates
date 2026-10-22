@@ -20,6 +20,16 @@
 支持 Naive HTTPS、Hysteria2、Trojan、Shadowsocks、VLESS 分享链接。解析、生成和
 下载均在浏览器内完成，节点不上传、不自动保存。支持保存 `nodes.json`，方便下次更新。
 
+**流量接入方式**（Linux / Windows / macOS）可明确选择：仅监听本地 HTTP/SOCKS
+（应用手动配置代理）、由 sing-box 在启动时自动设置并在停止时恢复系统 HTTP 代理
+（`mixed.set_system_proxy`），或 TUN 系统流量接管。系统代理并不等同于 TUN，
+部分应用及 UDP 不会使用系统 HTTP 代理；是否可自动设置取决于平台环境与权限。
+
+**高级设置**可单独选择 RealIP / FakeIP DNS 返回方式（纯 HTTP/SOCKS 模式禁用 FakeIP）、
+直连和代理 DNS 的 DoH 服务器（内置或自定义 IPv4），以及 mixed 监听端口。
+自定义内容只写入网页导出的 JSON，不会改变公开的 Raw 预设，也不会修改运行设备的系统设置。
+请用 `sing-box check -c sing-box.json` 校验下载的配置。
+
 ## 命令行生成
 
 需要 Node.js 22+；运行和内核检查需要 sing-box。

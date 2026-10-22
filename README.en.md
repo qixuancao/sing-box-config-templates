@@ -21,6 +21,18 @@ Supports Naive HTTPS, Hysteria2, Trojan, Shadowsocks and VLESS links. Parsing, c
 and downloads run in your browser; nodes are not uploaded or automatically stored. Save
 `nodes.json` to reuse your nodes for the next update.
 
+For Linux, Windows and macOS, **Traffic capture method** explicitly distinguishes a
+local HTTP/SOCKS listener, automatic OS system proxy (`mixed.set_system_proxy`) and
+TUN traffic capture. A system HTTP proxy is not the same as TUN and may not cover UDP
+or applications ignoring OS proxy settings. Automatic proxy changes depend on OS support
+and privileges and are restored on shutdown.
+
+Advanced settings independently select RealIP/FakeIP DNS responses (FakeIP is disabled
+without DNS capture), upstream DoH servers for direct and proxied traffic (presets or
+custom IPv4), and the mixed listener port. Custom options change the browser-exported
+JSON, not public Raw profiles or system settings while browsing. Verify the downloaded
+file using `sing-box check -c sing-box.json`.
+
 ## Generate with the CLI
 
 Requires Node.js 22+; running and core validation require sing-box.

@@ -20,7 +20,7 @@
   "nodes_list_label": "Parsed nodes",
   "device_heading": "Choose your device",
   "platform_label": "Where will you use sing-box?",
-  "advanced_label": "Advanced · core version and scenario",
+  "advanced_label": "Advanced · core, DNS and port",
   "core_label": "sing-box core version",
   "core_help": "Match your client core. The experimental 1.15 presets target 1.15.0-alpha.12.",
   "scenario_label": "Scenario",
@@ -46,7 +46,7 @@
   "trouble_body": "Check the core version and node details first. Try RealIP for app compatibility issues. On Linux / Windows, start with local HTTP / SOCKS mode to check your nodes.",
   "trouble_link": "Read troubleshooting steps",
   "technical_heading": "Default profile and command line",
-  "technical_help": "Public Raw JSON uses placeholder nodes so you can inspect the default policies. The CLI shares its node parser and renderer with this page and requires Node.js 22+.",
+  "technical_help": "Raw JSON is a public placeholder preset. Custom options affect the web-downloaded JSON only; the CLI command below matches presets without customization.",
   "path_label": "Platform profile path",
   "raw_label": "Profile Raw URL (placeholder nodes)",
   "cmd_label": "Generate and check locally",
@@ -72,5 +72,20 @@
       "Public Raw JSON uses placeholder nodes. Use the generator to download a JSON file containing your own nodes."
     ]
   ],
-  "experimental_label": "Experimental · alpha.12"
+  "experimental_label": "Experimental · alpha.12",
+  "access_label": "Traffic capture method",
+  "access_local": "Local proxy listener only · configure apps manually",
+  "access_system": "Set OS system proxy automatically · not TUN",
+  "access_tun": "TUN · route system traffic",
+  "dns_mode_label": "DNS response mode",
+  "dns_default": "Use preset",
+  "dns_realip": "RealIP · return actual addresses",
+  "dns_fakeip": "FakeIP · return synthetic addresses",
+  "dns_help": "RealIP is more compatible. FakeIP requires DNS capture through a TUN / VPN mode.",
+  "direct_dns_label": "Direct DNS (default: AliDNS)",
+  "proxy_dns_label": "Proxy DNS (default: Google)",
+  "dns_custom": "Custom IPv4",
+  "dns_upstream_help": "Direct and proxied upstreams use DNS over HTTPS. Custom servers require IPv4 addresses. DNS capture depends on the runtime environment.",
+  "port_label": "Local listen port",
+  "port_help": "Bound to 127.0.0.1 to avoid exposing an unauthenticated proxy to the LAN."
 }
