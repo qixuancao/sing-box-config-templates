@@ -8,7 +8,7 @@ Generate sing-box configurations for Android, iOS, macOS, Linux, and Windows, wi
 - Select nodes manually or let URLTest choose by latency.
 - Merge your nodes locally into an importable JSON configuration.
 - Use stable profiles for sing-box 1.13 / 1.14, or opt into [1.15 · Experimental](docs/experimental-1.15.md).
-- Edit DNS, inbound and routing modules by category, core version and mode; see [configuration modules](modules/README.md).
+- Edit DNS, inbound and routing modules by category, core version and mode. Versions, platforms and scenario recipes live in [`modules/catalog.json`](modules/catalog.json); see [configuration modules](modules/README.md).
 
 ## Generate in your browser
 

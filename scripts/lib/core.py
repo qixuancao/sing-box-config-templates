@@ -20,7 +20,7 @@ def checker(command, line=None, root=ROOT):
     require(lines, "Checker returned no version information")
     version = lines[0]
     match = re.search(r"sing-box version (1\.\d+)\.([^\s]+)", version)
-    catalog = read_json(root / "presets/catalog.json")
+    catalog = read_json(root / "modules/catalog.json")
     require(match and match[1] in catalog["versions"], "Checker must use a maintained sing-box core")
     actual = match[1]
     require(line is None or line == actual, f"Checker does not match requested core {line}")
@@ -84,7 +84,7 @@ def validate_profile(config, platform, line, scenario):
 
 
 def check_profiles(binary, line, version, root=ROOT):
-    catalog = read_json(root / "presets/catalog.json")
+    catalog = read_json(root / "modules/catalog.json")
     profiles = [(platform, scenario, root / f"platforms/{platform}/{line}/{scenario}.json")
                 for platform, settings in catalog["platforms"].items() for scenario in settings["scenarios"]]
     actual = set((root / "platforms").glob(f"*/{line}/*.json"))

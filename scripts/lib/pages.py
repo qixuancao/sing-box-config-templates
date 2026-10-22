@@ -141,7 +141,7 @@ def check_page(path, *, root, lang, canonical, other_hreflang):
                 found_faq = True
                 expect(node.get("mainEntity"), "FAQ has no questions")
     expect(found_software and found_faq, "JSON-LD must include SoftwareSourceCode and FAQ")
-    expect(info.core_versions == list(read_json(root / "presets/catalog.json")["versions"]), "core versions must match presets/catalog.json")
+    expect(info.core_versions == list(read_json(root / "modules/catalog.json")["versions"]), "core versions must match modules/catalog.json")
     for element in ("platform", "core", "scenario", "nodes-input", "nodes-file", "generate",
                     "download-json", "download-nodes", "copy-json", "clear", "json-preview", "out-path", "out-raw", "out-cmd"):
         expect(element in info.element_ids, f"missing generator element: {element}")

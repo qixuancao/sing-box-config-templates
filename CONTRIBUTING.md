@@ -31,7 +31,7 @@ python3 -B scripts/check.py browser # 需要本机 Chrome，可用 CHROME 指定
 `python3 -B scripts/check.py rule-sets --core 1.14 --sing-box /path/to/checker`。
 这是唯一主动下载规则集的检查，不包含在默认检查中，平时由每周 CI 执行。
 
-配置源位于 `modules/<类别>/<版本>/`，场景组合位于 `presets/`。修改后运行
+配置源位于 `modules/<类别>/<版本>/`，版本、平台与全部场景组合统一在 `modules/catalog.json`。修改后运行
 `python3 -B scripts/build.py`，同时更新平台文件、浏览器配置包与中英文页面。
 `platforms/` 中的稳定与实验版 JSON 都由这些源生成；不再生成不区分平台的通用配置。
 修改页面结构或翻译后使用同一构建入口。模块分工与公共 API 见

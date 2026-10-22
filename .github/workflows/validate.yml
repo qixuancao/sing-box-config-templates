@@ -96,7 +96,7 @@ jobs:
           python3 - <<'PY' >> "$GITHUB_ENV"
           import json
           from pathlib import Path
-          pin = json.loads(Path('presets/catalog.json').read_text())['versions']['1.15']
+          pin = json.loads(Path('modules/catalog.json').read_text())['versions']['1.15']
           assert pin['channel'] == 'experimental'
           print('SING_BOX_VERSION=' + pin['checker'])
           print('SING_BOX_SHA256=' + pin['sha256'])

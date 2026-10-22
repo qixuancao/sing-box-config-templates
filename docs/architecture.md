@@ -23,7 +23,7 @@ flowchart LR
 | 配置组合 | `docs/assets/core/render.mjs` | 注入节点、更新策略组、检查引用；不修改传入对象 |
 | 平台目录 | `docs/assets/core/catalog.mjs` | 支持的平台、内核版本与默认场景 |
 | 配置模块 | `modules/<类别>/<版本>/<方案>.json` | 独立维护 DNS、入站、路由、规则集；共享策略组与缓存模块 |
-| 场景预设 | `presets/scenarios/`、`presets/catalog.json` | 选择模块、平台适配、稳定与实验版本通道 |
+| 构建目录与场景组合 | `modules/catalog.json` | 声明版本、平台适配与全部场景选用的模块 |
 | 构建入口 | `scripts/build.py` | 一次生成平台 JSON、浏览器包与中英文页面；`--check` 只检查同步 |
 | 验证入口 | `scripts/check.py` | 默认执行静态、所选内核和浏览器检查；规则集下载单独触发 |
 | 开发工具内部模块 | `scripts/lib/` | 配置组合、页面、公共审计、平台契约和规则集检查；仅 Python 标准库 |
@@ -54,7 +54,7 @@ const json = JSON.stringify(config, null, 2);
 ## 修改默认规则
 
 1. 在 `modules/dns/1.14/fakeip.json` 等对应的类别、版本和方案中修改配置。
-2. 如需组合新场景，在 `presets/scenarios/` 选择 DNS、入站、规则等模块，再登记支持的平台；网页场景名称与说明位于 `docs/assets/app.mjs`。
+2. 如需组合新场景，在 `modules/catalog.json` 的 `scenarios` 中选择 DNS、入站、规则等模块，再在 `platforms` 中登记支持的平台；网页场景名称与说明位于 `docs/assets/app.mjs`。
 3. 运行 `python3 -B scripts/build.py`，更新全部构建产物。
 4. 运行 `python3 -B scripts/check.py static`，再用 `check.py core --sing-box /path/to/checker` 验证目标内核。
 

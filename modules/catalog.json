@@ -1,0 +1,170 @@
+{
+  "default_core": "1.14",
+  "versions": {
+    "1.14": {
+      "channel": "stable",
+      "checker": "1.14.0"
+    },
+    "1.13": {
+      "channel": "stable",
+      "checker": "1.13.21"
+    },
+    "1.15": {
+      "channel": "experimental",
+      "checker": "1.15.0-alpha.12",
+      "sha256": "b107528ec7d989333d986573c097d840b9ef1afa9bb177f8eb03e0767f370514"
+    }
+  },
+  "platforms": {
+    "android": {
+      "scenarios": [
+        "fakeip",
+        "realip",
+        "tcp-stable",
+        "privacy-strict",
+        "dual-stack",
+        "no-adblock",
+        "battery-saver",
+        "udp-first"
+      ]
+    },
+    "ios": {
+      "scenarios": [
+        "fakeip",
+        "realip"
+      ],
+      "ios_lan_bypass": true
+    },
+    "macos": {
+      "scenarios": [
+        "fakeip",
+        "realip",
+        "mixed"
+      ],
+      "auto_detect_interface": true
+    },
+    "linux": {
+      "scenarios": [
+        "mixed",
+        "tun"
+      ],
+      "auto_detect_interface": true,
+      "inbound_overrides": {
+        "tun": "linux-tun"
+      }
+    },
+    "windows": {
+      "scenarios": [
+        "mixed",
+        "tun"
+      ],
+      "auto_detect_interface": true,
+      "inbound_overrides": {
+        "tun": "windows-tun"
+      }
+    }
+  },
+  "scenarios": {
+    "battery-saver": {
+      "modules": {
+        "dns": "realip",
+        "inbounds": "tun",
+        "outbounds": "battery-saver",
+        "rules": "standard",
+        "rule-sets": "standard",
+        "experimental": "default"
+      },
+      "log_level": "error"
+    },
+    "dual-stack": {
+      "modules": {
+        "dns": "dual-stack",
+        "inbounds": "dual-stack",
+        "outbounds": "standard",
+        "rules": "dual-stack",
+        "rule-sets": "standard",
+        "experimental": "default"
+      }
+    },
+    "fakeip": {
+      "modules": {
+        "dns": "fakeip",
+        "inbounds": "tun",
+        "outbounds": "standard",
+        "rules": "standard",
+        "rule-sets": "standard",
+        "experimental": "fakeip"
+      }
+    },
+    "mixed": {
+      "modules": {
+        "dns": "realip",
+        "inbounds": "mixed",
+        "outbounds": "standard",
+        "rules": "mixed",
+        "rule-sets": "standard",
+        "experimental": "default"
+      }
+    },
+    "no-adblock": {
+      "modules": {
+        "dns": "realip",
+        "inbounds": "tun",
+        "outbounds": "standard",
+        "rules": "no-adblock",
+        "rule-sets": "no-adblock",
+        "experimental": "default"
+      }
+    },
+    "privacy-strict": {
+      "modules": {
+        "dns": "privacy-strict",
+        "inbounds": "tun",
+        "outbounds": "standard",
+        "rules": "tcp-stable",
+        "rule-sets": "standard",
+        "experimental": "default"
+      }
+    },
+    "realip": {
+      "modules": {
+        "dns": "realip",
+        "inbounds": "tun",
+        "outbounds": "standard",
+        "rules": "standard",
+        "rule-sets": "standard",
+        "experimental": "default"
+      }
+    },
+    "tcp-stable": {
+      "modules": {
+        "dns": "realip",
+        "inbounds": "tun",
+        "outbounds": "standard",
+        "rules": "tcp-stable",
+        "rule-sets": "standard",
+        "experimental": "default"
+      }
+    },
+    "tun": {
+      "modules": {
+        "dns": "realip",
+        "inbounds": "tun",
+        "outbounds": "standard",
+        "rules": "standard",
+        "rule-sets": "standard",
+        "experimental": "default"
+      }
+    },
+    "udp-first": {
+      "modules": {
+        "dns": "realip",
+        "inbounds": "tun",
+        "outbounds": "udp-first",
+        "rules": "standard",
+        "rule-sets": "standard",
+        "experimental": "default"
+      }
+    }
+  }
+}

@@ -33,7 +33,7 @@ class TemporaryRepoTest(unittest.TestCase):
         self.quiet = io.StringIO()
 
     def build_sources(self):
-        for name in ("modules", "presets", "web"):
+        for name in ("modules", "web"):
             shutil.copytree(ROOT / name, self.root / name)
 
 

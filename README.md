@@ -8,7 +8,7 @@
 - 手动选节点或通过 URLTest 按延迟自动选择；
 - 在本地合并节点，生成可直接导入客户端的 JSON；
 - 稳定配置维护 1.13、1.14；[1.15 · 实验版](docs/experimental-1.15.md)按固定 alpha 预备。
-- DNS、入站、规则按“类别 → 版本 → 方案”独立维护，见[配置模块](modules/README.md)。
+- DNS、入站、规则按“类别 → 版本 → 方案”独立维护，版本、平台和场景组合统一在 [`modules/catalog.json`](modules/catalog.json)，见[配置模块](modules/README.md)。
 
 ## 在线生成
 

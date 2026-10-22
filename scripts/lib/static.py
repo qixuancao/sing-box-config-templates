@@ -5,7 +5,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from .common import ROOT, read_json, require
 
-PUBLIC_DIRECTORIES = ("platforms", "modules", "presets", "examples", "docs", "scripts", "tests", "web", ".github")
+PUBLIC_DIRECTORIES = ("platforms", "modules", "examples", "docs", "scripts", "tests", "web", ".github")
 PUBLIC_FILES = ("README.md", "README.en.md", "CHANGELOG.md", "CONTRIBUTING.md", "PRIVACY.md",
                 "SECURITY.md", "SUBSCRIPTIONS.md", "THIRD_PARTY.md", "LICENSE", ".gitignore")
 PRIVATE_MARKER = re.compile(
@@ -53,7 +53,7 @@ def audit(root=ROOT):
         name = path.relative_to(root).as_posix()
         text = path.read_text(encoding="utf-8")
         require(not PRIVATE_MARKER.search(text), f"Forbidden private marker in {name}")
-        if path.suffix != ".json" or path.relative_to(root).parts[0] not in ("platforms", "modules", "presets", "examples"):
+        if path.suffix != ".json" or path.relative_to(root).parts[0] not in ("platforms", "modules", "examples"):
             continue
         document = read_json(path)
         for value in objects(document):
@@ -69,7 +69,7 @@ def audit(root=ROOT):
 
 
 def check_links(root=ROOT):
-    catalog = read_json(root / "presets/catalog.json")
+    catalog = read_json(root / "modules/catalog.json")
     expected = set()
     expected_imports = set()
     for version, metadata in catalog["versions"].items():
@@ -84,7 +84,7 @@ def check_links(root=ROOT):
                     expected_imports.add(RAW_PREFIX + path)
     text = (root / "SUBSCRIPTIONS.md").read_text(encoding="utf-8")
     raw_urls = set(re.findall(re.escape(RAW_PREFIX) + r"[A-Za-z0-9._!/-]+\.json", text))
-    require(raw_urls == expected and expected, "Stable Raw URLs must exactly match presets/catalog.json")
+    require(raw_urls == expected and expected, "Stable Raw URLs must exactly match modules/catalog.json")
     uris = re.findall(r"sing-box://import-remote-profile\?url=[^># ]+#[^> ]+", text)
     imported = []
     for uri in uris:

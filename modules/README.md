@@ -1,10 +1,12 @@
 # 配置模块
 
-按“功能 → 内核版本 → 方案”查找和修改配置。每个文件都是普通 JSON 片段，
-保留对应的 sing-box 顶层字段，例如 DNS 文件包含 `{"dns": {...}}`。
+配置源统一在本目录：`catalog.json` 声明版本、平台与场景组合，类别子目录按
+“功能 → 内核版本 → 方案”维护 JSON 片段，保留对应的 sing-box 顶层字段，
+例如 DNS 文件包含 `{"dns": {...}}`。
 
 ```text
 modules/
+├── catalog.json            # 版本、平台与全部场景组合
 ├── dns/
 │   ├── 1.13/
 │   ├── 1.14/
@@ -33,15 +35,15 @@ modules/
 | 远程规则集与下载方式 | `rule-sets/<版本>/<方案>.json` |
 | 节点选择组、自动测速 | `outbounds/common/` |
 | 日志、schema、HTTP 客户端 | `base/<版本>/default.json` |
-| 场景选用哪些模块 | [`../presets/scenarios/`](../presets/scenarios/) |
-| 平台支持的场景、版本通道 | [`../presets/catalog.json`](../presets/catalog.json) |
+| 场景选用哪些模块 | [`catalog.json`](catalog.json) 的 `scenarios` |
+| 平台支持的场景、版本通道 | [`catalog.json`](catalog.json) 的 `platforms` / `versions` |
 
-例如，[FakeIP 场景](../presets/scenarios/fakeip.json)选择 `dns: fakeip`，
+例如，`catalog.json` 中的 `scenarios.fakeip` 选择 `dns: fakeip`，
 构建 1.14 配置时读取 `dns/1.14/fakeip.json`。TCP 稳定场景复用 RealIP DNS，
 另外选择 `rules: tcp-stable`；修改 DNS 时不需要同时维护完整配置。
 
 ```bash
-# 修改模块或场景预设后，生成所有配置与网页模板包
+# 修改模块或 catalog.json 后，生成所有配置与网页模板包
 python3 -B scripts/build.py
 # 确认生成产物与模块一致
 python3 -B scripts/build.py --check
