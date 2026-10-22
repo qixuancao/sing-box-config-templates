@@ -12,6 +12,19 @@ function inferredUDP(node) {
   return UDP_TYPES.has(node.type);
 }
 
+function validateTransportHost(transport) {
+  const safe = value => value === '' || plain(value);
+  if (transport?.type === 'httpupgrade' && transport.host !== undefined) requireValue(safe(transport.host), 'transport');
+  if (transport?.type === 'ws' && object(transport.headers)) {
+    for (const [name, value] of Object.entries(transport.headers)) {
+      if (name.toLowerCase() === 'host') {
+        const values = Array.isArray(value) ? value : [value];
+        requireValue(values.every(safe), 'transport');
+      }
+    }
+  }
+}
+
 export function validateNodes(document) {
   requireValue(object(document) && Array.isArray(document.outbounds) && document.outbounds.length > 0, 'nodes');
   requireValue(document.outbounds.length <= 200, 'too-many');
@@ -28,6 +41,7 @@ export function validateNodes(document) {
       if (node.type === 'shadowsocks') requireValue(plain(node.method), 'method');
       if (['naive', 'hysteria2', 'trojan', 'tuic', 'anytls'].includes(node.type)) requireValue(node.tls?.enabled === true, 'security');
       if (node.tls?.server_name !== undefined) requireValue(plain(node.tls.server_name), 'server');
+      validateTransportHost(node.transport);
       requireValue(node.network === undefined || ['tcp', 'udp'].includes(node.network), 'network');
       tags.add(node.tag);
     } catch (error) { if (error instanceof ConfigError) error.position = index + 1; throw error; }

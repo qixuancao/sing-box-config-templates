@@ -3,6 +3,7 @@
 
 import ipaddress
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -114,27 +115,65 @@ class IOSRoutesTest(unittest.TestCase):
                     for inbound in json.loads(path.read_text(encoding="utf-8"))["inbounds"]:
                         self.assertNotIn("route_exclude_address", inbound)
 
+
+class PublicAuditTest(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix="sing-box-audit-")
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        for name in ("scripts", "templates", "platforms", "experimental", "modules", "presets", "examples"):
+            (self.root / name).mkdir()
+        self.audit = self.root / "scripts/audit-public.sh"
+        shutil.copyfile(ROOT / "scripts/audit-public.sh", self.audit)
+        self.fixture = self.root / "templates/example.json"
+        self.fixture.write_text("{}\n", encoding="utf-8")
+        self.bash = shutil.which("bash")
+        self.assertIsNotNone(self.bash, "bash is required for audit tests")
+
+    def isolated_path(self, name, missing=None):
+        directory = self.root / name
+        directory.mkdir()
+        for command in ("bash", "dirname", "find", "sort", "jq", "rg"):
+            if command != missing:
+                executable = shutil.which(command)
+                self.assertIsNotNone(executable, f"{command} is required for audit tests")
+                (directory / command).symlink_to(executable)
+        return directory
+
     def test_public_audit_allows_only_the_exact_cgnat_network(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            for name in ("scripts", "templates", "platforms", "experimental", "modules", "presets", "examples"):
-                (root / name).mkdir()
-            audit = root / "scripts/audit-public.sh"
-            shutil.copyfile(ROOT / "scripts/audit-public.sh", audit)
-            fixture = root / "templates/example.json"
-            # Build synthetic device addresses without storing private host literals.
-            for value, allowed in [
-                (str(CGNAT), True),
-                (str(CGNAT.network_address + 1), False),
-                (str(CGNAT.network_address), False),
-                (str(CGNAT) + "0", False),
-                (str(CGNAT) + "invalid", False),
-            ]:
-                with self.subTest(value=value):
-                    fixture.write_text(json.dumps({"route_exclude_address": [value]}), encoding="utf-8")
-                    result = subprocess.run(["bash", str(audit)], capture_output=True, text=True)
-                    self.assertEqual(result.returncode, 0 if allowed else 1,
-                                     result.stdout + result.stderr)
+        # Build synthetic device addresses without storing private host literals.
+        for value, allowed in [
+            (str(CGNAT), True),
+            (str(CGNAT.network_address + 1), False),
+            (str(CGNAT.network_address), False),
+            (str(CGNAT) + "0", False),
+            (str(CGNAT) + "invalid", False),
+        ]:
+            with self.subTest(value=value):
+                self.fixture.write_text(json.dumps({"route_exclude_address": [value]}), encoding="utf-8")
+                result = subprocess.run([self.bash, str(self.audit)], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0 if allowed else 1, result.stdout + result.stderr)
+
+    def test_public_audit_fails_when_a_required_tool_is_missing(self):
+        for command in ("jq", "rg"):
+            with self.subTest(command=command):
+                directory = self.isolated_path(f"without-{command}", missing=command)
+                result = subprocess.run([self.bash, str(self.audit)], capture_output=True, text=True,
+                                        env={**os.environ, "PATH": str(directory)})
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn(f"error: {command} is required", result.stderr)
+                self.assertNotIn("audit passed", result.stdout)
+
+    def test_public_audit_fails_when_the_marker_scan_errors(self):
+        directory = self.isolated_path("broken-scan", missing="rg")
+        scanner = directory / "rg"
+        scanner.write_text("#!/bin/sh\nexit 2\n", encoding="utf-8")
+        scanner.chmod(0o700)
+        result = subprocess.run([self.bash, str(self.audit)], capture_output=True, text=True,
+                                env={**os.environ, "PATH": str(directory)})
+        self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+        self.assertIn("error: public-marker scan failed", result.stderr)
+        self.assertNotIn("audit passed", result.stdout)
 
 
 if __name__ == "__main__":

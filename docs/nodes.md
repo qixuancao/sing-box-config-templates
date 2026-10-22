@@ -29,6 +29,10 @@
 出站；可使用 Hysteria2、VLESS、Trojan 等官方支持类型，但具体字段应以当前
 [官方出站文档](https://sing-box.sagernet.org/configuration/outbound/) 为准。
 
+输入上限为 1 MB、200 个节点；标准化后的节点文档与模板最多嵌套 100 层对象或数组。
+超过深度上限会返回明确错误，不生成配置。WebSocket / HTTPUpgrade 的 Host 不能包含
+换行或其他 ASCII 控制字符；分享链接与原生节点 JSON 使用同一套检查。
+
 ## 两个数组分别做什么
 
 - `outbounds`：所有节点。tag 必须唯一且非空。

@@ -106,12 +106,30 @@ try {
     }
     assert.equal(requests.length, before, 'Generation must make no network requests');
     // A changed input or device must invalidate an earlier successful result.
-    await input('naive+https://example-user:DO-NOT-ECHO@example.com:443?unknown=1');
-    assert.equal(await evaluate("document.getElementById('download-json').disabled"), true);
+    const deep = '{"type":"http","tag":"DO-NOT-ECHO","server":"example.com","server_port":443,"extra":' + '['.repeat(60000) + '0' + ']'.repeat(60000) + '}';
+    for (const invalid of [
+      'naive+https://example-user:DO-NOT-ECHO@example.com:443?unknown=1',
+      'trojan://DO-NOT-ECHO@example.com:443?type=ws&host=a%0D%0Ab',
+      deep,
+    ]) {
+      await input(invalid);
+      assert.equal(await evaluate("document.getElementById('download-json').disabled"), true);
+      await evaluate("document.getElementById('generate').click()");
+      const error = await evaluate("document.getElementById('status').textContent");
+      assert.ok(error.length > 5); assert.equal(error.includes('DO-NOT-ECHO'), false);
+      if (invalid === deep) assert.match(error, /100/);
+      assert.equal(await evaluate("document.getElementById('download-json').disabled"), true);
+      assert.equal(await evaluate("document.getElementById('download-nodes').disabled"), true);
+      assert.equal(await evaluate("document.getElementById('copy-json').disabled"), true);
+      assert.equal(await evaluate("document.getElementById('json-preview').value"), '');
+    }
+    const password = 'p#?%41% +@:/\\密码';
+    const legacy = 'ss://' + Buffer.from(`aes-128-gcm:${password}@example.com:8388`).toString('base64') + '#Browser-SS';
+    await input(legacy);
     await evaluate("document.getElementById('generate').click()");
-    const error = await evaluate("document.getElementById('status').textContent");
-    assert.ok(error.length > 5); assert.equal(error.includes('DO-NOT-ECHO'), false);
-    assert.equal(await evaluate("document.getElementById('json-preview').value"), '');
+    assert.equal(await generated(), true);
+    const legacyOutput = JSON.parse(await evaluate("document.getElementById('json-preview').value"));
+    assert.equal(legacyOutput.outbounds.find(node => node.tag === 'Browser-SS').password, password);
     await input('naive+https://example-user:example-password@example.com:443#Browser-TCP');
     await evaluate("document.getElementById('generate').click()"); assert.equal(await generated(), true);
     assert.equal((await evaluate("document.getElementById('json-preview').value")).includes('udp-auto'), false);

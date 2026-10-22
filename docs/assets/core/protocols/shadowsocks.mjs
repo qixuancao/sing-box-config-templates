@@ -3,18 +3,26 @@ import {base64, checkedURL, decode, host, port, parameters} from './common.mjs';
 
 export function parseShadowsocks(text) {
   // SIP002 userinfo and the older whole-authority Base64 form.
-  let link = text;
+  let url, credential;
   const body = text.slice(5).split('#')[0].split('?')[0];
   if (!body.includes('@')) {
+    const authority = base64(body);
+    const separator = authority.lastIndexOf('@');
+    requireValue(separator > 0, 'credentials');
+    // Legacy credentials are already plaintext, not percent-encoded URL data.
+    credential = authority.slice(0, separator);
+    const address = authority.slice(separator + 1);
+    requireValue(!/[/?#]/u.test(address), 'link');
     const tail = text.slice(5 + body.length);
-    link = `ss://${base64(body)}${tail}`;
+    url = checkedURL(`ss://${address}${tail}`);
+  } else {
+    url = checkedURL(text);
+    credential = decode(url.username);
+    if (url.password) credential += `:${decode(url.password)}`;
+    else credential = base64(credential);
   }
-  const url = checkedURL(link);
   requireValue(url.port, 'port');
   parameters(url, []); // Plugins need native JSON; never silently discard one.
-  let credential = decode(url.username);
-  if (url.password) credential += `:${decode(url.password)}`;
-  else credential = base64(credential);
   const colon = credential.indexOf(':');
   requireValue(colon > 0 && colon < credential.length - 1, 'credentials');
   const method = credential.slice(0, colon);

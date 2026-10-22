@@ -67,6 +67,20 @@ jobs:
       - name: Test browser JSON downloads and local-only generation
         run: node scripts/check-browser.mjs
 
+  shell-compatibility:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+
+      - name: Check synchronization on macOS system Bash
+        env:
+          TEST_BASH: /bin/bash
+        run: node --test --test-name-pattern='platform synchronization' tests/generator.test.mjs
+
   legacy-profiles:
     runs-on: ubuntu-latest
     strategy:
