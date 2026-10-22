@@ -26,25 +26,27 @@ sing-box check -c generated/your-config.json
 
 ## 登录、支付或跳转被拦截
 
-Android 可换成同版本的 `no-adblock.json`。若问题立刻消失，通常是
-`category-ads-all` 的误判；不要把整套国内/国外分流一起删掉。提交反馈时提供
-脱敏后的目标域名和规则集版本即可。
+基础配置不带广告过滤。先比较 RealIP 与 FakeIP，检查目标命中的策略组和节点，
+以及设备上其他过滤工具。提交反馈时提供脱敏后的目标域名与命中规则。
 
 ## IPv6 网站或局域网不可用
 
 默认配置抑制 AAAA 并拒绝公网 IPv6；iOS 的本地 IPv6 绕行见[iOS 说明](../platforms/ios/README.md#局域网与链路本地流量)。
-Android 在接入网络和节点均支持 IPv6 时可测试 `dual-stack.json`；若出现超时，
-退回同版本的 `realip.json`。
+接入网络和出口支持 IPv6 时，在高级设置启用 IPv6，或使用 CLI `--ipv6`。
+若出现超时，取消该选项重新生成；不要只修改 AAAA 而保留 IPv6 拒绝规则。
 
 ## 视频卡顿、QUIC 或 UDP 反复失败
 
-确认 `nodes.json` 的 `udp_outbounds` 只包含确实支持 UDP 的节点。Android 可
-进一步测试 `tcp-stable.json`；它会阻断 DoT、QUIC 和 STUN，让常见 HTTPS
-回退到 TCP，但语音、视频通话和部分实时功能也可能降级。
+确认 `nodes.json` 的 `udp_outbounds` 只包含确实支持 UDP 的节点，并检查应用策略组实际选中的节点。
+手选 TCP-only 节点不会自动为 UDP 换出口。URLTest 的 HTTPS 延迟也不能反映 UDP 丢包。
 
-Android 游戏、语音或视频通话可测试
-`udp-first.json`，并确认 `nodes.json` 的 `udp_outbounds` 没有混入不支持 UDP
-的节点。
+若仅 QUIC 失败，可在私有模板的嗅探规则之后临时加入以下规则，比较应用表现：
+
+```json
+{"protocol": "quic", "action": "reject"}
+```
+
+部分 HTTPS 应用会回退 TCP，但这不是游戏或语音的通用修复。确认原因后移除临时规则；不应一并封锁 DoT 和 STUN。
 
 ## 日志出现 `dial tcp ... i/o timeout`
 

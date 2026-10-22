@@ -2,7 +2,7 @@ import {ConfigError, requireValue, fail} from './errors.mjs';
 import {object, clone, UUID, plain} from './values.mjs';
 import {parseLink} from './share-links.mjs';
 
-const RESERVED = new Set(['select', 'auto', 'udp-auto', 'streaming', 'ai', 'telegram', 'microsoft', 'apple', 'google', 'github', 'direct', 'GLOBAL']);
+const RESERVED = new Set(['select', 'auto', 'streaming', 'ai', 'telegram', 'microsoft', 'apple', 'google', 'github', 'direct', 'GLOBAL']);
 const TCP_ONLY = new Set(['naive', 'http', 'ssh', 'shadowtls', 'tor']);
 const UDP_TYPES = new Set(['shadowsocks', 'trojan', 'vless', 'vmess', 'hysteria2', 'hysteria', 'tuic', 'anytls']);
 const TYPES = new Set([...TCP_ONLY, ...UDP_TYPES, 'socks']);

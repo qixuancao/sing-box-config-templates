@@ -28,5 +28,5 @@ Apple NetworkExtension 未实现 `strict_route`，也不支持 Android 包名分
 现在其他平台的 TUN 配置也采用同一套构建器，但 Android
 **不会排除回环地址**，以规避 VpnService 的 `Bad address`。
 
-关于各端差异、Global/隐私场景、Include All Networks 与实机验证限制，
+关于各端差异、Global 模式、Include All Networks 与实机验证限制，
 请查阅[跨平台局域网绕行说明](../../docs/lan-bypass.md)。

@@ -11,9 +11,7 @@ modules/
 │   ├── 1.13/
 │   ├── 1.14/
 │   │   ├── fakeip.json
-│   │   ├── realip.json
-│   │   ├── privacy-strict.json
-│   │   └── dual-stack.json
+│   │   └── realip.json
 │   └── 1.15/
 ├── inbounds/{1.13,1.14,1.15}/
 ├── rules/{1.13,1.14,1.15}/
@@ -23,7 +21,7 @@ modules/
 └── experimental/common/
 ```
 
-三个版本的 DNS 目录都有上面四种方案。`outbounds/common/` 和
+三个版本的 DNS 目录都有上面两种方案。`outbounds/common/` 和
 `experimental/common/` 共享策略组与缓存设置；版本相关的字段留在各自版本目录。
 这里的 `experimental` 是 sing-box 的原生配置字段，与 1.15 的实验发布通道不同。
 
@@ -39,8 +37,8 @@ modules/
 | 平台支持的场景、版本通道 | [`catalog.json`](catalog.json) 的 `platforms` / `versions` |
 
 例如，`catalog.json` 中的 `scenarios.fakeip` 选择 `dns: fakeip`，
-构建 1.14 配置时读取 `dns/1.14/fakeip.json`。TCP 稳定场景复用 RealIP DNS，
-另外选择 `rules: tcp-stable`；修改 DNS 时不需要同时维护完整配置。
+构建 1.14 配置时读取 `dns/1.14/fakeip.json`。TUN 和 mixed 复用同一套策略组；
+修改 DNS 时不需要同时维护完整配置。IPv6 等用户选项由网页和 CLI 共用的 `customize.mjs` 应用。
 
 ```bash
 # 修改模块或 catalog.json 后，生成所有配置与网页模板包

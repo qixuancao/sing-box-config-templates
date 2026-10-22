@@ -8,7 +8,7 @@ flowchart LR
   Web[网页] --> Parse[分享链接解析 / 节点校验]
   CLI[命令行] --> Parse
   Parse --> Render[配置组合]
-  Modules[版本化 DNS / 入站 / 规则模块] --> Build[场景预设与平台组合]
+   Modules[版本化 DNS / 入站 / 规则模块] --> Build[基础配置与平台组合]
   Build --> Templates[完整平台配置]
   Templates --> Render
   Render --> JSON[完整 JSON 文件]
@@ -21,11 +21,11 @@ flowchart LR
 | 协议注册 | `docs/assets/core/share-links.mjs` | 把 URI scheme 分派给协议适配器 |
 | 节点数据 | `docs/assets/core/nodes.mjs` | 节点校验、名称处理、UDP 能力选择 |
 | 配置组合 | `docs/assets/core/render.mjs` | 注入节点、更新策略组、检查引用；不修改传入对象 |
-| 网页高级选项 | `docs/assets/core/customize.mjs` | 纯函数修改模板的 mixed 系统代理、端口和 DNS，不改变公开模板 |
+| 用户选项 | `docs/assets/core/customize.mjs` | 网页与 CLI 共用：接入、DNS、IPv6、LAN 绕行，不改变输入模板 |
 | 平台目录 | `docs/assets/core/catalog.mjs` | 支持的平台、内核版本与默认场景 |
 | 配置模块 | `modules/<类别>/<版本>/<方案>.json` | 独立维护 DNS、入站、路由、规则集；共享策略组与缓存模块 |
 | 构建目录与场景组合 | `modules/catalog.json` | 声明版本、平台适配与全部场景选用的模块 |
-| TUN 基础与差异层 | `modules/inbounds/<版本>/tun.json`、`scripts/lib/tun_profiles.py` | 每个内核维护一份 TUN 基础模板；叠加受校验的平台和场景字段 |
+| TUN 基础与差异层 | `modules/inbounds/<版本>/tun.json`、`scripts/lib/tun_profiles.py` | 每个内核维护一份 TUN 基础模板；叠加受校验的平台字段 |
 | 局域网绕行 | `scripts/lib/lan_routes.py` | 分平台生成 LAN 排除路由，自动保护 TUN、DNS、FakeIP 地址 |
 | 构建入口 | `scripts/build.py` | 一次生成平台 JSON、浏览器包与中英文页面；`--check` 只检查同步 |
 | 验证入口 | `scripts/check.py` | 默认执行静态、所选内核和浏览器检查；规则集下载单独触发 |
@@ -37,7 +37,7 @@ flowchart LR
 | 命令行 | `scripts/generate.mjs` | 本地文件与 stdin 输入、原子写入、0600 文件权限 |
 
 `platforms/` 中的 JSON、`docs/assets/presets.mjs`、
-`docs/index.html`、`docs/en/index.html` 和 `docs/assets/profiles.mjs` 是生成产物。
+`docs/index.html`、`docs/en/index.html`、`docs/assets/profiles.mjs` 和 `SUBSCRIPTIONS.md` 是生成产物。
 修改源文件后统一运行 `python3 -B scripts/build.py`；CI 会检查它们是否同步。
 
 ## 复用生成逻辑
@@ -58,13 +58,13 @@ const json = JSON.stringify(config, null, 2);
 ## 修改默认规则
 
 1. 在 `modules/dns/1.14/fakeip.json` 等对应的类别、版本和方案中修改配置。
-2. 如需组合新场景，在 `modules/catalog.json` 的 `scenarios` 中选择 DNS、入站、规则等模块，再在 `platforms` 中登记支持的平台；网页场景名称与说明位于 `docs/assets/app.mjs`。
+2. `modules/catalog.json` 的 `scenarios` 仅声明 FakeIP、RealIP、TUN、mixed 基础组合；平台字段在 `platforms` 中声明。用户选项统一由 `customize.mjs` 应用，不为单个开关新增配置变体。
 3. 运行 `python3 -B scripts/build.py`，更新全部构建产物。
 4. 运行 `python3 -B scripts/check.py static`，再用 `check.py core --sing-box /path/to/checker` 验证目标内核。
 
 详细目录与修改例子见[配置模块](../modules/README.md)。对象递归合并、数组保持原顺序，
 同一字段由两个模块重复定义时构建失败；各版本独立选择模块，不会自动回退到其他版本。
-三个版本均放在 `platforms/<平台>/<版本>/`，各 17 份，共 51 份配置。
+三个版本均放在 `platforms/<平台>/<版本>/`，各 11 份，共 33 份配置。
 1.13 / 1.14 为稳定兼容线；1.15 标记为**实验版**，
 按[实验说明](experimental-1.15.md)使用固定 alpha 检查器验证。
 

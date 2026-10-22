@@ -55,7 +55,7 @@ class RenderTest(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
-    def test_tcp_only_profiles_keep_direct_routes_and_reject_proxy_udp(self):
+    def test_tcp_only_profiles_preserve_application_and_direct_routes(self):
         profiles = sorted((ROOT / "platforms").glob(f"*/{self.line}/*.json"))
         for profile in profiles:
             with self.subTest(profile=str(profile.relative_to(ROOT))):
@@ -70,20 +70,8 @@ class RenderTest(unittest.TestCase):
                     [r for r in rendered["route"]["rules"] if r.get("outbound") == "direct"],
                     [r for r in original["route"]["rules"] if r.get("outbound") == "direct"],
                 )
-                rules = rendered["route"]["rules"]
-                blocked = [r for r in rules if r.get("network") == "udp"
-                           and r.get("action") == "reject" and "clash_mode" not in r]
-                self.assertEqual(len(blocked), 1)
-                self.assertTrue(blocked[0]["no_drop"])
-                self.assertLess(
-                    next(i for i, r in enumerate(rules) if r.get("rule_set") == "geosite-cn"),
-                    rules.index(blocked[0]),
-                )
-                global_rules = [r for r in rules if r.get("clash_mode") == "Global"]
-                self.assertEqual(global_rules[0], {
-                    "clash_mode": "Global", "network": "udp", "action": "reject", "no_drop": True,
-                })
-                self.assertEqual(global_rules[1]["outbound"], "GLOBAL")
+                self.assertEqual(rendered["route"]["rules"], original["route"]["rules"])
+                self.assertFalse(any(r.get("network") == "udp" for r in rendered["route"]["rules"]))
                 self.assert_valid(output)
 
     def test_omitted_udp_list_keeps_existing_default(self):
@@ -92,7 +80,7 @@ class RenderTest(unittest.TestCase):
         result, output = self.render(nodes)
         self.assertEqual(result.returncode, 0, result.stderr)
         rendered = json.loads(output.read_text())
-        udp = next(o for o in rendered["outbounds"] if o["tag"] == "udp-auto")
+        udp = next(o for o in rendered["outbounds"] if o["tag"] == "auto")
         self.assertEqual(udp["outbounds"], [o["tag"] for o in nodes["outbounds"]])
         self.assert_valid(output)
 
@@ -102,10 +90,10 @@ class RenderTest(unittest.TestCase):
         result, output = self.render(nodes)
         self.assertEqual(result.returncode, 0, result.stderr)
         rendered = json.loads(output.read_text())
-        udp = next(o for o in rendered["outbounds"] if o["tag"] == "udp-auto")
+        udp = next(o for o in rendered["outbounds"] if o["tag"] == "auto")
         self.assertEqual(udp["outbounds"], nodes["udp_outbounds"])
-        auto = next(o for o in rendered["outbounds"] if o["tag"] == "auto")
-        self.assertIn("tcp-node", auto["outbounds"])
+        select = next(o for o in rendered["outbounds"] if o["tag"] == "select")
+        self.assertIn("tcp-node", select["outbounds"])
         self.assert_valid(output)
 
     def test_invalid_nodes_preserve_the_existing_output(self):

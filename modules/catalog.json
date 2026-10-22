@@ -19,13 +19,7 @@
     "android": {
       "scenarios": [
         "fakeip",
-        "realip",
-        "tcp-stable",
-        "privacy-strict",
-        "dual-stack",
-        "no-adblock",
-        "battery-saver",
-        "udp-first"
+        "realip"
       ],
       "lan_bypass": true
     },
@@ -86,33 +80,6 @@
     }
   },
   "scenarios": {
-    "battery-saver": {
-      "modules": {
-        "dns": "realip",
-        "inbounds": "tun",
-        "outbounds": "battery-saver",
-        "rules": "standard",
-        "rule-sets": "standard",
-        "experimental": "default"
-      },
-      "log_level": "error"
-    },
-    "dual-stack": {
-      "modules": {
-        "dns": "dual-stack",
-        "inbounds": "tun",
-        "outbounds": "standard",
-        "rules": "dual-stack",
-        "rule-sets": "standard",
-        "experimental": "default"
-      },
-      "tun_options": {
-        "address": [
-          "172.19.0.1/30",
-          "fdfe:dcba:9876::1/126"
-        ]
-      }
-    },
     "fakeip": {
       "modules": {
         "dns": "fakeip",
@@ -133,27 +100,6 @@
         "experimental": "default"
       }
     },
-    "no-adblock": {
-      "modules": {
-        "dns": "realip",
-        "inbounds": "tun",
-        "outbounds": "standard",
-        "rules": "no-adblock",
-        "rule-sets": "no-adblock",
-        "experimental": "default"
-      }
-    },
-    "privacy-strict": {
-      "modules": {
-        "dns": "privacy-strict",
-        "inbounds": "tun",
-        "outbounds": "standard",
-        "rules": "tcp-stable",
-        "rule-sets": "standard",
-        "experimental": "default"
-      },
-      "lan_bypass": false
-    },
     "realip": {
       "modules": {
         "dns": "realip",
@@ -164,31 +110,11 @@
         "experimental": "default"
       }
     },
-    "tcp-stable": {
-      "modules": {
-        "dns": "realip",
-        "inbounds": "tun",
-        "outbounds": "standard",
-        "rules": "tcp-stable",
-        "rule-sets": "standard",
-        "experimental": "default"
-      }
-    },
     "tun": {
       "modules": {
         "dns": "realip",
         "inbounds": "tun",
         "outbounds": "standard",
-        "rules": "standard",
-        "rule-sets": "standard",
-        "experimental": "default"
-      }
-    },
-    "udp-first": {
-      "modules": {
-        "dns": "realip",
-        "inbounds": "tun",
-        "outbounds": "udp-first",
         "rules": "standard",
         "rule-sets": "standard",
         "experimental": "default"

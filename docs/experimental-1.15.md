@@ -5,7 +5,7 @@
 
 | 平台 | 配置 |
 | --- | --- |
-| Android | [FakeIP](../platforms/android/1.15/fakeip.json) · [RealIP](../platforms/android/1.15/realip.json)，另含六种场景 |
+| Android | [FakeIP](../platforms/android/1.15/fakeip.json) · [RealIP](../platforms/android/1.15/realip.json) |
 | iOS | [FakeIP](../platforms/ios/1.15/fakeip.json) · [RealIP](../platforms/ios/1.15/realip.json) |
 | macOS | [FakeIP](../platforms/macos/1.15/fakeip.json) · [RealIP](../platforms/macos/1.15/realip.json) · [mixed](../platforms/macos/1.15/mixed.json) |
 | Linux | [mixed](../platforms/linux/1.15/mixed.json) · [TUN](../platforms/linux/1.15/tun.json) |

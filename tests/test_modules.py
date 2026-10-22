@@ -17,7 +17,7 @@ catalog = json.loads((ROOT / "modules/catalog.json").read_text())
 
 class ModuleTests(unittest.TestCase):
     def test_outputs_contain_only_declared_platform_profiles_and_browser_catalog(self):
-        expected = {"docs/assets/presets.mjs", "docs/assets/profiles.mjs"}
+        expected = {"docs/assets/presets.mjs", "docs/assets/profiles.mjs", "SUBSCRIPTIONS.md"}
         for version in catalog["versions"]:
             for platform, settings in catalog["platforms"].items():
                 for scenario in settings["scenarios"]:
@@ -82,12 +82,12 @@ class ModuleTests(unittest.TestCase):
             shutil.copytree(ROOT / "modules", root / "modules")
             path = root / "modules/catalog.json"
             changed_catalog = json.loads(path.read_text())
-            changed_catalog["scenarios"]["tcp-stable"]["modules"]["rules"] = "standard"
+            changed_catalog["scenarios"]["tun"]["modules"]["dns"] = "fakeip"
             path.write_text(json.dumps(changed_catalog))
             changed = outputs(root)
             self.assertEqual({name for name in baseline if baseline[name] != changed[name]}, {
-                "platforms/android/1.13/tcp-stable.json", "platforms/android/1.14/tcp-stable.json",
-                "platforms/android/1.15/tcp-stable.json", "docs/assets/profiles.mjs",
+                *(f"platforms/{platform}/{version}/tun.json" for platform in ("linux", "windows") for version in catalog["versions"]),
+                "docs/assets/profiles.mjs",
             })
 
     def test_composition_does_not_mutate_shared_catalog_recipes(self):
@@ -107,7 +107,7 @@ class ModuleTests(unittest.TestCase):
         generated = outputs()
         for version in catalog["versions"]:
             paths = [name for name in generated if name.startswith("platforms/") and f"/{version}/" in name]
-            self.assertEqual(len(paths), 17)
+            self.assertEqual(len(paths), 11)
             for name in paths:
                 config = json.loads(generated[name])
                 for inbound in config["inbounds"]:

@@ -41,10 +41,6 @@
         "outbound": "GLOBAL"
       },
       {
-        "rule_set": "category-ads-all",
-        "action": "reject"
-      },
-      {
         "rule_set": "geosite-private",
         "action": "route",
         "outbound": "direct"
@@ -68,11 +64,6 @@
         ],
         "action": "route",
         "outbound": "direct"
-      },
-      {
-        "network": "udp",
-        "action": "route",
-        "outbound": "udp-auto"
       },
       {
         "rule_set": "category-ai-!cn",

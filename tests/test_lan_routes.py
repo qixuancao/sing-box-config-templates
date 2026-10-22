@@ -41,7 +41,7 @@ class LanRoutesTest(unittest.TestCase):
                         profile = read_profile(platform, line, scenario)
                         inbound = profile["inbounds"][0]
                         entries = inbound.get("route_exclude_address", [])
-                        expected = inbound["type"] == "tun" and scenario != "privacy-strict"
+                        expected = inbound["type"] == "tun"
                         self.assertEqual(bool(entries), expected)
                         if expected:
                             self.assertEqual(entries, route_exclusions(profile, platform))
@@ -84,8 +84,9 @@ class LanRoutesTest(unittest.TestCase):
 
     def test_ipv6_tun_android_keeps_ula_in_tun_to_limit_vpn_routes(self):
         for line in CATALOG["versions"]:
-            profile = read_profile("android", line, "dual-stack")
-            routes = networks(profile["inbounds"][0]["route_exclude_address"])
+            profile = read_profile("android", line, "realip")
+            profile["inbounds"][0]["address"].append("fdfe:dcba:9876::1/126")
+            routes = networks(route_exclusions(profile, "android"))
             with self.subTest(line=line):
                 self.assertFalse(includes(routes, "fdfe:dcba:9876::1"))
                 self.assertFalse(includes(routes, "fdfe:dcba:9876::2"))

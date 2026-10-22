@@ -52,14 +52,14 @@
 <div id="access-setting"><label for="access-mode">$access_label</label>
 <select id="access-mode"><option value="local">$access_local</option><option value="system">$access_system</option><option value="tun">$access_tun</option></select>
 <p class="help" id="access-desc"></p></div>
-<p class="scenario-note" id="scenario-desc"></p>
 <details id="advanced"><summary>$advanced_label</summary><div class="settings">
 <div><label for="core">$core_label</label><select id="core"><option value="1.14">1.14.x</option><option value="1.13">1.13.x</option><option value="1.15">1.15 · $experimental_label</option></select><p class="help">$core_help</p></div>
-<div id="scenario-setting"><label for="scenario">$scenario_label</label><select id="scenario"></select></div>
-<div><label for="dns-mode">$dns_mode_label</label><select id="dns-mode"><option value="auto">$dns_default</option><option value="realip">$dns_realip</option><option value="fakeip">$dns_fakeip</option></select><p class="help" id="dns-desc">$dns_help</p></div>
+<div><label for="dns-mode">$dns_mode_label</label><select id="dns-mode"><option value="fakeip">$dns_fakeip</option><option value="realip">$dns_realip</option></select><p class="help" id="dns-desc">$dns_help</p></div>
+<div><label><input type="checkbox" id="ipv6"> $ipv6_label</label><p class="help">$ipv6_help</p></div>
+<div id="lan-setting"><label><input type="checkbox" id="lan-bypass" checked> $lan_label</label><p class="help">$lan_help</p></div>
 <div class="dns-grid">
-<div><label for="direct-dns">$direct_dns_label</label><select id="direct-dns"><option value="default">$dns_default</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="custom">$dns_custom</option></select><input type="text" id="direct-custom" inputmode="decimal" autocomplete="off" placeholder="IPv4 · 1.1.1.1" hidden></div>
-<div><label for="proxy-dns">$proxy_dns_label</label><select id="proxy-dns"><option value="default">$dns_default</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="custom">$dns_custom</option></select><input type="text" id="proxy-custom" inputmode="decimal" autocomplete="off" placeholder="IPv4 · 8.8.8.8" hidden></div>
+<div><label for="direct-dns">$direct_dns_label</label><select id="direct-dns"><option value="default">$dns_default</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option></select></div>
+<div><label for="proxy-dns">$proxy_dns_label</label><select id="proxy-dns"><option value="default">$dns_default</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option></select></div>
 </div>
 <p class="help">$dns_upstream_help</p>
 <div id="port-setting"><label for="listen-port">$port_label</label><input type="number" id="listen-port" min="1" max="65535" step="1" value="2080"><p class="help">$port_help</p></div>

@@ -6,7 +6,7 @@
 - 路径统一为 `platforms/<平台>/<内核版本>/<配置>.json`；
 - CI 检查器：官方 1.14.0、1.13.21 Linux amd64 发布包；
 - 同一平台目录下的 `1.15/` 为[实验版](experimental-1.15.md)，固定在 `1.15.0-alpha.12` 验证，默认选择仍为 1.14；
-- 默认 DNS：仅 IPv4；`dual-stack.json` 改为双栈并优先 IPv4；
+- 默认使用 IPv4；网页或 CLI 的 IPv6 选项同时调整 DNS、TUN 与路由，双栈优先 IPv4；
 - 规则：MetaCubeX `sing` 分支远程 `.srs`。
 
 ## sing-box FakeIP 与 RealIP 如何选择
@@ -46,17 +46,17 @@ Android/iOS 的字段省略是平台适配，不是功能缺失造成的遗漏�
 `auto_redirect` 是官方针对 Linux TUN 的推荐方案；Windows 的
 `strict_route` 有助于限制多宿主 DNS 泄漏，但可能与虚拟网络软件冲突。
 
-### iOS 局域网绕行
+### 局域网绕行
 
-`platforms/ios/{1.13,1.14,1.15}/{fakeip,realip}.json`（1.15 为实验版）默认添加 `route_exclude_address`，
+各平台 TUN 默认添加 `route_exclude_address`，
 排除常见本地 IPv4/IPv6 地址及 CGNAT。生成时从排除范围中扣除 TUN 子网、
 虚拟 DNS 与 FakeIP 地址池，避免绕过 `172.19.0.2` 或误排 IPv6 FakeIP。
-其他平台与 Android `privacy-strict` 保持原有接管策略。
+Android 不排除回环；启用 IPv6 时 ULA 保留在 TUN 中按私网直连规则处理。
 
 这允许本地 IPv6 通信绕过 TUN，但不启用公网 IPv6。绕行的流量（包括应用向
 局域网 DNS 发起的查询）不受 sing-box 规则控制；需要代理内网或严格 DNS
-接管时，应在生成后的私有配置中调整/删除排除项。SFI 的 Include All Networks
-选项也会影响行为。完整边界与依据见 [iOS 说明](../platforms/ios/README.md#局域网与链路本地流量)。
+接管时，可关闭生成器的局域网绕行并调整私有路由规则。SFI 的 Include All Networks
+选项也会影响行为。完整边界与依据见[局域网说明](lan-bypass.md)。
 
 ## 已自动验证
 
@@ -65,9 +65,9 @@ Android/iOS 的字段省略是平台适配，不是功能缺失造成的遗漏�
 - 平台字段符合上表约束；
 - iOS 局域网排除范围完整，且不重叠 TUN、虚拟 DNS 或 FakeIP；
 - 五个平台的版本、场景与 `modules/catalog.json` 一致；
-- 八种 Android 用途差异符合各自契约；
+- DNS、IPv6 和接入方式组合一致，TCP/UDP 遵循相同的应用策略；
 - 配置不包含真实节点凭据或明显私有网络标记；
-- 每周实际下载 17 个远程规则集，并用两套固定核心解析其二进制内容。
+- 每周实际下载 16 个远程规则集，并用两套固定核心解析其二进制内容。
 
 ## 验证边界
 

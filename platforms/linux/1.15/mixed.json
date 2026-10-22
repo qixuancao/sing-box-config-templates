@@ -85,7 +85,6 @@
       "tag": "select",
       "outbounds": [
         "auto",
-        "udp-auto",
         "proxy-example"
       ],
       "default": "auto"
@@ -97,18 +96,7 @@
         "proxy-example"
       ],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "3m",
-      "tolerance": 150,
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "urltest",
-      "tag": "udp-auto",
-      "outbounds": [
-        "proxy-example"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "3m",
+      "interval": "10m",
       "tolerance": 150,
       "interrupt_exist_connections": false
     },
@@ -118,7 +106,6 @@
       "outbounds": [
         "select",
         "auto",
-        "udp-auto",
         "direct"
       ],
       "default": "select",
@@ -130,7 +117,6 @@
       "outbounds": [
         "select",
         "auto",
-        "udp-auto",
         "direct"
       ],
       "default": "select",
@@ -142,7 +128,6 @@
       "outbounds": [
         "select",
         "auto",
-        "udp-auto",
         "direct"
       ],
       "default": "select",
@@ -154,10 +139,9 @@
       "outbounds": [
         "select",
         "auto",
-        "udp-auto",
         "direct"
       ],
-      "default": "direct",
+      "default": "select",
       "interrupt_exist_connections": false
     },
     {
@@ -166,10 +150,9 @@
       "outbounds": [
         "select",
         "auto",
-        "udp-auto",
         "direct"
       ],
-      "default": "direct",
+      "default": "select",
       "interrupt_exist_connections": false
     },
     {
@@ -178,7 +161,6 @@
       "outbounds": [
         "select",
         "auto",
-        "udp-auto",
         "direct"
       ],
       "default": "select",
@@ -190,7 +172,6 @@
       "outbounds": [
         "select",
         "auto",
-        "udp-auto",
         "direct"
       ],
       "default": "select",
@@ -206,7 +187,6 @@
       "outbounds": [
         "select",
         "auto",
-        "udp-auto",
         "proxy-example",
         "direct"
       ],
@@ -243,10 +223,6 @@
         "outbound": "GLOBAL"
       },
       {
-        "rule_set": "category-ads-all",
-        "action": "reject"
-      },
-      {
         "rule_set": "geosite-private",
         "action": "route",
         "outbound": "direct"
@@ -270,11 +246,6 @@
         ],
         "action": "route",
         "outbound": "direct"
-      },
-      {
-        "network": "udp",
-        "action": "route",
-        "outbound": "udp-auto"
       },
       {
         "rule_set": "category-ai-!cn",
@@ -343,13 +314,6 @@
       }
     ],
     "rule_set": [
-      {
-        "type": "remote",
-        "tag": "category-ads-all",
-        "format": "binary",
-        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
-        "http_client": "rule-set-direct"
-      },
       {
         "type": "remote",
         "tag": "geosite-private",

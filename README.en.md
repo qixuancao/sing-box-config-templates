@@ -2,7 +2,7 @@
 
 [中文](README.md) · [Generate configuration](https://qixuancao.github.io/sing-box-config-templates/en/) · [Changelog](CHANGELOG.md)
 
-Generate sing-box configurations for Android, iOS, macOS, Linux, and Windows, with domestic/international routing, service policy groups, FakeIP / RealIP DNS, TUN, and local HTTP/SOCKS proxy modes.
+A small set of everyday routing configurations and a local browser generator for sing-box users with their own nodes. Adapted to Android, iOS, macOS, Linux and Windows, with explicit core-version compatibility.
 
 - Choose exits for streaming, AI, Telegram, Microsoft, Apple, Google, and GitHub.
 - Select nodes manually or let URLTest choose by latency.
@@ -14,7 +14,7 @@ Generate sing-box configurations for Android, iOS, macOS, Linux, and Windows, wi
 Open the [configuration generator](https://qixuancao.github.io/sing-box-config-templates/en/):
 
 1. Paste node share links or read a nodes JSON file.
-2. Choose a device. Core version and other scenarios are in Advanced.
+2. Choose a device and traffic capture method. Core version, DNS and IPv6 are in Advanced.
 3. Generate and download `sing-box.json`, then import it in your client.
 
 Supports Naive HTTPS, Hysteria2, Trojan, Shadowsocks and VLESS links. Parsing, composition
@@ -28,10 +28,9 @@ or applications ignoring OS proxy settings. Automatic proxy changes depend on OS
 and privileges and are restored on shutdown.
 
 Advanced settings independently select RealIP/FakeIP DNS responses (FakeIP is disabled
-without DNS capture), upstream DoH servers for direct and proxied traffic (presets or
-custom IPv4), and the mixed listener port. Custom options change the browser-exported
-JSON, not public Raw profiles or system settings while browsing. Verify the downloaded
-file using `sing-box check -c sing-box.json`.
+without DNS capture), DoH providers for direct and proxied traffic, IPv6, LAN bypass,
+and the mixed listener port. The page provides an equivalent CLI command including your
+options. Verify the downloaded file using `sing-box check -c sing-box.json`.
 
 ## Generate with the CLI
 
@@ -53,15 +52,16 @@ sing-box check -c generated/sing-box.json
 `nodes.txt`, `nodes.json` and `generated/` are Git-ignored. CLI output files use mode `0600`.
 Use `--template PATH` for a private template.
 
-TUN profiles are composed from a [versioned base and platform-specific deltas](docs/architecture.md).
-The [LAN bypass policy](docs/lan-bypass.en.md) omits loopback exclusions on Android;
-HTTP/SOCKS listener profiles and Android `privacy-strict` do not inherit bypass routes.
+Defaults: mainland China and LAN traffic go direct; other traffic follows service groups
+or the main selection. No ad blocking. URLTest probes every 10 minutes; logs use warn level.
+TCP and UDP follow the same application policies; automatic selection uses UDP-capable nodes
+when available. See [configuration notes](docs/policy-groups.md) and [LAN bypass](docs/lan-bypass.en.md).
 
 ## Choose a platform
 
 | Platform | Profiles | Guide |
 | --- | --- | --- |
-| Android / SFA | [FakeIP](platforms/android/1.14/fakeip.json) · [RealIP](platforms/android/1.14/realip.json) | [Scenarios and core versions](platforms/android/README.md) |
+| Android / SFA | [FakeIP](platforms/android/1.14/fakeip.json) · [RealIP](platforms/android/1.14/realip.json) | [Import and core versions](platforms/android/README.md) |
 | iOS / SFI | [FakeIP](platforms/ios/1.14/fakeip.json) · [RealIP](platforms/ios/1.14/realip.json) | [Import and LAN access](platforms/ios/README.md) |
 | macOS / SFM | [FakeIP](platforms/macos/1.14/fakeip.json) · [RealIP](platforms/macos/1.14/realip.json) · [mixed](platforms/macos/1.14/mixed.json) | [Guide](platforms/macos/README.md) |
 | Linux | [TUN](platforms/linux/1.14/tun.json) · [mixed](platforms/linux/1.14/mixed.json) | [Guide](platforms/linux/README.md) |
@@ -77,19 +77,6 @@ node scripts/generate.mjs --platform linux --core 1.14 --scenario mixed \
 sing-box check -c generated/linux.json
 sing-box run -c generated/linux.json
 ```
-
-## Android scenarios
-
-| Profile | Use case |
-| --- | --- |
-| `fakeip.json` | Everyday use; FakeIP for international domains |
-| `realip.json` | Apps that do not work with FakeIP |
-| `tcp-stable.json` | Unreliable UDP; blocks QUIC, DoT, and STUN, affecting some calls |
-| `privacy-strict.json` | DNS through the proxy without ECS; also blocks QUIC, DoT, and STUN |
-| `dual-stack.json` | IPv6 support on both the local network and nodes |
-| `no-adblock.json` | Disable ad blocking to diagnose false positives |
-| `battery-saver.json` | Less frequent probes and quieter logs |
-| `udp-first.json` | Gaming and voice; prefer designated UDP nodes |
 
 ## Customize and reuse
 

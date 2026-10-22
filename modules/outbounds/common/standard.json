@@ -6,142 +6,77 @@
       "server": "example.com",
       "server_port": 443,
       "password": "CHANGE_ME",
-      "tls": {
-        "enabled": true,
-        "server_name": "example.com",
-        "insecure": false
-      }
+      "tls": {"enabled": true, "server_name": "example.com", "insecure": false}
     },
     {
       "type": "selector",
       "tag": "select",
-      "outbounds": [
-        "auto",
-        "udp-auto",
-        "proxy-example"
-      ],
+      "outbounds": ["auto", "proxy-example"],
       "default": "auto"
     },
     {
       "type": "urltest",
       "tag": "auto",
-      "outbounds": [
-        "proxy-example"
-      ],
+      "outbounds": ["proxy-example"],
       "url": "https://www.gstatic.com/generate_204",
-      "interval": "3m",
-      "tolerance": 150,
-      "interrupt_exist_connections": false
-    },
-    {
-      "type": "urltest",
-      "tag": "udp-auto",
-      "outbounds": [
-        "proxy-example"
-      ],
-      "url": "https://www.gstatic.com/generate_204",
-      "interval": "3m",
+      "interval": "10m",
       "tolerance": 150,
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
       "tag": "streaming",
-      "outbounds": [
-        "select",
-        "auto",
-        "udp-auto",
-        "direct"
-      ],
+      "outbounds": ["select", "auto", "direct"],
       "default": "select",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
       "tag": "ai",
-      "outbounds": [
-        "select",
-        "auto",
-        "udp-auto",
-        "direct"
-      ],
+      "outbounds": ["select", "auto", "direct"],
       "default": "select",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
       "tag": "telegram",
-      "outbounds": [
-        "select",
-        "auto",
-        "udp-auto",
-        "direct"
-      ],
+      "outbounds": ["select", "auto", "direct"],
       "default": "select",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
       "tag": "microsoft",
-      "outbounds": [
-        "select",
-        "auto",
-        "udp-auto",
-        "direct"
-      ],
-      "default": "direct",
+      "outbounds": ["select", "auto", "direct"],
+      "default": "select",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
       "tag": "apple",
-      "outbounds": [
-        "select",
-        "auto",
-        "udp-auto",
-        "direct"
-      ],
-      "default": "direct",
+      "outbounds": ["select", "auto", "direct"],
+      "default": "select",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
       "tag": "google",
-      "outbounds": [
-        "select",
-        "auto",
-        "udp-auto",
-        "direct"
-      ],
+      "outbounds": ["select", "auto", "direct"],
       "default": "select",
       "interrupt_exist_connections": false
     },
     {
       "type": "selector",
       "tag": "github",
-      "outbounds": [
-        "select",
-        "auto",
-        "udp-auto",
-        "direct"
-      ],
+      "outbounds": ["select", "auto", "direct"],
       "default": "select",
       "interrupt_exist_connections": false
     },
-    {
-      "type": "direct",
-      "tag": "direct"
-    },
+    {"type": "direct", "tag": "direct"},
     {
       "type": "selector",
       "tag": "GLOBAL",
-      "outbounds": [
-        "select",
-        "auto",
-        "udp-auto",
-        "proxy-example",
-        "direct"
-      ],
+      "outbounds": ["select", "auto", "proxy-example", "direct"],
       "default": "select",
       "interrupt_exist_connections": false
     }

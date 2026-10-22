@@ -2,7 +2,7 @@
 
 [English](README.en.md) · [在线生成配置](https://qixuancao.github.io/sing-box-config-templates/) · [更新记录](CHANGELOG.md)
 
-为 Android、iOS、macOS、Linux 和 Windows 生成 sing-box 配置。内置国内外分流、应用策略组、FakeIP / RealIP DNS，以及 TUN 和本地 HTTP/SOCKS 代理模式。
+为自备节点的 sing-box 用户提供少量可靠的日常分流配置，以及浏览器本地生成器。支持 Android、iOS、macOS、Linux 和 Windows，按平台和内核版本适配。
 
 - 按流媒体、AI、Telegram、Microsoft、Apple、Google、GitHub 选择出口；
 - 手动选节点或通过 URLTest 按延迟自动选择；
@@ -14,7 +14,7 @@
 打开[配置生成器](https://qixuancao.github.io/sing-box-config-templates/)：
 
 1. 粘贴节点分享链接，或读取节点 JSON 文件。
-2. 选择设备；内核版本和其他场景在高级设置中。
+2. 选择设备和接入方式；内核版本、DNS 和 IPv6 在高级设置中。
 3. 点击“生成配置”，下载 `sing-box.json` 后导入客户端。
 
 支持 Naive HTTPS、Hysteria2、Trojan、Shadowsocks、VLESS 分享链接。解析、生成和
@@ -26,8 +26,8 @@
 部分应用及 UDP 不会使用系统 HTTP 代理；是否可自动设置取决于平台环境与权限。
 
 **高级设置**可单独选择 RealIP / FakeIP DNS 返回方式（纯 HTTP/SOCKS 模式禁用 FakeIP）、
-直连和代理 DNS 的 DoH 服务器（内置或自定义 IPv4），以及 mixed 监听端口。
-自定义内容只写入网页导出的 JSON，不会改变公开的 Raw 预设，也不会修改运行设备的系统设置。
+直连和代理 DNS 的 DoH 服务商、IPv6、局域网绕行，以及 mixed 监听端口。
+网页会给出包含当前选项的等价 CLI 命令。
 请用 `sing-box check -c sing-box.json` 校验下载的配置。
 
 ## 命令行生成
@@ -50,15 +50,15 @@ sing-box check -c generated/sing-box.json
 `nodes.txt`、`nodes.json` 和 `generated/` 已加入 `.gitignore`，CLI 输出文件权限为 `0600`。
 私有模板通过 `--template PATH` 指定。
 
-各平台 TUN 从同一版本的[基础模板 + 平台差异层](docs/architecture.md)生成。
-默认的[局域网绕行策略](docs/lan-bypass.md)按平台适配：Android 不排除回环地址；
-HTTP/SOCKS 本地端口及 Android `privacy-strict` 不应用该绕行策略。
+默认配置：国内与局域网直连，其他流量按应用策略组或主选择组代理；不含广告拦截。
+自动测速间隔 10 分钟，日志级别为 warn。TCP/UDP 遵循相同应用策略；自动选择优先保证节点具备 UDP 能力。
+具体默认值、选择依据和修改方法见[配置说明](docs/policy-groups.md)。
 
 ## 选择平台
 
 | 平台 | 配置 | 说明 |
 | --- | --- | --- |
-| Android / SFA | [FakeIP](platforms/android/1.14/fakeip.json) · [RealIP](platforms/android/1.14/realip.json) | [八种场景与版本选择](platforms/android/README.md) |
+| Android / SFA | [FakeIP](platforms/android/1.14/fakeip.json) · [RealIP](platforms/android/1.14/realip.json) | [导入与版本选择](platforms/android/README.md) |
 | iOS / SFI | [FakeIP](platforms/ios/1.14/fakeip.json) · [RealIP](platforms/ios/1.14/realip.json) | [导入与局域网访问](platforms/ios/README.md) |
 | macOS / SFM | [FakeIP](platforms/macos/1.14/fakeip.json) · [RealIP](platforms/macos/1.14/realip.json) · [mixed](platforms/macos/1.14/mixed.json) | [使用说明](platforms/macos/README.md) |
 | Linux | [TUN](platforms/linux/1.14/tun.json) · [mixed](platforms/linux/1.14/mixed.json) | [使用说明](platforms/linux/README.md) |
@@ -74,19 +74,6 @@ node scripts/generate.mjs --platform linux --core 1.14 --scenario mixed \
 sing-box check -c generated/linux.json
 sing-box run -c generated/linux.json
 ```
-
-## Android 场景
-
-| 配置 | 用途 |
-| --- | --- |
-| `fakeip.json` | 日常使用，国外域名返回 FakeIP |
-| `realip.json` | 应用不兼容 FakeIP 时使用 |
-| `tcp-stable.json` | UDP 不稳定的网络；阻断 QUIC、DoT 和 STUN，会影响部分通话功能 |
-| `privacy-strict.json` | DNS 统一走代理、不发送 ECS；同样阻断 QUIC、DoT 和 STUN |
-| `dual-stack.json` | 本地网络和节点均支持 IPv6 |
-| `no-adblock.json` | 关闭广告拦截，排查规则误杀 |
-| `battery-saver.json` | 降低测速频率和日志量 |
-| `udp-first.json` | 游戏、语音；优先使用指定的 UDP 节点 |
 
 ## 修改与复用
 

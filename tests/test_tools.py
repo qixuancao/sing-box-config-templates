@@ -43,7 +43,7 @@ class BuildTest(TemporaryRepoTest):
         with redirect_stdout(self.quiet):
             build(self.root)
         files = {path: (path.read_bytes(), path.stat().st_mtime_ns) for path in self.root.rglob("*") if path.is_file()}
-        self.assertEqual(len(list((self.root / "platforms").rglob("*.json"))), 51)
+        self.assertEqual(len(list((self.root / "platforms").rglob("*.json"))), 33)
         for name in ("docs/index.html", "docs/en/index.html", "docs/assets/profiles.mjs", "docs/assets/presets.mjs"):
             self.assertTrue((self.root / name).is_file())
         with redirect_stdout(self.quiet):
@@ -191,7 +191,7 @@ class LinksAndPagesTest(TemporaryRepoTest):
 
 
 class CoreContractsTest(unittest.TestCase):
-    def test_all_profiles_retain_the_old_platform_and_scenario_contracts(self):
+    def test_all_profiles_follow_platform_and_default_policy_contracts(self):
         for name, content in outputs().items():
             if name.endswith(".json"):
                 _, platform, line, scenario = name.removesuffix(".json").split("/")
@@ -208,11 +208,9 @@ class CoreContractsTest(unittest.TestCase):
             ("android/1.13/fakeip", lambda c: c.update({"$schema": "invalid"})),
             ("android/1.14/fakeip", lambda c: c.pop("http_clients")),
             ("android/1.15/fakeip", lambda c: c["inbounds"][0].update(stack="mixed")),
-            ("android/1.14/dual-stack", lambda c: c["dns"].update(strategy="ipv4_only")),
-            ("android/1.14/no-adblock", lambda c: c["route"]["rule_set"].append({"tag": "category-ads-all", "type": "local"})),
-            ("android/1.14/battery-saver", lambda c: c["log"].update(level="debug")),
-            ("android/1.14/udp-first", lambda c: next(o for o in c["outbounds"] if o["tag"] == "select").update(default="auto")),
-            ("android/1.14/privacy-strict", lambda c: c["dns"].update(client_subnet="example")),
+            ("android/1.14/realip", lambda c: c["route"]["rule_set"].append({"tag": "category-ads-all", "type": "local"})),
+            ("android/1.14/realip", lambda c: c["log"].update(level="debug")),
+            ("android/1.14/realip", lambda c: c["route"]["rules"].insert(0, {"network": "udp", "outbound": "auto"})),
         ]
         for name, mutate in cases:
             with self.subTest(name=name):
@@ -246,7 +244,7 @@ class CoreContractsTest(unittest.TestCase):
                 self.assertFalse({"url", "http_client", "download_detour"} & rule.keys())
         with patch("lib.core.run", side_effect=check_local), redirect_stdout(io.StringIO()):
             check_rule_sets("checker", "1.14", "test checker", downloader=download)
-        self.assertEqual(len(downloads), 17)
+        self.assertEqual(len(downloads), 16)
         self.assertEqual((ROOT / "platforms/android/1.14/realip.json").read_bytes(), original)
         with self.assertRaises(CheckError):
             check_rule_sets("checker", "1.14", "test checker", downloader=lambda url, target: target.touch())

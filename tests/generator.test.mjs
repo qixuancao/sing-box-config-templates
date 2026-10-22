@@ -177,7 +177,7 @@ test('native JSON shapes, automatic UDP inference and explicit override', () => 
   ]) assert.throws(() => validateNodes(document), ConfigError);
 });
 
-test('all presets preserve route ordering, direct UDP and TCP-only behavior', () => {
+test('application policies are identical for TCP and UDP, with capability-aware automatic selection', () => {
   assert.equal(Object.keys(PROFILES).length, Object.values(PLATFORMS).flat().length * CORES.length);
   const nodes = {outbounds: [tcp], udp_outbounds: []};
   const snapshot = JSON.stringify(nodes);
@@ -188,12 +188,13 @@ test('all presets preserve route ordering, direct UDP and TCP-only behavior', ()
     assert.equal(JSON.stringify(nodes), snapshot);
     assert.equal(JSON.stringify(config).includes('udp-auto'), false, path);
     assert.deepEqual(config.route.rules.filter(r => r.outbound === 'direct'), template.route.rules.filter(r => r.outbound === 'direct'));
-    const block = config.route.rules.findIndex(r => r.network === 'udp' && r.action === 'reject' && !r.clash_mode);
-    const china = config.route.rules.findIndex(r => r.rule_set === 'geosite-cn');
-    assert.ok(block > china, path);
-    assert.equal(config.route.rules.find(r => r.clash_mode === 'Global').action, 'reject');
+    assert.deepEqual(config.route.rules, template.route.rules);
+    assert.equal(config.route.rules.some(r => r.network === 'udp'), false, path);
+    assert.deepEqual(config.outbounds.find(n => n.tag === 'auto').outbounds, ['tcp']);
     const mixed = renderConfig(template, {outbounds: [tcp, udp]});
-    assert.deepEqual(mixed.outbounds.find(n => n.tag === 'udp-auto').outbounds, ['udp']);
+    assert.deepEqual(mixed.outbounds.find(n => n.tag === 'auto').outbounds, ['udp']);
+    assert.ok(mixed.outbounds.find(n => n.tag === 'select').outbounds.includes('tcp'));
+    assert.deepEqual(mixed.route.rules, template.route.rules);
   }
 });
 
@@ -235,6 +236,14 @@ test('CLI output is private and atomic, preserves old files and refuses input al
       if (invalid.startsWith('{')) assert.match(result.stderr, /100 levels/);
     }
     writeFileSync(source, links.naive);
+    const dnsSource = join(ROOT, profilePath('android', '1.14', 'fakeip'));
+    const dnsBefore = read(dnsSource, 'utf8');
+    const dnsAlias = join(directory, 'dns-source-alias.json');
+    symlinkSync(dnsSource, dnsAlias);
+    const dnsOverwrite = run(['--platform', 'linux', '--access', 'tun', '--dns', 'fakeip', '--input', source, '--output', dnsAlias]);
+    assert.notEqual(dnsOverwrite.status, 0);
+    assert.match(dnsOverwrite.stderr, /must not overwrite an input file/);
+    assert.equal(read(dnsSource, 'utf8'), dnsBefore);
     for (const alias of [source, join(directory, 'symlink'), join(directory, 'hardlink')]) {
       if (alias.endsWith('symlink')) symlinkSync(source, alias);
       if (alias.endsWith('hardlink')) linkSync(source, alias);
@@ -245,10 +254,22 @@ test('CLI output is private and atomic, preserves old files and refuses input al
     }
     assert.equal(run(['--input', '-', '--output', output, '--platform', 'linux'], links.hy2).status, 0);
     assert.equal(JSON.parse(read(output, 'utf8')).inbounds[0].type, 'mixed');
+    for (const options of [
+      ['--platform', 'android', '--access', 'system'],
+      ['--access', 'invalid'], ['--dns', 'invalid'],
+      ['--platform', 'linux', '--access', 'local', '--dns', 'fakeip'],
+      ['--scenario', 'realip', '--access', 'tun'], ['--port', '12.5'],
+      ['--direct-dns', '192.0.2.53'], ['--scenario', 'udp-first'],
+    ]) {
+      const before = read(output, 'utf8');
+      assert.notEqual(run(['--input', source, '--output', output, ...options]).status, 0, options.join(' '));
+      assert.equal(read(output, 'utf8'), before);
+    }
     const templatePath = join(directory, 'private-template.json');
     const template = structuredClone(PROFILES[profilePath('linux', '1.14', 'mixed')]);
     template.log.level = 'debug';
     writeFileSync(templatePath, JSON.stringify(template), {mode: 0o600});
+    assert.notEqual(run(['--template', templatePath, '--ipv6', '--input', source, '--output', output]).status, 0);
     const privateResult = run(['--template', templatePath, '--input', source, '--output', output]);
     assert.equal(privateResult.status, 0, privateResult.stderr);
     const rendered = JSON.parse(read(output, 'utf8'));
@@ -280,7 +301,7 @@ test('advanced ingress and DNS configuration is real, isolated and validated', (
   for (const invalid of [0, -1, 65536, 100.5, '2080']) {
     assert.throws(() => customizeTemplate(sample, {listenPort: invalid}), ConfigError);
   }
-  for (const invalid of ['999.1.1.1', 'a.example', '127.0.0.1:53', '1.1.1.1\n0.0.0.0', '01.1.1.1']) {
+  for (const invalid of ['999.1.1.1', 'a.example', '127.0.0.1:53', '1.1.1.1\n0.0.0.0', '01.1.1.1', '192.0.2.53']) {
     assert.throws(() => customizeTemplate(sample, {directDns: invalid}), ConfigError);
   }
   assert.throws(() => customizeTemplate(sample, {systemProxy: true, listenPort: 3000,
@@ -291,4 +312,28 @@ test('advanced ingress and DNS configuration is real, isolated and validated', (
   assert.equal(fake.dns.servers.some(server => server.type === 'fakeip'), true);
   assert.equal(renderConfig(fake, {outbounds: [udp]}).inbounds[0].type, 'tun');
   assert.throws(() => customizeTemplate(tun, {systemProxy: true}), ConfigError);
+});
+
+test('IPv6 settings update DNS, routing and TUN together without bypassing virtual ranges', () => {
+  for (const [path, base] of Object.entries(PROFILES)) {
+    const before = JSON.stringify(base);
+    const dual = customizeTemplate(base, {ipv6: true});
+    assert.equal(JSON.stringify(base), before);
+    assert.equal(dual.dns.strategy, 'prefer_ipv4', path);
+    assert.equal(dual.dns.rules.some(r => r.action === 'predefined' && r.query_type.includes('AAAA')), false);
+    assert.equal(dual.route.rules.some(r => r.ip_version === 6 && r.action === 'reject'), false);
+    assert.ok(dual.route.rules.filter(r => r.action === 'resolve').every(r => r.strategy === 'prefer_ipv4'));
+    for (const server of dual.dns.servers.filter(s => s.type === 'fakeip')) {
+      assert.equal(server.inet6_range, 'fc00::/18');
+      assert.ok(dual.dns.rules.some(r => r.server === server.tag && r.query_type.includes('AAAA')));
+    }
+    for (const inbound of dual.inbounds.filter(i => i.type === 'tun')) {
+      assert.ok(inbound.address.includes('fdfe:dcba:9876::1/126'));
+      assert.equal(inbound.route_exclude_address.some(address => /^f[cd]/i.test(address)), false);
+    }
+    const captured = customizeTemplate(base, {ipv6: true, lanBypass: false});
+    assert.ok(captured.inbounds.every(inbound => !Object.hasOwn(inbound, 'route_exclude_address')));
+    assert.deepEqual(captured.route.rules, dual.route.rules);
+    assert.deepEqual(customizeTemplate(base).dns, base.dns);
+  }
 });

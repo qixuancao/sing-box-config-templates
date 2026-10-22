@@ -11,7 +11,7 @@ from urllib.request import urlopen
 
 from .common import ROOT, CheckError, executable, read_json, require, run
 
-GROUPS = {"select", "auto", "udp-auto", "streaming", "ai", "telegram", "microsoft", "apple", "google", "github", "direct", "GLOBAL"}
+GROUPS = {"select", "auto", "streaming", "ai", "telegram", "microsoft", "apple", "google", "github", "direct", "GLOBAL"}
 
 
 def checker(command, line=None, root=ROOT):
@@ -63,24 +63,11 @@ def validate_profile(config, platform, line, scenario):
                     for rule in route["rule_set"] if rule["type"] == "remote"), "Incorrect rule-set HTTP client")
     if line == "1.15":
         require(all("stack" not in item for item in config["inbounds"]), "Removed TUN stack field in 1.15")
-    if platform != "android":
-        return
-    dns_rules = config["dns"]["rules"]
-    if scenario == "dual-stack":
-        require(any(":" in address for address in inbound["address"]) and config["dns"].get("strategy") == "prefer_ipv4", "Dual-stack addressing missing")
-        require(not any(rule.get("ip_version") == 6 and rule.get("action") == "reject" for rule in route["rules"]), "Dual-stack IPv6 rejected")
-        require(not any(rule.get("action") == "predefined" and "AAAA" in rule.get("query_type", []) for rule in dns_rules), "Dual-stack AAAA blocked")
-    elif scenario == "no-adblock":
-        require(not any("category-ads-all" in rule.get("rule_set", []) for rule in route["rules"])
-                and all(rule["tag"] != "category-ads-all" for rule in route["rule_set"]), "Ad blocking still enabled")
-    elif scenario == "battery-saver":
-        require(config["log"].get("level") == "error" and all(outbound.get("interval") == "15m" and outbound.get("tolerance") == 300
-                for outbound in config["outbounds"] if outbound["type"] == "urltest"), "Incorrect battery-saver settings")
-    elif scenario == "udp-first":
-        require(next(outbound for outbound in config["outbounds"] if outbound["tag"] == "select").get("default") == "udp-auto", "UDP-first default missing")
-    elif scenario == "privacy-strict":
-        from .static import objects
-        require(all("client_subnet" not in item for item in objects(config)), "Privacy profile includes ECS")
+    require(all(rule["tag"] != "category-ads-all" for rule in route["rule_set"]), "Default profiles must not include ad blocking")
+    require(not any(rule.get("network") == "udp" for rule in route["rules"]), "UDP must follow application policies")
+    require("udp-auto" not in tags, "Unexpected transport-specific policy group")
+    require(config["log"]["level"] == "warn", "Expected warning-level logging")
+    require(all(outbound.get("interval") == "10m" for outbound in config["outbounds"] if outbound["type"] == "urltest"), "Unexpected probe interval")
 
 
 def check_profiles(binary, line, version, root=ROOT):
@@ -125,7 +112,7 @@ def download(url, destination):
 def check_rule_sets(binary, line, version, root=ROOT, *, downloader=download):
     config = read_json(root / f"platforms/android/{line}/realip.json")
     rules = config["route"]["rule_set"]
-    require(len(rules) == 17 and len({rule["tag"] for rule in rules}) == 17, "Expected 17 unique rule sets")
+    require(len(rules) == 16 and len({rule["tag"] for rule in rules}) == 16, "Expected 16 unique rule sets")
     with tempfile.TemporaryDirectory(prefix="sing-box-rules-") as directory:
         work = Path(directory)
         for rule in rules:

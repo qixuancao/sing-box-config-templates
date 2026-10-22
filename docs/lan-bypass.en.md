@@ -4,8 +4,7 @@ All platforms' **TUN** profiles use `inbounds[].route_exclude_address`
 for common RFC 1918 addresses, CGNAT, link-local, multicast and IPv4
 limited broadcast. This routes local traffic outside the sing-box userspace
 TUN path when supported by the OS. **Mixed HTTP/SOCKS** profiles do not
-set this field. The Android `privacy-strict` scenario deliberately keeps
-its stricter capture behavior and does not inherit these exclusions.
+set this field. Disable LAN bypass in the generator or use CLI `--no-lan-bypass` to remove the exclusions.
 
 | Platform | LAN bypass policy |
 | --- | --- |
@@ -20,16 +19,16 @@ subnet (`172.19.0.0/30` by default), the explicit or inferred virtual
 DNS address (`172.19.0.2`), and any IPv4/IPv6 FakeIP ranges. A wider
 RFC 1918 exclusion may therefore be split into smaller CIDR prefixes.
 
-**Android dual-stack exception:** If splitting a single IPv6 local range
-around protected TUN/DNS addresses would produce more than 32 prefixes,
-the generator keeps the entire local range inside TUN, subject to the
-existing direct-routing rules. This threshold is a **conservative project
-guardrail**, not an officially documented Android route limit.
+**IPv6 option:** On all platforms, enabling IPv6 keeps ULA inside TUN and
+uses private-IP direct rules. This protects virtual DNS, TUN and FakeIP ranges
+without excessive route splitting. Link-local and multicast bypass remains.
+For custom Android source addresses, the builder also caps splitting at 32
+prefixes per network; this is a project guardrail, not an OS limit.
 
 **Trade-offs and limitations:** Bypassed traffic cannot be subjected to
-sing-box DNS hijacking, ad blocking, or Global-mode proxy rules. Private
-addresses may belong to enterprise, overlay, or other VPN networks; remove
-the corresponding exclusion when proxy routing is required. Local bypass
+sing-box DNS hijacking or Global-mode proxy rules. Private
+addresses may belong to enterprise, overlay, or other VPN networks; disable
+bypass and place explicit proxy rules before private-IP direct rules when needed. Local bypass
 does not guarantee LAN hostname/mDNS resolution. Apple Include All Networks
 may affect route behavior. A valid JSON configuration and passing core
 checks do **not** prove actual VPN startup or LAN reachability on the device.

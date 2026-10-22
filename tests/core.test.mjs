@@ -16,7 +16,7 @@ test('generated links pass the selected real sing-box core on every maintained p
   const line = version.stdout.match(/sing-box version (1\.(?:13|14|15))\./)?.[1];
   assert.ok(line);
   const profiles = Object.entries(PROFILES).filter(([path]) => path.includes(`/${line}/`));
-  assert.equal(profiles.length, 17);
+   assert.equal(profiles.length, 11);
   const directory = mkdtempSync(join(tmpdir(), 'sing-box-core-'));
   try {
     for (const [name, link] of Object.entries({...links, legacySS})) {
@@ -29,6 +29,18 @@ test('generated links pass the selected real sing-box core on every maintained p
       }
     }
     // Real kernel validates the advanced UI's new combinations as well as public presets.
+    for (const [path, base] of profiles) {
+      for (const dns of ['realip', 'fakeip']) {
+        if (path.endsWith('/mixed.json') && dns === 'fakeip') continue;
+        const template = customizeTemplate(base, {
+          dnsTemplate: PROFILES[profilePath('android', line, dns)], ipv6: true, lanBypass: false
+        });
+        const file = join(directory, 'ipv6.json');
+        writeFileSync(file, JSON.stringify(renderConfig(template, parseNodes(links.hy2))));
+        const result = spawnSync(core, ['check', '-c', file], {cwd: directory, encoding: 'utf8'});
+        assert.equal(result.status, 0, `${path} ${dns} IPv6: ${result.stdout}${result.stderr}`);
+      }
+    }
     for (const [name, platform, scenario, options] of [
       ['system', 'linux', 'mixed', {systemProxy: true, listenPort: 3128}],
       ['mac-system', 'macos', 'mixed', {systemProxy: true, listenPort: 3128}],

@@ -14,26 +14,20 @@ SFA 应用版本与内核版本通常接近，但排障时以“关于”页或�
 sing-box 版本为准。若你的补丁版本与表中检查器不同，请在导入前使用相同版本的
 `sing-box check -c` 再验一次。
 
-## 2. 选择用途
+## 2. 选择 DNS
 
 | 文件名 | 建议场景 | 代价 / 注意事项 |
 | --- | --- | --- |
 | `fakeip.json` | 普通用户首选 | 极少数应用不接受 FakeIP；1.13 版使用较简单的 DNS 判定 |
 | `realip.json` | FakeIP 异常、银行或局域网应用 | 兼容性较高，但不享受 FakeIP 的域名映射方式 |
-| `tcp-stable.json` | UDP/QUIC 经常失败的校园网、公司网、移动网络 | 阻断 DoT、QUIC、STUN；游戏、通话可能降级或不可用 |
-| `privacy-strict.json` | 更重视 DNS 隔离 | A 查询走代理 DNS，不发送 ECS；同时阻断 DoT、QUIC、STUN |
-| `dual-stack.json` | 本地与节点都有稳定 IPv6 | 允许 AAAA/IPv6；IPv6 路径有问题时反而可能变慢 |
-| `no-adblock.json` | 登录、支付、跳转或 App 因广告规则误杀 | 不拦截广告域名 |
-| `battery-saver.json` | 墨水屏、备用机、后台长期开启 | 测速改为 15 分钟一次，节点故障切换可能更慢 |
-| `udp-first.json` | 游戏、语音、视频通话 | 必须在 `nodes.json` 正确维护 `udp_outbounds` |
 
-选择顺序建议：先用 `fakeip`；应用异常换 `realip`；只有症状明确时再用其他
-专项配置。不要同时改节点、DNS 和用途配置，否则无法判断是哪一项起作用。
+先用 FakeIP，应用不兼容时换 RealIP。IPv6、上游 DNS 与局域网绕行在生成器高级设置中调整。
+默认值与策略顺序见[配置说明](../../docs/policy-groups.md)。
 
 ### 局域网绕行兼容性
 
 TUN 默认绕行常见 LAN、CGNAT 和链路本地地址，但**不排除 `127.0.0.0/8` 和 `::1/128`**，避免 Android VpnService 的 `Bad address`。
-Android 双栈在排除条目过多时保留 ULA 由 TUN 内直连规则处理；`privacy-strict` 不继承此默认策略。见[各平台说明](../../docs/lan-bypass.md)。
+启用 IPv6 时 ULA 保留在 TUN 内按私网直连规则处理；需要企业网接管时可关闭绕行。见[各平台说明](../../docs/lan-bypass.md)。
 
 ## 3. 生成并导入
 

@@ -281,9 +281,6 @@ input[type=file] {
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:12px
 }
-.dns-grid input {
-  margin-top:8px
-}
 #listen-port {
   max-width:190px
 }
@@ -309,11 +306,6 @@ summary {
 }
 details>.settings {
   margin-top:14px
-}
-.scenario-note {
-  font-size:.81rem;
-  color:var(--muted);
-  margin:10px 0 0
 }
 .status {
   font-size:.85rem;

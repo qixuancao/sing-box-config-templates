@@ -34,10 +34,10 @@ Linux / Windows 默认推荐本地 HTTP / SOCKS。电脑端可明确选择三种
 - **TUN**：使用虚拟网卡接管系统流量，需要系统权限或客户端授权。远程机器先保留其他管理通道，避免中断 SSH。
 
 高级设置还可独立选择 **DNS 返回方式**（RealIP / FakeIP）和**上游 DNS 服务**
-（直连与代理各自的 DoH IPv4 地址）。仅监听端口和系统 HTTP 代理时不一定能接管系统 DNS，
+（AliDNS、Cloudflare、Google）。仅监听端口和系统 HTTP 代理时不一定能接管系统 DNS，
 因此网页会禁用 FakeIP；TUN / VPN 环境需要核实 DNS 确实被接管。
-修改监听端口后，请使用相同端口设置应用代理。自定义仅作用于网页下载的 JSON，
-公开 Raw 模板和没有额外参数的 CLI 不会同步包含这些选项。
+修改监听端口后，请使用相同端口设置应用代理。高级设置还可启用 IPv6 或关闭系统级 LAN 绕行。
+网页下方的 CLI 命令包含当前选项；默认值和取舍见[配置说明](policy-groups.md)。
 
 “试用示例”只用于预览操作流程，连接时请使用自己的节点。“保存节点 JSON”可保留
 输入供下次更新，页面刷新会清空输入。节点格式见[节点链接与 JSON](nodes.md)。
@@ -52,10 +52,10 @@ node scripts/generate.mjs --platform android --core 1.14 \
 sing-box check -c generated/sing-box.json
 ```
 
-选择其他平台或场景：
+选择接入方式和 DNS：
 
 ```bash
-node scripts/generate.mjs --platform linux --core 1.13 --scenario mixed \
+node scripts/generate.mjs --platform linux --core 1.13 --access local --dns realip \
   --input nodes.json --output generated/linux.json
 sing-box check -c generated/linux.json
 sing-box run -c generated/linux.json

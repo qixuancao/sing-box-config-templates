@@ -42,10 +42,10 @@
 生成器只能识别配置所声明的能力，不能替你确认服务端是否启用了 UDP。
 需要进一步限制时显式填写 `udp_outbounds`；其名称必须存在且不重复。
 
-全部节点都只支持 TCP 时，使用 `"udp_outbounds": []`。生成器会移除 `udp-auto`
-及其选择项，将需要代理的 UDP 改为明确拒绝；国内和局域网已有的 UDP 直连规则
-仍然生效。`udp-first` 此时改用 `auto`。常见 HTTPS 可以回退到 TCP，依赖 UDP
-的游戏和通话需要另加支持 UDP 的节点。
+自动选择组在非空 `udp_outbounds` 中选择，保持 TCP/UDP 出口一致；其他节点仍可手选。
+全部节点只支持 TCP 时，使用 `"udp_outbounds": []`，自动组使用全部节点。
+生成器保留同一套应用及直连规则；代理 UDP 是否可用取决于选中的出站能力，不会静默回退直连。
+依赖 UDP 的游戏和通话需要支持 UDP 的节点；能力列表不等于网络实测结果。
 
 Naive 默认使用 HTTP/2 承载 TCP；配置 `udp_over_tcp` 还需要服务端支持对应协议，
 不能仅凭节点类型或启用 QUIC 就把它列入 `udp_outbounds`。Naive 从 1.13 起提供，
@@ -58,7 +58,7 @@ Cronet 库。详见 [Naive 官方文档](https://sing-box.sagernet.org/configura
 节点不能使用这些内部 tag：
 
 ```text
-select auto udp-auto streaming ai telegram microsoft apple google github direct GLOBAL
+select auto streaming ai telegram microsoft apple google github direct GLOBAL
 ```
 
 脚本遇到重复 tag、保留 tag、空的 `outbounds` 或不存在的 UDP tag 会直接退出。

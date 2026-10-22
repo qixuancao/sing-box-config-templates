@@ -4,31 +4,19 @@ import {PROFILES} from './profiles.mjs';
 const english = document.documentElement.lang === 'en';
 const t = (zh, en) => english ? en : zh;
 const byId = id => document.getElementById(id);
-const input = byId('nodes-input'), platform = byId('platform'), core = byId('core'), scenario = byId('scenario');
+const input = byId('nodes-input'), platform = byId('platform'), core = byId('core');
 const access = byId('access-mode'), dnsMode = byId('dns-mode'), directDns = byId('direct-dns'), proxyDns = byId('proxy-dns'), listenPort = byId('listen-port');
 const desktop = () => ['linux', 'windows', 'macos'].includes(platform.value);
-const chosenScenario = () => desktop() ? (access.value === 'tun' ? (platform.value === 'macos' ? (dnsMode.value === 'realip' ? 'realip' : 'fakeip') : 'tun') : 'mixed') : scenario.value;
-const resolvedDNS = select => select.value === 'default' ? null : select.value === 'custom' ? byId(select.id === 'direct-dns' ? 'direct-custom' : 'proxy-custom').value.trim() : select.value;
-const customSettings = () => access.value === 'system' && desktop() || dnsMode.value !== 'auto' || directDns.value !== 'default' || proxyDns.value !== 'default' || desktop() && access.value !== 'tun' && listenPort.value !== '2080';
+const ipv6 = byId('ipv6'), lanBypass = byId('lan-bypass');
+const chosenScenario = () => desktop() && access.value !== 'tun' ? 'mixed'
+  : ['linux', 'windows'].includes(platform.value) ? 'tun' : dnsMode.value;
+const resolvedDNS = select => select.value === 'default' ? null : select.value;
 const dnsTemplateFor = () => {
-  if (dnsMode.value === 'auto') return null;
   const from = PLATFORMS[platform.value].includes(dnsMode.value) ? platform.value : 'android';
   return PROFILES[profilePath(from, core.value, dnsMode.value)];
 };
 const status = byId('status'), download = byId('download-json'), copy = byId('copy-json');
 let config = null, parsed = null, example = false, revision = 0;
-const scenarios = {
-  fakeip: ['日常推荐 · FakeIP', 'Recommended · FakeIP', '适合日常分流；局域网和国内流量保留直连。', 'Everyday routing; local and mainland China traffic retain direct routes.'],
-  realip: ['兼容模式 · RealIP', 'Compatibility · RealIP', '应用不兼容 FakeIP 时使用；DNS 返回真实 IP。', 'Use when an app has trouble with FakeIP; DNS returns real IPs.'],
-  mixed: ['日常推荐 · 本地 HTTP / SOCKS', 'Recommended · local HTTP / SOCKS', '在应用中设置本地代理 127.0.0.1:2080，无需开启 TUN。', 'Set your app proxy to 127.0.0.1:2080; no TUN required.'],
-  tun: ['TUN · 系统流量接管', 'TUN · system traffic', '需要系统 VPN / TUN 权限。远程操作设备前，先确认有其他管理通道。', 'Requires VPN / TUN privileges. Keep another management path when configuring a remote device.'],
-  'tcp-stable': ['TCP 稳定', 'TCP stability', '阻断 QUIC、DoT、STUN；部分语音和游戏功能会受影响。', 'Blocks QUIC, DoT and STUN; some calls and games will be affected.'],
-  'privacy-strict': ['严格 DNS 隔离', 'Strict DNS isolation', 'DNS 经代理，关闭 ECS，阻断 QUIC、DoT、STUN。', 'Proxy DNS, no ECS, and blocked QUIC, DoT and STUN.'],
-  'dual-stack': ['IPv4 / IPv6 双栈', 'IPv4 / IPv6 dual stack', '本地网络和节点均有可靠 IPv6 时使用。', 'Use when both your network and nodes have reliable IPv6.'],
-  'no-adblock': ['关闭广告拦截', 'Without ad blocking', '排查广告规则误杀时使用，保留其他分流。', 'For troubleshooting ad-rule false positives; keeps routing rules.'],
-  'battery-saver': ['省电常驻', 'Battery saver', '降低自动测速频率和日志量。', 'Less frequent automatic probing and fewer logs.'],
-  'udp-first': ['UDP 优先', 'Prefer UDP', '优先选择支持 UDP 的节点；没有 UDP 节点时自动使用 TCP 方案。', 'Prefers UDP-capable nodes; falls back to the TCP policy when none are available.'],
-};
 
 function showStatus(text = '', kind = '') { status.textContent = text; status.className = `status ${kind}`; }
 function invalidate() {
@@ -40,21 +28,17 @@ function invalidate() {
   showStatus();
 }
 function updatePreset(reset = false) {
-  const current = scenario.value;
-  scenario.replaceChildren();
-  PLATFORMS[platform.value].forEach(key => {
-    const option = document.createElement('option'); option.value = key;
-    option.textContent = scenarios[key][english ? 1 : 0]; scenario.append(option);
-  });
-  if (!reset && PLATFORMS[platform.value].includes(current)) scenario.value = current;
-  if (reset) { access.value = platform.value === 'macos' ? 'tun' : 'local'; dnsMode.value = 'auto'; }
+  if (reset) {
+    access.value = ['linux', 'windows'].includes(platform.value) ? 'local' : 'tun';
+    dnsMode.value = ['linux', 'windows'].includes(platform.value) ? 'realip' : 'fakeip';
+  }
   updateDetails();
 }
 function updateDetails() {
   invalidate();
   const isDesktop = desktop(), isTun = !isDesktop || access.value === 'tun';
   byId('access-setting').hidden = !isDesktop;
-  byId('scenario-setting').hidden = isDesktop;
+  byId('lan-setting').hidden = !isTun;
   byId('port-setting').hidden = isTun;
   byId('listen-port').disabled = isTun;
   byId('access-desc').textContent = access.value === 'system'
@@ -68,16 +52,16 @@ function updateDetails() {
   byId('dns-desc').textContent = fakeOption.disabled
     ? t('纯端口 / 系统代理模式不接管系统 DNS，因此禁用 FakeIP；可以选择 RealIP 和上游 DNS。', 'Local / system proxy does not capture OS DNS, so FakeIP is disabled. RealIP and upstream DNS remain configurable.')
     : t('RealIP 返回真实地址，FakeIP 返回虚拟地址。TUN / VPN 模式需要正确接管 DNS 才能使用 FakeIP。', 'RealIP returns real addresses; FakeIP returns synthetic addresses and requires working TUN / VPN DNS capture.');
-  for (const select of [directDns, proxyDns]) {
-    byId(select.id === 'direct-dns' ? 'direct-custom' : 'proxy-custom').hidden = select.value !== 'custom';
-  }
   const selected = chosenScenario(), path = profilePath(platform.value, core.value, selected);
-  byId('scenario-desc').textContent = isDesktop ? '' : scenarios[selected][english ? 3 : 2];
   byId('out-path').value = path;
   byId('out-raw').value = `https://raw.githubusercontent.com/qixuancao/sing-box-config-templates/main/${path}`;
-  byId('out-cmd').value = customSettings()
-    ? 'sing-box check -c sing-box.json\nsing-box run -c sing-box.json'
-    : `node scripts/generate.mjs --platform ${platform.value} --core ${core.value} --scenario ${selected} --input nodes.txt --output generated/sing-box.json\nsing-box check -c generated/sing-box.json`;
+  const options = [`--platform ${platform.value}`, `--core ${core.value}`, `--access ${isDesktop ? access.value : 'tun'}`, `--dns ${dnsMode.value}`];
+  if (ipv6.checked) options.push('--ipv6');
+  if (isTun && !lanBypass.checked) options.push('--no-lan-bypass');
+  if (!isTun) options.push(`--port ${listenPort.value}`);
+  if (resolvedDNS(directDns)) options.push(`--direct-dns ${directDns.value}`);
+  if (resolvedDNS(proxyDns)) options.push(`--proxy-dns ${proxyDns.value}`);
+  byId('out-cmd').value = `node scripts/generate.mjs ${options.join(' ')} --input nodes.txt --output generated/sing-box.json\nsing-box check -c generated/sing-box.json`;
   const port = listenPort.value || '2080';
   byId('import-help').textContent = isDesktop && !isTun
     ? access.value === 'system'
@@ -96,13 +80,10 @@ function generate() {
     const port = desktop() && access.value !== 'tun' ? Number(listenPort.value) : 2080;
     if (desktop() && access.value !== 'tun' &&
       (!/^\d+$/.test(listenPort.value) || !Number.isInteger(port) || port < 1 || port > 65535)) throw new Error('bad-port');
-    const ipv4 = value => typeof value === 'string' && /^(?:0|[1-9]\d{0,2})(?:\.(?:0|[1-9]\d{0,2})){3}$/.test(value) &&
-      value.split('.').every(part => Number(part) <= 255);
     const direct = resolvedDNS(directDns), proxy = resolvedDNS(proxyDns);
-    if ([direct, proxy].some(value => value !== null && !ipv4(value))) throw new Error('bad-dns');
     const template = customizeTemplate(PROFILES[path], {
       dnsTemplate: dnsTemplateFor(), systemProxy: desktop() && access.value === 'system',
-      listenPort: port, directDns: direct, proxyDns: proxy
+      listenPort: port, directDns: direct, proxyDns: proxy, ipv6: ipv6.checked, lanBypass: lanBypass.checked
     });
     const result = renderConfig(template, nodes);
     config = result; parsed = nodes;
@@ -124,16 +105,15 @@ function generate() {
     const warnings = [];
     if (core.value === '1.15') warnings.push(t('1.15 实验配置，按 1.15.0-alpha.12 验证；测试版后续更新可能需要重新适配。', 'Experimental 1.15 presets, checked against 1.15.0-alpha.12; later testing releases may need updates.'));
     if (example) warnings.push(t('当前是演示节点。请替换成自己的节点后再连接。', 'These are demonstration nodes. Replace them with your own before connecting.'));
-    if (!nodes.udp_outbounds.length) warnings.push(t('这些节点仅用于 TCP；需要代理的 UDP 已设为拒绝，国内与局域网直连规则保留。', 'TCP-only nodes: proxied UDP is rejected; existing mainland China and local direct routes are retained.'));
+    if (!nodes.udp_outbounds.length) warnings.push(t('这些节点未声明 UDP 能力；代理 UDP 无法保证可用，不会自动改走直连。', 'These nodes have no declared UDP capability; proxied UDP may fail and will not fall back to direct.'));
+    else if (nodes.udp_outbounds.length < nodes.outbounds.length) warnings.push(t('自动选择仅使用支持 UDP 的节点，以保持 TCP/UDP 出口一致；其他节点可手动选择。', 'Automatic selection uses UDP-capable nodes for a consistent TCP/UDP exit; other nodes remain available manually.'));
     if (nodes.outbounds.some(node => node.tls?.insecure)) warnings.push(t('部分节点关闭了证书校验，请确认这是你的预期设置。', 'Some nodes disable TLS certificate verification; confirm this is intentional.'));
     if (nodes.outbounds.some(node => node.type === 'naive')) warnings.push(t('Naive 需要客户端内核包含 Naive 支持；Linux / Windows 请保留官方包内的 Cronet 库。', 'Naive requires a compatible core; keep the bundled Cronet library on Linux / Windows.'));
     byId('warnings').textContent = warnings.join(' '); byId('warnings').hidden = !warnings.length;
     download.disabled = false; copy.disabled = false; byId('download-nodes').disabled = false;
     showStatus(t('配置已生成，可以下载 JSON。', 'Configuration ready. Download the JSON file.'), 'success');
   } catch (error) {
-    const message = error.message === 'bad-dns'
-      ? t('自定义 DNS 仅接受有效的 IPv4 地址（例如 1.1.1.1）。', 'Custom DNS must be a valid IPv4 address (e.g. 1.1.1.1).')
-      : error.message === 'bad-port'
+    const message = error.message === 'bad-port'
         ? t('监听端口必须是 1 到 65535 的整数。', 'Listener port must be an integer from 1 to 65535.')
         : errorMessage(error, english ? 'en' : 'zh');
     showStatus(message, 'error');
@@ -151,10 +131,11 @@ function clear() {
 
 input.addEventListener('input', () => { example = false; byId('nodes-file').value = ''; invalidate(); });
 platform.addEventListener('change', () => updatePreset(true));
-core.addEventListener('change', updateDetails); scenario.addEventListener('change', updateDetails);
+core.addEventListener('change', updateDetails);
+ipv6.addEventListener('change', updateDetails); lanBypass.addEventListener('change', updateDetails);
 access.addEventListener('change', updateDetails); dnsMode.addEventListener('change', updateDetails);
 for (const select of [directDns, proxyDns]) select.addEventListener('change', updateDetails);
-for (const item of [listenPort, byId('direct-custom'), byId('proxy-custom')]) item.addEventListener('input', updateDetails);
+listenPort.addEventListener('input', updateDetails);
 byId('generate').addEventListener('click', generate);
 download.addEventListener('click', () => { if (config) saveJSON(config, 'sing-box.json'); });
 byId('download-nodes').addEventListener('click', () => { if (parsed) saveJSON(parsed, 'nodes.json'); });

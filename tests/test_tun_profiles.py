@@ -1,4 +1,4 @@
-"""Tests for versioned TUN base and constrained platform/scenario overlays."""
+"""Tests for versioned TUN base and constrained platform overlays."""
 import copy
 import json
 from pathlib import Path
@@ -34,11 +34,6 @@ class TunProfilesTest(unittest.TestCase):
                     for key in ("route_exclude_address",):
                         actual.pop(key, None)
                     self.assertEqual(actual, expected)
-            scenario = source(f"platforms/android/{version}/dual-stack.json")["inbounds"][0]
-            scenario.pop("route_exclude_address")
-            self.assertEqual(scenario["address"], ["172.19.0.1/30", "fdfe:dcba:9876::1/126"])
-            self.assertEqual({k:v for k,v in scenario.items() if k!="address"},
-                             {k:v for k,v in base.items() if k!="address"})
 
     def test_scenarios_do_not_change_the_source_base(self):
         catalog = source("modules/catalog.json")
@@ -53,29 +48,25 @@ class TunProfilesTest(unittest.TestCase):
 
     def test_unexpected_and_conflicting_overrides_fail(self):
         profile = {"inbounds":[{"type":"tun","tag":"tun-in"}]}
-        scenarios = [{"tun_options":{"auto_redirect":True}},
-                     {"tun_options":{"address":["10.0.0.1/32"]}}]
-        with self.assertRaisesRegex(ValueError, "Unsupported scenario"):
-            apply_tun_overlays(copy.deepcopy(profile),"1.14","linux",scenarios[0],{})
         with self.assertRaisesRegex(ValueError, "Unsupported android"):
-            apply_tun_overlays(copy.deepcopy(profile),"1.14","android",{},{"tun_options":{"auto_redirect":True}})
+            apply_tun_overlays(copy.deepcopy(profile),"1.14","android",{"tun_options":{"auto_redirect":True}})
         with self.assertRaisesRegex(ValueError, "Conflicting"):
-            apply_tun_overlays(copy.deepcopy(profile),"1.14","linux",{},
+            apply_tun_overlays(copy.deepcopy(profile),"1.14","linux",
                                {"tun_options":{"strict_route":True},
                                 "tun_options_by_core":{"1.14":{"strict_route":False}}})
         with self.assertRaisesRegex(ValueError, "not supported"):
-            apply_tun_overlays(copy.deepcopy(profile),"1.13","linux",{},
+            apply_tun_overlays(copy.deepcopy(profile),"1.13","linux",
                                {"tun_options_by_core":{"1.13":{"dns_mode":"hijack"}}})
         with self.assertRaisesRegex(ValueError, "removed"):
             apply_tun_overlays({"inbounds":[{"type":"tun","stack":"system"}]},
-                               "1.15","windows",{},{"tun_options":{"strict_route":True}})
+                               "1.15","windows",{"tun_options":{"strict_route":True}})
         with self.assertRaisesRegex(ValueError, "exactly one TUN"):
-            apply_tun_overlays({"inbounds":[{"type":"mixed"}]},"1.14","android",scenarios[1],{})
+            apply_tun_overlays({"inbounds":[{"type":"tun"}, {"type":"tun"}]},"1.14","windows",{"tun_options":{"strict_route":True}})
 
     def test_mixed_mode_ignores_tun_only_platform_options(self):
         profile={"inbounds":[{"type":"mixed","listen":"127.0.0.1","listen_port":2080}]}
         old=copy.deepcopy(profile)
-        apply_tun_overlays(profile,"1.14","windows",{},
+        apply_tun_overlays(profile,"1.14","windows",
                            {"tun_options":{"strict_route":True},
                             "tun_options_by_core":{"1.14":{"dns_mode":"hijack"}}})
         self.assertEqual(profile,old)
