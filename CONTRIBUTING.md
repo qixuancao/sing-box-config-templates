@@ -19,7 +19,7 @@ python3 -B scripts/build.py --check # 只检查，不改写产物
 python3 -B scripts/check.py static # 构建同步、公共审计、文档/订阅链接、页面、单元测试
 python3 -B scripts/check.py core --core 1.14 --sing-box /path/to/sing-box-1.14.0
 python3 -B scripts/check.py core --core 1.13 --sing-box /path/to/sing-box-1.13.21
-python3 -B scripts/check.py core --core 1.15 --sing-box /path/to/sing-box-1.15.0-alpha.12
+python3 -B scripts/check.py core --core 1.15 --sing-box /path/to/sing-box-1.15.0-alpha.13
 python3 -B scripts/check.py browser # 需要本机 Chrome，可用 CHROME 指定路径
 ```
 

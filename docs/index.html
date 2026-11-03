@@ -56,7 +56,7 @@
 <select id="access-mode"><option value="local">仅监听端口 · 应用手动配置代理</option><option value="system">自动开启系统代理 · 非 TUN</option><option value="tun">TUN · 接管系统流量</option></select>
 <p class="help" id="access-desc"></p></div>
 <details id="advanced"><summary>高级设置 · 内核、DNS 和端口</summary><div class="settings">
-<div><label for="core">sing-box 内核版本</label><select id="core"><option value="1.14">1.14.x</option><option value="1.13">1.13.x</option><option value="1.15">1.15 · 实验版 · alpha.12</option></select><p class="help">与客户端的内核版本保持一致。1.15 是实验配置，按 1.15.0-alpha.12 验证。</p></div>
+<div><label for="core">sing-box 内核版本</label><select id="core"><option value="1.14">1.14.x</option><option value="1.13">1.13.x</option><option value="1.15">1.15 · 实验版 · alpha.13</option></select><p class="help">与客户端的内核版本保持一致。1.15 是实验配置，按 1.15.0-alpha.13 验证。</p></div>
 <div><label for="dns-mode">DNS 返回方式</label><select id="dns-mode"><option value="fakeip">FakeIP · 返回虚拟地址</option><option value="realip">RealIP · 返回真实地址</option></select><p class="help" id="dns-desc">RealIP 兼容性优先；FakeIP 仅适合能接管 DNS 查询的 TUN/VPN 模式。</p></div>
 <div><label><input type="checkbox" id="ipv6"> 启用 IPv6</label><p class="help">同时调整 DNS、TUN 地址和路由；需要网络及出口支持 IPv6。默认使用 IPv4。</p></div>
 <div id="lan-setting"><label><input type="checkbox" id="lan-bypass" checked> 局域网绕过 TUN</label><p class="help">默认方便访问路由器和 NAS；绕行流量不受代理策略控制。企业网或覆盖网络需要接管这些地址时取消。</p></div>

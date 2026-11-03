@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | 1.14.x | [`1.14/`](1.14/) | 1.14.0 | 当前版，使用共享 HTTP 客户端和新版 FakeIP DNS 评估 |
 | 1.13.x | [`1.13/`](1.13/) | 1.13.21 | 使用 `download_detour` 与兼容的 FakeIP DNS 判定 |
-| 1.15 · **实验版** | [`1.15/`](1.15/) | 1.15.0-alpha.12 | 移除 TUN `stack`，仅适配固定 alpha，非默认推荐 |
+| 1.15 · **实验版** | [`1.15/`](1.15/) | 1.15.0-alpha.13 | 移除 TUN `stack`，仅适配固定 alpha，非默认推荐 |
 
 SFA 应用版本与内核版本通常接近，但排障时以“关于”页或启动日志实际显示的
 sing-box 版本为准。若你的补丁版本与表中检查器不同，请在导入前使用相同版本的
@@ -48,6 +48,12 @@ sing-box check -c generated/android-1.13-realip.json
 Android 图形客户端通过 `VpnService` 提供无 root TUN。本目录故意不写
 `strict_route` 和 `auto_redirect`：前者在 SFA 中未实现，后者对普通无 root
 客户端并不是 Linux 那套 nftables 加速方案。
+
+三条兼容线的 FakeIP / RealIP 均启用 `route.auto_detect_interface`，让出站拨号走
+SFA 的平台网络选择与 socket 保护路径，避免流量重新进入自身 VPN（[#4](https://github.com/qixuancao/sing-box-config-templates/issues/4)）。
+不默认启用 `override_android_vpn`：它允许将 Android VPN 作为上游接口，并非通用的防回环开关；
+SFA 使用平台默认接口监视器时也不走该选项控制的原生监视器路径。
+配置检查和回归测试不等于 Android 实机验证，具体版本仍需在设备上确认上下行及网络切换。
 
 需要“某些应用代理、某些应用直连”时，优先使用 SFA 设置里的按应用代理覆盖。
 公开 JSON 不硬编码包名，既避免暴露个人应用清单，也不会把 Android 专用规则

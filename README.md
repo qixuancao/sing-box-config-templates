@@ -64,7 +64,7 @@ sing-box check -c generated/sing-box.json
 | Linux | [TUN](platforms/linux/1.14/tun.json) · [mixed](platforms/linux/1.14/mixed.json) | [使用说明](platforms/linux/README.md) |
 | Windows | [TUN](platforms/windows/1.14/tun.json) · [mixed](platforms/windows/1.14/mixed.json) | [使用说明](platforms/windows/README.md) |
 
-所有平台都先选择内核版本，再选择配置：`platforms/<平台>/<版本>/`。上表链接指向 1.14；使用 1.13 内核时，换成同平台 `1.13/` 目录中的同名文件。`1.15/` 为**实验版**，仅按 `1.15.0-alpha.12` 验证。
+所有平台都先选择内核版本，再选择配置：`platforms/<平台>/<版本>/`。上表链接指向 1.14；使用 1.13 内核时，换成同平台 `1.13/` 目录中的同名文件。`1.15/` 为**实验版**，仅按 `1.15.0-alpha.13` 验证。
 
 Linux / Windows 可先用 `mixed.json`，运行后将应用代理设为 `127.0.0.1:2080`：
 

@@ -103,7 +103,7 @@ function generate() {
       li.append(name, kind); byId('node-list').append(li);
     });
     const warnings = [];
-    if (core.value === '1.15') warnings.push(t('1.15 实验配置，按 1.15.0-alpha.12 验证；测试版后续更新可能需要重新适配。', 'Experimental 1.15 presets, checked against 1.15.0-alpha.12; later testing releases may need updates.'));
+    if (core.value === '1.15') warnings.push(t('1.15 实验配置，按 1.15.0-alpha.13 验证；测试版后续更新可能需要重新适配。', 'Experimental 1.15 presets, checked against 1.15.0-alpha.13; later testing releases may need updates.'));
     if (example) warnings.push(t('当前是演示节点。请替换成自己的节点后再连接。', 'These are demonstration nodes. Replace them with your own before connecting.'));
     if (!nodes.udp_outbounds.length) warnings.push(t('这些节点未声明 UDP 能力；代理 UDP 无法保证可用，不会自动改走直连。', 'These nodes have no declared UDP capability; proxied UDP may fail and will not fall back to direct.'));
     else if (nodes.udp_outbounds.length < nodes.outbounds.length) warnings.push(t('自动选择仅使用支持 UDP 的节点，以保持 TCP/UDP 出口一致；其他节点可手动选择。', 'Automatic selection uses UDP-capable nodes for a consistent TCP/UDP exit; other nodes remain available manually.'));

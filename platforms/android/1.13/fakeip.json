@@ -483,7 +483,8 @@
     "final": "select",
     "default_domain_resolver": {
       "server": "direct-dns"
-    }
+    },
+    "auto_detect_interface": true
   },
   "experimental": {
     "clash_api": {

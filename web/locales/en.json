@@ -22,7 +22,7 @@
   "platform_label": "Where will you use sing-box?",
   "advanced_label": "Advanced · core, DNS and port",
   "core_label": "sing-box core version",
-  "core_help": "Match your client core. The experimental 1.15 presets target 1.15.0-alpha.12.",
+  "core_help": "Match your client core. The experimental 1.15 presets target 1.15.0-alpha.13.",
   "generate_button": "Generate configuration",
   "clear_button": "Clear",
   "download_heading": "Download and import",
@@ -71,7 +71,7 @@
       "Public Raw JSON uses placeholder nodes. Use the generator to download a JSON file containing your own nodes."
     ]
   ],
-  "experimental_label": "Experimental · alpha.12",
+  "experimental_label": "Experimental · alpha.13",
   "access_label": "Traffic capture method",
   "access_local": "Local proxy listener only · configure apps manually",
   "access_system": "Set OS system proxy automatically · not TUN",

@@ -13,13 +13,15 @@
 - 统一使用 10 分钟 URLTest、warn 日志和默认跟随主选择的应用组。
 - 网页与 Node.js CLI 共用节点解析和配置生成逻辑，支持五种分享链接及原生节点 JSON。
 - 提供节点文件导入/导出、完整配置下载与预览；修改输入后禁用旧结果，离开页面清空节点。
-- 五个平台统一使用 `platforms/<平台>/<版本>/`，共 33 份配置；支持 1.13 / 1.14，1.15 实验版固定按 `1.15.0-alpha.12` 验证。
+- 五个平台统一使用 `platforms/<平台>/<版本>/`，共 33 份配置；支持 1.13 / 1.14，1.15 实验版固定按 `1.15.0-alpha.13` 验证。
 - 配置片段与场景组合统一在 `modules/`，构建和验证入口为 `scripts/build.py`、`scripts/check.py`。
 - 三套内核集成测试、双语网页组合、下载与重新导入测试，以及 macOS 工具检查。
 - Raw 链接清单由平台目录声明自动生成；集中提供默认值与配置取舍说明。
 
 ### 修复
 
+- 修复 Android TUN 配置缺少 `route.auto_detect_interface` 的问题，覆盖三条内核兼容线及网页/CLI 生成结果（[#4](https://github.com/qixuancao/sing-box-config-templates/issues/4)）；不默认启用 `override_android_vpn`，Android 上下行仍需实机复测。
+- 将 1.15 实验检查器及双语界面统一到 alpha.13，补充出站组成员唯一性测试；纠正 TUN `stack` 弃用时间和实验配置数量说明。
 - 修复旧版 Shadowsocks Base64 分享链接中特殊字符密码被误解析或静默修改的问题，保留原始密码与 IPv6 地址。
 - 拒绝 WebSocket / HTTPUpgrade Host 中的 ASCII 控制字符，覆盖分享链接、原生 JSON 及 Host 数组，防止请求头注入。
 - 限制 JSON 嵌套深度为 100 层，深层输入返回安全的双语错误。

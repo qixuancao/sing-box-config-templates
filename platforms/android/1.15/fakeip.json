@@ -503,7 +503,8 @@
     "default_domain_resolver": {
       "server": "direct-dns"
     },
-    "default_http_client": "rule-set-direct"
+    "default_http_client": "rule-set-direct",
+    "auto_detect_interface": true
   },
   "experimental": {
     "clash_api": {
