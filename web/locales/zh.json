@@ -22,7 +22,7 @@
   "platform_label": "你在哪个平台使用？",
   "advanced_label": "高级设置 · 内核、DNS 和端口",
   "core_label": "sing-box 内核版本",
-  "core_help": "与客户端的内核版本保持一致。1.15 是实验配置，按 1.15.0-alpha.12 验证。",
+  "core_help": "与客户端的内核版本保持一致。1.15 是实验配置，按 1.15.0-alpha.13 验证。",
   "generate_button": "生成配置",
   "clear_button": "清空",
   "download_heading": "下载并导入",
@@ -71,7 +71,7 @@
       "公开 Raw JSON 使用占位节点。使用生成器导出加入自己节点后的 JSON 文件。"
     ]
   ],
-  "experimental_label": "实验版 · alpha.12",
+  "experimental_label": "实验版 · alpha.13",
   "access_label": "流量接入方式",
   "access_local": "仅监听端口 · 应用手动配置代理",
   "access_system": "自动开启系统代理 · 非 TUN",

@@ -11,8 +11,8 @@
     },
     "1.15": {
       "channel": "experimental",
-      "checker": "1.15.0-alpha.12",
-      "sha256": "b107528ec7d989333d986573c097d840b9ef1afa9bb177f8eb03e0767f370514"
+      "checker": "1.15.0-alpha.13",
+      "sha256": "bfc39f643a5ecc1b702c5723ff662e61dde813f12b3af0d0cfce4f629ff74047"
     }
   },
   "platforms": {
@@ -21,6 +21,7 @@
         "fakeip",
         "realip"
       ],
+      "auto_detect_interface": true,
       "lan_bypass": true
     },
     "ios": {

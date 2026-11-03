@@ -20,7 +20,7 @@ DNS providers: 223.5.5.5, 1.1.1.1 or 8.8.8.8 (HTTPS).
 
 Input: node share links (one per line) or sing-box nodes JSON; --input - reads stdin.
 Defaults: Android, core 1.14, recommended scenario for the selected platform.
-Core 1.15 uses experimental presets pinned to 1.15.0-alpha.12.
+Core 1.15 uses experimental presets pinned to 1.15.0-alpha.13.
 Output is written atomically with mode 0600. Input files are never overwritten.
 `;
 const root = fileURLToPath(new URL('../', import.meta.url));

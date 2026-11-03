@@ -1,6 +1,6 @@
 # Android 1.15 · 实验版
 
-**实验版：仅按官方 sing-box 1.15.0-alpha.12 验证，稳定默认仍为 1.14。**
+**实验版：仅按官方 sing-box 1.15.0-alpha.13 验证，稳定默认仍为 1.14。**
 
 本目录包含 FakeIP / RealIP 两种基础配置。TUN 不再设置 `stack`，使用 1.15 的新默认栈；
 仍以 SFA 无 root 使用方式为前提，不启用 `strict_route` 或 `auto_redirect`。

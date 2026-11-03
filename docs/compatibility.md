@@ -5,7 +5,7 @@
 - Android、iOS、macOS、Linux、Windows 均维护 1.14、1.13 两条兼容线；
 - 路径统一为 `platforms/<平台>/<内核版本>/<配置>.json`；
 - CI 检查器：官方 1.14.0、1.13.21 Linux amd64 发布包；
-- 同一平台目录下的 `1.15/` 为[实验版](experimental-1.15.md)，固定在 `1.15.0-alpha.12` 验证，默认选择仍为 1.14；
+- 同一平台目录下的 `1.15/` 为[实验版](experimental-1.15.md)，固定在 `1.15.0-alpha.13` 验证，默认选择仍为 1.14；
 - 默认使用 IPv4；网页或 CLI 的 IPv6 选项同时调整 DNS、TUN 与路由，双栈优先 IPv4；
 - 规则：MetaCubeX `sing` 分支远程 `.srs`。
 

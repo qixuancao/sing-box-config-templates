@@ -35,9 +35,14 @@ def validate_profile(config, platform, line, scenario):
     require(GROUPS <= tags, "Missing policy groups")
     inbound = config["inbounds"][0]
     route = config["route"]
-    if platform in ("android", "ios"):
+    if platform == "android":
         require(inbound["type"] == "tun" and "strict_route" not in inbound and "auto_redirect" not in inbound
-                and "auto_detect_interface" not in route, "Incorrect mobile TUN fields")
+                and route.get("auto_detect_interface") is True and "override_android_vpn" not in route,
+                "Incorrect Android TUN fields")
+    elif platform == "ios":
+        require(inbound["type"] == "tun" and "strict_route" not in inbound and "auto_redirect" not in inbound
+                and "auto_detect_interface" not in route and "override_android_vpn" not in route,
+                "Incorrect mobile TUN fields")
     elif platform == "linux" and scenario == "tun":
         require(inbound["type"] == "tun" and inbound.get("strict_route") is True and inbound.get("auto_redirect") is True
                 and route.get("auto_detect_interface") is True, "Incorrect Linux TUN fields")
@@ -62,7 +67,7 @@ def validate_profile(config, platform, line, scenario):
         require(all(rule.get("http_client") == "rule-set-direct" and "download_detour" not in rule
                     for rule in route["rule_set"] if rule["type"] == "remote"), "Incorrect rule-set HTTP client")
     if line == "1.15":
-        require(all("stack" not in item for item in config["inbounds"]), "Removed TUN stack field in 1.15")
+        require(all("stack" not in item for item in config["inbounds"]), "Public 1.15 profiles must use the default TUN stack")
     require(all(rule["tag"] != "category-ads-all" for rule in route["rule_set"]), "Default profiles must not include ad blocking")
     require(not any(rule.get("network") == "udp" for rule in route["rules"]), "UDP must follow application policies")
     require("udp-auto" not in tags, "Unexpected transport-specific policy group")

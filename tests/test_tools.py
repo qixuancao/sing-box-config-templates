@@ -196,11 +196,25 @@ class CoreContractsTest(unittest.TestCase):
             if name.endswith(".json"):
                 _, platform, line, scenario = name.removesuffix(".json").split("/")
                 validate_profile(json.loads(content), platform, line, scenario)
+                validate_profile(read_json(ROOT / name), platform, line, scenario)
+
+    def test_android_tun_profiles_enable_auto_detect_interface_without_override_android_vpn(self):
+        for line in ("1.13", "1.14", "1.15"):
+            for scenario in ("fakeip", "realip"):
+                path = f"platforms/android/{line}/{scenario}.json"
+                with self.subTest(path=path):
+                    for config in (read_json(ROOT / path), json.loads(outputs()[path])):
+                        self.assertIs(config["route"].get("auto_detect_interface"), True)
+                        self.assertNotIn("override_android_vpn", config["route"])
 
     def test_contracts_reject_mutated_platform_version_and_scenario_fields(self):
         cases = [
             ("android/1.14/fakeip", lambda c: c["outbounds"].pop()),
             ("android/1.14/fakeip", lambda c: c["inbounds"][0].update(strict_route=False)),
+            ("android/1.15/fakeip", lambda c: c["route"].pop("auto_detect_interface", None)),
+            ("android/1.15/fakeip", lambda c: c["route"].update(auto_detect_interface=False)),
+            ("android/1.15/fakeip", lambda c: c["route"].update(override_android_vpn=True)),
+            ("ios/1.14/fakeip", lambda c: c["route"].update(auto_detect_interface=True)),
             ("linux/1.14/tun", lambda c: c["inbounds"][0].update(auto_redirect=False)),
             ("windows/1.14/tun", lambda c: c["inbounds"][0].update(auto_redirect=True)),
             ("macos/1.14/fakeip", lambda c: c["route"].update(auto_detect_interface=False)),

@@ -337,3 +337,39 @@ test('IPv6 settings update DNS, routing and TUN together without bypassing virtu
     assert.deepEqual(customizeTemplate(base).dns, base.dns);
   }
 });
+
+test('preset and rendered outbound groups contain unique members for alpha.13', () => {
+  for (const [path, preset] of Object.entries(PROFILES)) {
+    for (const config of [preset, renderConfig(preset, {outbounds: [tcp, udp]})]) {
+      for (const group of config.outbounds.filter(item => ['selector', 'urltest'].includes(item.type))) {
+        assert.equal(new Set(group.outbounds).size, group.outbounds.length, `${path}: ${group.tag}`);
+      }
+    }
+  }
+});
+
+test('Android TUN presets and CLI/browser customization preserve auto_detect_interface without override_android_vpn', () => {
+  const directory = mkdtempSync(join(tmpdir(), 'sing-box-android-route-'));
+  const output = join(directory, 'android.json');
+  try {
+    for (const core of CORES) {
+      for (const scenario of PLATFORMS.android) {
+        const path = profilePath('android', core, scenario);
+        const preset = PROFILES[path];
+        assert.equal(preset.route.auto_detect_interface, true, `${path} must set route.auto_detect_interface`);
+        assert.equal(Object.hasOwn(preset.route, 'override_android_vpn'), false, `${path} must not set route.override_android_vpn`);
+        const customized = renderConfig(customizeTemplate(preset, {ipv6: true, lanBypass: false}), {outbounds: [udp]});
+        assert.equal(customized.route.auto_detect_interface, true);
+        assert.equal(Object.hasOwn(customized.route, 'override_android_vpn'), false);
+        const cli = spawnSync(process.execPath, [
+          join(ROOT, 'scripts/generate.mjs'), '--platform', 'android', '--core', core, '--dns', scenario,
+          '--input', '-', '--output', output,
+        ], {encoding: 'utf8', input: links.hy2});
+        assert.equal(cli.status, 0, cli.stderr);
+        const rendered = JSON.parse(read(output, 'utf8'));
+        assert.equal(rendered.route.auto_detect_interface, true);
+        assert.equal(Object.hasOwn(rendered.route, 'override_android_vpn'), false);
+      }
+    }
+  } finally { rmSync(directory, {recursive: true, force: true}); }
+});

@@ -57,7 +57,7 @@ class TunProfilesTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "not supported"):
             apply_tun_overlays(copy.deepcopy(profile),"1.13","linux",
                                {"tun_options_by_core":{"1.13":{"dns_mode":"hijack"}}})
-        with self.assertRaisesRegex(ValueError, "removed"):
+        with self.assertRaisesRegex(ValueError, "deprecated TUN stack"):
             apply_tun_overlays({"inbounds":[{"type":"tun","stack":"system"}]},
                                "1.15","windows",{"tun_options":{"strict_route":True}})
         with self.assertRaisesRegex(ValueError, "exactly one TUN"):

@@ -67,7 +67,7 @@ when available. See [configuration notes](docs/policy-groups.md) and [LAN bypass
 | Linux | [TUN](platforms/linux/1.14/tun.json) · [mixed](platforms/linux/1.14/mixed.json) | [Guide](platforms/linux/README.md) |
 | Windows | [TUN](platforms/windows/1.14/tun.json) · [mixed](platforms/windows/1.14/mixed.json) | [Guide](platforms/windows/README.md) |
 
-Choose the core version on every platform: `platforms/<platform>/<version>/`. The table links to 1.14 profiles; use the same filename under `1.13/` when running a 1.13 core. The `1.15/` profiles are **Experimental**, checked only against `1.15.0-alpha.12`.
+Choose the core version on every platform: `platforms/<platform>/<version>/`. The table links to 1.14 profiles; use the same filename under `1.13/` when running a 1.13 core. The `1.15/` profiles are **Experimental**, checked only against `1.15.0-alpha.13`.
 
 On desktop systems, start with `mixed.json` and set the application proxy to `127.0.0.1:2080`:
 

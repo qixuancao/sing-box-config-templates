@@ -51,4 +51,4 @@ def apply_tun_overlays(config, version, platform, settings):
     if "dns_mode" in tun and version == "1.13":
         raise ValueError("dns_mode is not supported on sing-box 1.13")
     if "stack" in tun and version == "1.15":
-        raise ValueError("TUN stack was removed in sing-box 1.15")
+        raise ValueError("Public 1.15 profiles must omit deprecated TUN stack to use the new default")
