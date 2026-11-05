@@ -9,6 +9,15 @@
 - 在本地合并节点，生成可直接导入客户端的 JSON；
 - 稳定配置维护 1.13、1.14；[1.15 · 实验版](docs/experimental-1.15.md)按固定 alpha 预备。
 
+## 25 秒操作演示
+
+[![在 Firefox 中粘贴示例节点、选择 macOS、生成并下载配置](docs/assets/demo/generator-demo.gif)](https://qixuancao.github.io/sing-box-config-templates/assets/demo/generator-demo.mp4)
+
+粘贴节点 → 选择设备 → 生成配置 → 下载 JSON。
+[观看清晰版 MP4](https://qixuancao.github.io/sing-box-config-templates/assets/demo/generator-demo.mp4) · [立即试用](https://qixuancao.github.io/sing-box-config-templates/)
+
+<sub>macOS Firefox 实际操作画面逐帧采集并剪辑；使用虚构的 example.com 演示节点，不能用于连接。下载后需在客户端导入自己的有效节点配置。</sub>
+
 ## 在线生成
 
 打开[配置生成器](https://qixuancao.github.io/sing-box-config-templates/)：
