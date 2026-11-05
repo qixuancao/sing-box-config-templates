@@ -41,7 +41,7 @@ try {
   if (values.access && !['local', 'system', 'tun'].includes(values.access) || values.dns && !['fakeip', 'realip'].includes(values.dns)) throw new ConfigError('profile');
   const desktop = ['linux', 'windows', 'macos'].includes(values.platform);
   const access = values.access || (['linux', 'windows'].includes(values.platform) ? 'local' : 'tun');
-  if (!desktop && access !== 'tun') throw new ConfigError('profile');
+  if (!desktop && (access !== 'tun' || values['clash-api-port'] !== undefined)) throw new ConfigError('profile');
   let scenario = values.scenario;
   if (!scenario && !values.template) {
     scenario = access !== 'tun' ? 'mixed' : ['linux', 'windows'].includes(values.platform) ? 'tun' : (values.dns || 'fakeip');

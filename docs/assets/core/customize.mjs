@@ -111,6 +111,7 @@ export function customizeTemplate(template, {dnsTemplate = null, systemProxy = f
   }
   if (clashApiPort !== null) {
     requireValue(Number.isInteger(clashApiPort) && clashApiPort >= 1 && clashApiPort <= 65535, 'port');
+    requireValue(!mixed || clashApiPort !== listenPort, 'port');
     requireValue(object(config.experimental?.clash_api), 'template');
     config.experimental.clash_api.external_controller = `127.0.0.1:${clashApiPort}`;
   }

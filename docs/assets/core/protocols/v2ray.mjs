@@ -39,8 +39,10 @@ export function parseVMess(text) {
     const url = checkedURL(text);
     return parseV2Ray(url, {type: 'vmess', tag: decode(url.hash.slice(1)), server: host(url), server_port: port(url)});
   }
-  const [encoded, hash = ''] = rest.split('#', 2);
-  requireValue(encoded.length > 0 && !encoded.includes('?'), 'link');
+  const hashIndex = rest.indexOf('#');
+  const encoded = hashIndex >= 0 ? rest.slice(0, hashIndex) : rest;
+  const hash = hashIndex >= 0 ? rest.slice(hashIndex + 1) : '';
+  requireValue(encoded.length > 0 && !encoded.includes('?') && !hash.includes('#'), 'link');
   let item;
   try { item = JSON.parse(base64(encoded)); } catch (error) {
     if (error instanceof ConfigError) throw error;
@@ -60,6 +62,7 @@ export function parseVMess(text) {
   const aid = item.aid === undefined || item.aid === '' ? 0 : Number(item.aid);
   requireValue((typeof item.aid === 'number' || typeof item.aid === 'string' || item.aid === undefined) &&
     Number.isInteger(aid) && aid >= 0 && aid <= 64, 'parameters');
+  requireValue(!(item.scy && item.security && item.scy !== item.security), 'method');
   const cipher = item.scy || item.security || 'auto';
   requireValue(VMESS_CIPHERS.includes(cipher), 'method');
   const tag = hash ? decode(hash) : (typeof item.ps === 'string' ? item.ps.trim() : '');

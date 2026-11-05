@@ -182,6 +182,18 @@ test('invalid or unsupported link options fail without exposing input', () => {
     `ss://${btoa('aes-128-gcm:' + secret)}@example.com:8388?plugin=unknown`,
     `vless://${uuid}@example.com:443?security=none&sni=example.com`,
     `vless://${uuid}@example.com:443?security=reality&pbk=invalid`,
+    `hy2://${secret}@example.com:443?mport=40000-20000`,
+    `hy2://${secret}@example.com:443?mport=20000&ports=30000`,
+    `hy2://${secret}@example.com:443?upmbps=0`,
+    `tuic://not-a-uuid:${secret}@example.com:443`,
+    `tuic://${uuid}:${secret}@example.com:443?congestion_control=invalid`,
+    `anytls://${secret}@example.com:443?unknown=1`,
+    `socks5://:${secret}@example.com:1080`,
+    `socks5://user:${secret}@example.com`,
+    'vmess://' + Buffer.from(JSON.stringify({v: '2', add: 'example.com', port: 443, id: secret})).toString('base64'),
+    'vmess://' + Buffer.from(JSON.stringify({v: '2', add: 'example.com', port: 443, id: uuid, scy: 'aes-128-gcm', security: 'none', ps: secret})).toString('base64'),
+    'vmess://' + Buffer.from(JSON.stringify({v: '2', add: 'example.com', port: 443, id: uuid})).toString('base64') + `#a#${secret}`,
+    Buffer.from(`hy2://${secret}@example.com:443?unknown=1`).toString('base64'),
   ];
   for (const input of invalid) {
     assert.throws(() => parseNodes(input), error => {
@@ -302,6 +314,8 @@ test('CLI output is private and atomic, preserves old files and refuses input al
       ['--platform', 'linux', '--access', 'tun', '--port', '7890'],
       ['--platform', 'linux', '--access', 'tun', '--port', '2080'],
       ['--platform', 'android', '--port', '2080'],
+      ['--platform', 'android', '--clash-api-port', '9090'],
+      ['--platform', 'linux', '--port', '9090', '--clash-api-port', '9090'],
     ]) {
       const before = read(output, 'utf8');
       assert.notEqual(run(['--input', source, '--output', output, ...options]).status, 0, options.join(' '));
