@@ -9,7 +9,7 @@
 - 在本地合并节点，生成可直接导入客户端的 JSON；
 - 稳定配置维护 1.13、1.14；[1.15 · 实验版](docs/experimental-1.15.md)按固定 alpha 预备。
 
-## 25 秒操作演示
+## 6 秒操作演示
 
 [![在 Firefox 中粘贴示例节点、选择 macOS、生成并下载配置](docs/assets/demo/generator-demo.gif)](https://qixuancao.github.io/sing-box-config-templates/assets/demo/generator-demo.mp4)
 

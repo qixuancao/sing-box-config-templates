@@ -9,7 +9,7 @@ A small set of everyday routing configurations and a local browser generator for
 - Merge your nodes locally into an importable JSON configuration.
 - Use stable profiles for sing-box 1.13 / 1.14, or opt into [1.15 · Experimental](docs/experimental-1.15.md).
 
-## 25-second walkthrough
+## 6-second walkthrough
 
 [![Paste a demo node, choose macOS, generate and download JSON in Firefox](docs/assets/demo/generator-demo.gif)](https://qixuancao.github.io/sing-box-config-templates/assets/demo/generator-demo.mp4)
 
