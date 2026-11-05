@@ -44,6 +44,8 @@ try {
   if (!scenario && !values.template) {
     scenario = access !== 'tun' ? 'mixed' : ['linux', 'windows'].includes(values.platform) ? 'tun' : (values.dns || 'fakeip');
   }
+  // --port only configures the local mixed listener; TUN profiles have none.
+  if (values.port !== undefined && scenario !== 'mixed') throw new ConfigError('listener-access');
   const templatePath = values.template ? resolve(values.template) : resolve(root, profilePath(values.platform, values.core, scenario));
   const dnsPlatform = values.dns && PLATFORMS[values.platform]?.includes(values.dns) ? values.platform : 'android';
   const dnsPath = values.dns ? resolve(root, profilePath(dnsPlatform, values.core, values.dns)) : null;
@@ -73,7 +75,7 @@ try {
   let template = JSON.parse(await readFile(templatePath, 'utf8'));
   if (!values.template) {
     const dnsTemplate = dnsPath ? JSON.parse(await readFile(dnsPath, 'utf8')) : null;
-    if (values.port !== undefined && !/^\d+$/.test(values.port)) throw new ConfigError('template');
+    if (values.port !== undefined && !/^\d+$/.test(values.port)) throw new ConfigError('port');
     template = customizeTemplate(template, {
       dnsTemplate, systemProxy: values.access === 'system', listenPort: values.port === undefined ? 2080 : Number(values.port),
       directDns: values['direct-dns'] ?? null, proxyDns: values['proxy-dns'] ?? null,

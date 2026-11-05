@@ -1,6 +1,6 @@
 # Android 1.13.x
 
-本目录面向 sing-box 1.13 schema，CI 固定使用官方 1.13.21 检查八份公共配置及其
+本目录面向 sing-box 1.13 schema，CI 固定使用官方 1.13.21 检查两份公共配置及其
 节点注入结果。远程规则集使用 `download_detour`，FakeIP DNS 不包含 1.14 才
 支持的评估动作。
 

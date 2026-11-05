@@ -5,6 +5,7 @@ nodes.txt
 generated/
 *.local.json
 .render.*
+*.zip
 
 # sing-box runtime state
 *.db

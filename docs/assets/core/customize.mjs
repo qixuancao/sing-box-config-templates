@@ -16,23 +16,23 @@ export function customizeTemplate(template, {dnsTemplate = null, systemProxy = f
     config.dns = clone(dnsTemplate.dns);
     const fakeIP = config.dns.servers.some(server => server.type === 'fakeip');
     const isMixed = config.inbounds.some(inbound => inbound.type === 'mixed');
-    requireValue(!fakeIP || !isMixed, 'template');
+    requireValue(!fakeIP || !isMixed, 'fakeip-access');
     if (config.experimental?.cache_file) {
       if (fakeIP) config.experimental.cache_file.store_fakeip = true;
       else delete config.experimental.cache_file.store_fakeip;
     }
   }
-  requireValue(Number.isInteger(listenPort) && listenPort >= 1 && listenPort <= 65535, 'template');
+  requireValue(Number.isInteger(listenPort) && listenPort >= 1 && listenPort <= 65535, 'port');
   const mixed = config.inbounds.find(inbound => inbound.type === 'mixed');
   if (mixed) {
     mixed.listen_port = listenPort;
     mixed.set_system_proxy = Boolean(systemProxy);
   } else {
-    requireValue(!systemProxy && listenPort === 2080, 'template');
+    requireValue(!systemProxy && listenPort === 2080, 'listener-access');
   }
   for (const [tag, value] of [['direct-dns', directDns], ['proxy-dns', proxyDns]]) {
     if (value === null) continue;
-    requireValue(DNS_SERVERS.has(value), 'template');
+    requireValue(DNS_SERVERS.has(value), 'dns-server');
     const server = config.dns?.servers.find(server => server.tag === tag);
     requireValue(server && server.type === 'https', 'template');
     server.server = value;

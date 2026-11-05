@@ -260,10 +260,25 @@ test('CLI output is private and atomic, preserves old files and refuses input al
       ['--platform', 'linux', '--access', 'local', '--dns', 'fakeip'],
       ['--scenario', 'realip', '--access', 'tun'], ['--port', '12.5'],
       ['--direct-dns', '192.0.2.53'], ['--scenario', 'udp-first'],
+      ['--platform', 'linux', '--access', 'tun', '--port', '7890'],
+      ['--platform', 'linux', '--access', 'tun', '--port', '2080'],
+      ['--platform', 'android', '--port', '2080'],
     ]) {
       const before = read(output, 'utf8');
       assert.notEqual(run(['--input', source, '--output', output, ...options]).status, 0, options.join(' '));
       assert.equal(read(output, 'utf8'), before);
+    }
+    // CLI mistakes name the actual option instead of blaming the page template.
+    for (const [options, message] of [
+      [['--platform', 'linux', '--access', 'tun', '--port', '7890'], /TUN does not use --port/],
+      [['--platform', 'linux', '--access', 'local', '--dns', 'fakeip'], /FakeIP requires TUN/],
+      [['--platform', 'linux', '--port', '12.5'], /Port must be an integer/],
+      [['--direct-dns', '192.0.2.53'], /DNS provider must be/],
+    ]) {
+      const result = run(['--input', source, '--output', output, ...options]);
+      assert.notEqual(result.status, 0, options.join(' '));
+      assert.match(result.stderr, message, options.join(' '));
+      assert.doesNotMatch(result.stderr, /update the page/, options.join(' '));
     }
     const templatePath = join(directory, 'private-template.json');
     const template = structuredClone(PROFILES[profilePath('linux', '1.14', 'mixed')]);

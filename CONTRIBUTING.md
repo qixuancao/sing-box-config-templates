@@ -30,7 +30,7 @@ python3 -B scripts/check.py browser # 需要本机 Chrome，可用 CHROME 指定
 
 修改远程规则 URL 或准备发版时，再用对应检查器运行
 `python3 -B scripts/check.py rule-sets --core 1.14 --sing-box /path/to/checker`。
-规则集下载检查需联网，不包含在默认检查中，每周 CI 使用 1.13.21 / 1.14.0 执行。
+规则集下载检查需联网，不包含在默认检查中，每周 CI 使用 1.13.21 / 1.14.0 / 1.15.0-alpha.13 执行。
 
 配置源位于 `modules/<类别>/<版本>/`，版本、平台与全部场景组合统一在 `modules/catalog.json`。修改后运行
 `python3 -B scripts/build.py`，同时更新平台文件、浏览器配置包与中英文页面。

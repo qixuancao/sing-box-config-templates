@@ -1,7 +1,9 @@
 name: Validate public profiles
 
 on:
+  # Feature branches are validated through pull_request; avoid duplicate runs.
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
   schedule:
@@ -114,6 +116,10 @@ jobs:
 
       - name: Check all experimental platform configurations without starting a proxy
         run: python3 -B scripts/check.py core --core 1.15
+
+      - name: Download and parse every remote rule set with the experimental checker
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        run: python3 -B scripts/check.py rule-sets --core 1.15
 
   rule-set-compatibility:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
