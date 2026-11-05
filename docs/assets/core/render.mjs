@@ -3,6 +3,8 @@ import {requireValue} from './errors.mjs';
 import {object, clone} from './values.mjs';
 import {validateNodes} from './nodes.mjs';
 
+const SERVICE_GROUPS = new Set(['streaming', 'ai', 'telegram', 'microsoft', 'apple', 'google', 'github']);
+
 export function renderConfig(template, document) {
   const nodes = validateNodes(document);
   requireValue(object(template) && Array.isArray(template.outbounds) && Array.isArray(template.route?.rules), 'template');
@@ -14,6 +16,7 @@ export function renderConfig(template, document) {
     // One automatic choice for both transports; manual TCP-only choices remain
     // available, but cannot carry UDP. Never silently reroute an app's UDP.
     if (group.tag === 'auto') group.outbounds = [...(udpTags.length ? udpTags : allTags)];
+    if (SERVICE_GROUPS.has(group.tag)) group.outbounds = ['select', 'auto', 'direct', ...allTags];
     if (group.tag === 'GLOBAL') group.outbounds = ['select', 'auto', ...allTags, 'direct'];
   }
   validateReferences(config);

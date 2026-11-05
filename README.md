@@ -17,7 +17,7 @@
 2. 选择设备和接入方式；内核版本、DNS 和 IPv6 在高级设置中。
 3. 点击“生成配置”，下载 `sing-box.json` 后导入客户端。
 
-支持 Naive HTTPS、Hysteria2、Trojan、Shadowsocks、VLESS 分享链接。解析、生成和
+支持 Naive HTTPS、Hysteria2（含端口跳跃）、TUIC、AnyTLS、Trojan、VLESS、VMess、Shadowsocks、SOCKS5 分享链接及 Base64 订阅文本。解析、生成和
 下载均在浏览器内完成，节点不上传、不自动保存。支持保存 `nodes.json`，方便下次更新。
 
 **流量接入方式**（Linux / Windows / macOS）可明确选择：仅监听本地 HTTP/SOCKS
@@ -26,7 +26,8 @@
 部分应用及 UDP 不会使用系统 HTTP 代理；是否可自动设置取决于平台环境与权限。
 
 **高级设置**可单独选择 RealIP / FakeIP DNS 返回方式（纯 HTTP/SOCKS 模式禁用 FakeIP）、
-直连和代理 DNS 的 DoH 服务商、IPv6、局域网绕行，以及 mixed 监听端口。
+直连和代理 DNS 的 DoH 服务商（AliDNS、DNSPod、Cloudflare、Google）、IPv6、局域网绕行、
+基础广告拦截、经代理下载规则集、桌面端本地 Clash API 控制器（`127.0.0.1:9090`），以及 mixed 监听端口。
 网页会给出包含当前选项的等价 CLI 命令。
 请用 `sing-box check -c sing-box.json` 校验下载的配置。
 

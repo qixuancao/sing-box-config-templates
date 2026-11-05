@@ -1,5 +1,6 @@
 import {ConfigError, requireValue, fail} from './errors.mjs';
 import {object, clone, UUID, plain} from './values.mjs';
+import {base64} from './protocols/common.mjs';
 import {parseLink} from './share-links.mjs';
 
 const RESERVED = new Set(['select', 'auto', 'streaming', 'ai', 'telegram', 'microsoft', 'apple', 'google', 'github', 'direct', 'GLOBAL']);
@@ -39,6 +40,15 @@ export function validateNodes(document) {
       if (node.type === 'naive') requireValue(plain(node.username), 'credentials');
       if (['vless', 'vmess', 'tuic'].includes(node.type)) requireValue(UUID.test(node.uuid), 'uuid');
       if (node.type === 'shadowsocks') requireValue(plain(node.method), 'method');
+      if (node.type === 'vmess' && node.security !== undefined) requireValue(['auto', 'aes-128-gcm', 'chacha20-poly1305', 'none', 'zero'].includes(node.security), 'method');
+      if (node.type === 'socks' && (node.username !== undefined || node.password !== undefined)) requireValue(plain(node.username) && plain(node.password), 'credentials');
+      if (node.server_ports !== undefined) {
+        requireValue(['hysteria2', 'hysteria'].includes(node.type) && Array.isArray(node.server_ports) && node.server_ports.length > 0 &&
+          node.server_ports.every(range => typeof range === 'string' && /^\d+:\d+$/.test(range) && (() => {
+            const [start, end] = range.split(':').map(Number);
+            return start >= 1 && start <= end && end <= 65535;
+          })()), 'port');
+      }
       if (['naive', 'hysteria2', 'trojan', 'tuic', 'anytls'].includes(node.type)) requireValue(node.tls?.enabled === true, 'security');
       if (node.tls?.server_name !== undefined) requireValue(plain(node.tls.server_name), 'server');
       validateTransportHost(node.transport);
@@ -55,13 +65,27 @@ export function validateNodes(document) {
 export function parseNodes(input) {
   requireValue(typeof input === 'string' && input.trim().length > 0, 'empty');
   requireValue(input.length <= 1024 * 1024 && new TextEncoder().encode(input).length <= 1024 * 1024, 'too-large');
-  const text = input.trim();
+  let text = input.trim();
   if (text.startsWith('{') || text.startsWith('[')) {
     let document;
     try { document = JSON.parse(text); } catch { fail('json'); }
     if (Array.isArray(document)) document = {outbounds: document};
     else if (object(document) && document.type && !document.outbounds) document = {outbounds: [document]};
     return validateNodes(document);
+  }
+  if (!text.includes('://')) {
+    const compact = text.replace(/\s+/g, '');
+    if (/^[A-Za-z0-9+/_-]+=*$/.test(compact)) {
+      try {
+        const decoded = base64(compact).trim();
+        if (decoded.includes('://')) {
+          requireValue(decoded.length <= 1024 * 1024 && new TextEncoder().encode(decoded).length <= 1024 * 1024, 'too-large');
+          text = decoded;
+        }
+      } catch (error) {
+        if (error instanceof ConfigError && error.code === 'too-large') throw error;
+      }
+    }
   }
   const outbounds = []; const tags = new Set();
   text.split(/\r?\n/).forEach((line, index) => {

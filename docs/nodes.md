@@ -65,13 +65,19 @@ select auto streaming ai telegram microsoft apple google github direct GLOBAL
 
 ## 分享链接支持范围
 
+网页和 CLI 也支持直接粘贴整段 Base64 / Base64URL 编码的多行分享链接（离线解码，不访问订阅 URL）。
+
 | 类型 | 支持的设置 |
 | --- | --- |
 | `naive+https://` | 用户名、密码、SNI；默认按 TCP 处理 |
-| `hy2://` / `hysteria2://` | 密码、SNI、证书校验选项、Salamander 混淆 |
-| `trojan://` | TLS、SNI、ALPN、TCP / WebSocket / gRPC / HTTPUpgrade |
-| `vless://` | UUID、TLS / Reality、Vision、上述传输与 packetEncoding |
+| `hy2://` / `hysteria2://` | 密码、SNI、ALPN、证书校验选项、Salamander 混淆、`mport` / `ports` 端口跳跃、`upmbps` / `downmbps` |
+| `tuic://` | UUID、密码、SNI、ALPN、证书校验选项、`congestion_control`、`udp_relay_mode`、`zero_rtt_handshake` |
+| `anytls://` | 密码、SNI、ALPN、uTLS `fp`、证书校验选项 |
+| `trojan://` | TLS、SNI、ALPN、TCP / WebSocket（含 `?ed=` Early Data）/ gRPC / HTTPUpgrade |
+| `vless://` | UUID、TLS / Reality、Vision、上述传输与 `packetEncoding` |
+| `vmess://` | V2RayN Base64 JSON 与 URL 格式、常见加密、TLS、上述传输（含 WebSocket `?ed=`） |
 | `ss://` | SIP002 与旧版 Base64 格式、常见 AEAD / 2022 加密 |
+| `socks5://` / `socks://` | 必选端口、可选明文或 Base64 用户名与密码 |
 
 未支持的参数会报错，例如 SS 插件、XHTTP 或 Hysteria2 证书 pin，避免转换时悄悄丢失设置。
 这类配置可使用原生 sing-box 节点 JSON，再用实际内核检查。HTTP(S) 订阅地址不是节点

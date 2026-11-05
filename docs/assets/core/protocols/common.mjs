@@ -64,19 +64,39 @@ export function transport(params) {
   const type = params.type || 'tcp';
   requireValue(params.headerType === undefined || params.headerType === 'none', 'transport');
   if (type === 'tcp') {
-    requireValue(params.path === undefined && params.host === undefined && params.serviceName === undefined && params.mode === undefined, 'transport');
+    requireValue(params.path === undefined && params.host === undefined && params.serviceName === undefined && params.mode === undefined && params.ed === undefined, 'transport');
     return undefined;
   }
   requireValue(['ws', 'grpc', 'httpupgrade'].includes(type), 'transport');
   if (type === 'grpc') {
-    requireValue(params.path === undefined && params.host === undefined && (params.mode === undefined || params.mode === 'gun'), 'transport');
+    requireValue(params.path === undefined && params.host === undefined && params.ed === undefined && (params.mode === undefined || params.mode === 'gun'), 'transport');
+    if (params.serviceName !== undefined && params.serviceName !== '') requireValue(plain(params.serviceName), 'transport');
     return {type: 'grpc', service_name: params.serviceName || ''};
   }
   requireValue(params.serviceName === undefined && params.mode === undefined, 'transport');
-  const result = {type, path: params.path || '/'};
+  if (type === 'httpupgrade') requireValue(params.ed === undefined, 'transport');
+  let rawPath = params.path || '/';
+  let ed = params.ed;
+  if (type === 'ws') {
+    const match = rawPath.match(/^(.*?)\?ed=([^&?#]+)$/);
+    if (match) {
+      requireValue(ed === undefined || ed === match[2], 'transport');
+      rawPath = match[1] || '/';
+      ed = match[2];
+    }
+  }
+  requireValue(plain(rawPath), 'transport');
+  const result = {type, path: rawPath};
   if (params.host) {
+    requireValue(plain(params.host), 'transport');
     if (type === 'ws') result.headers = {Host: params.host};
     else result.host = params.host;
+  }
+  if (ed !== undefined) {
+    const maxEarlyData = Number(ed);
+    requireValue(/^[1-9]\d*$/.test(String(ed)) && Number.isInteger(maxEarlyData) && maxEarlyData <= 65535, 'transport');
+    result.max_early_data = maxEarlyData;
+    result.early_data_header_name = 'Sec-WebSocket-Protocol';
   }
   return result;
 }

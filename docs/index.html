@@ -39,10 +39,10 @@
 <section class="card" aria-labelledby="nodes-heading">
 <h2 id="nodes-heading"><span class="step">1</span>放入你的节点</h2>
 <div class="toolbar"><label for="nodes-input">分享链接 / 节点 JSON</label><button type="button" class="quiet" id="example">试用示例</button></div>
-<textarea id="nodes-input" rows="10" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="input-help" placeholder="每行粘贴一个节点分享链接
+<textarea id="nodes-input" rows="10" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="input-help" placeholder="每行粘贴一个节点分享链接，或直接粘贴 Base64 订阅内容
 
 也可以粘贴 sing-box 节点 JSON"></textarea>
-<p class="help" id="input-help">支持 Naive HTTPS、Hysteria2、Trojan、Shadowsocks、VLESS。每行一个链接，或使用 sing-box 节点 JSON；最多 200 个节点、1 MB。</p>
+<p class="help" id="input-help">支持 Naive HTTPS、Hysteria2（含 mport）、TUIC、AnyTLS、Trojan、VLESS、VMess、Shadowsocks、SOCKS5。可粘贴多行链接、Base64 订阅文本或 sing-box 节点 JSON；最多 200 个节点、1 MB。</p>
 <div class="file-row"><label for="nodes-file">或从本地文件读取（JSON / TXT）</label><input type="file" id="nodes-file" accept=".json,.txt,application/json,text/plain"></div>
 <p class="privacy-note">节点仅在当前标签页内处理，不上传、不自动保存；刷新页面后清空。</p>
 <ul class="node-list" id="node-list" aria-label="已解析节点"></ul>
@@ -60,9 +60,12 @@
 <div><label for="dns-mode">DNS 返回方式</label><select id="dns-mode"><option value="fakeip">FakeIP · 返回虚拟地址</option><option value="realip">RealIP · 返回真实地址</option></select><p class="help" id="dns-desc">RealIP 兼容性优先；FakeIP 仅适合能接管 DNS 查询的 TUN/VPN 模式。</p></div>
 <div><label><input type="checkbox" id="ipv6"> 启用 IPv6</label><p class="help">同时调整 DNS、TUN 地址和路由；需要网络及出口支持 IPv6。默认使用 IPv4。</p></div>
 <div id="lan-setting"><label><input type="checkbox" id="lan-bypass" checked> 局域网绕过 TUN</label><p class="help">默认方便访问路由器和 NAS；绕行流量不受代理策略控制。企业网或覆盖网络需要接管这些地址时取消。</p></div>
+<div><label><input type="checkbox" id="adblock"> 启用基础广告拦截（category-ads-all）</label><p class="help">在 DNS 和路由中拒绝常见广告域名；若个别网站或应用被误拦，取消勾选后重新生成。</p></div>
+<div><label><input type="checkbox" id="rule-set-proxy"> 经代理由主选择组下载规则集</label><p class="help">默认直连下载规则集；当前网络无法直连规则 CDN 时可改为经代理下载。</p></div>
+<div id="clash-api-setting"><label><input type="checkbox" id="clash-api"> 启用本地 Clash API 控制器（127.0.0.1:9090）</label><p class="help">方便桌面命令行运行时通过本地面板切换策略组和查看连接。</p></div>
 <div class="dns-grid">
-<div><label for="direct-dns">直连 DNS（默认 AliDNS）</label><select id="direct-dns"><option value="default">跟随预设</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option></select></div>
-<div><label for="proxy-dns">代理 DNS（默认 Google）</label><select id="proxy-dns"><option value="default">跟随预设</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option></select></div>
+<div><label for="direct-dns">直连 DNS（默认 AliDNS）</label><select id="direct-dns"><option value="default">跟随预设</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.12.12.12">DNSPod · 1.12.12.12</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option></select></div>
+<div><label for="proxy-dns">代理 DNS（默认 Google）</label><select id="proxy-dns"><option value="default">跟随预设</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.12.12.12">DNSPod · 1.12.12.12</option></select></div>
 </div>
 <p class="help">选择提供 HTTPS DNS 的服务商。直连 DNS 不经代理，代理 DNS 跟随主选择组；可用性取决于当前网络。</p>
 <div id="port-setting"><label for="listen-port">本地监听端口</label><input type="number" id="listen-port" min="1" max="65535" step="1" value="2080"><p class="help">只监听 127.0.0.1，避免无认证代理暴露到局域网。</p></div>

@@ -39,10 +39,10 @@
 <section class="card" aria-labelledby="nodes-heading">
 <h2 id="nodes-heading"><span class="step">1</span>Add your nodes</h2>
 <div class="toolbar"><label for="nodes-input">Share links / nodes JSON</label><button type="button" class="quiet" id="example">Try an example</button></div>
-<textarea id="nodes-input" rows="10" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="input-help" placeholder="Paste one node share link per line
+<textarea id="nodes-input" rows="10" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="input-help" placeholder="Paste one node share link per line, or Base64 subscription text
 
 Or paste native sing-box nodes JSON"></textarea>
-<p class="help" id="input-help">Supports Naive HTTPS, Hysteria2, Trojan, Shadowsocks and VLESS. One link per line, or native sing-box nodes JSON; up to 200 nodes and 1 MB.</p>
+<p class="help" id="input-help">Supports Naive HTTPS, Hysteria2 (including mport), TUIC, AnyTLS, Trojan, VLESS, VMess, Shadowsocks and SOCKS5. Paste links, Base64 subscription text, or native sing-box nodes JSON; up to 200 nodes and 1 MB.</p>
 <div class="file-row"><label for="nodes-file">Or read a local file (JSON / TXT)</label><input type="file" id="nodes-file" accept=".json,.txt,application/json,text/plain"></div>
 <p class="privacy-note">Nodes stay in this tab. No uploads or automatic storage; refreshing clears them.</p>
 <ul class="node-list" id="node-list" aria-label="Parsed nodes"></ul>
@@ -60,9 +60,12 @@ Or paste native sing-box nodes JSON"></textarea>
 <div><label for="dns-mode">DNS response mode</label><select id="dns-mode"><option value="fakeip">FakeIP · return synthetic addresses</option><option value="realip">RealIP · return actual addresses</option></select><p class="help" id="dns-desc">RealIP is more compatible. FakeIP requires DNS capture through a TUN / VPN mode.</p></div>
 <div><label><input type="checkbox" id="ipv6"> Enable IPv6</label><p class="help">Updates DNS, TUN addresses and routing together. Requires IPv6-capable networks and exits. IPv4 is the default.</p></div>
 <div id="lan-setting"><label><input type="checkbox" id="lan-bypass" checked> Bypass TUN for local networks</label><p class="help">Enables direct router and NAS access; bypassed traffic is outside proxy policies. Disable when corporate or overlay networks must enter TUN.</p></div>
+<div><label><input type="checkbox" id="adblock"> Enable basic ad blocking (category-ads-all)</label><p class="help">Rejects common ad domains in DNS and routing. Disable and regenerate if a site or app is blocked unexpectedly.</p></div>
+<div><label><input type="checkbox" id="rule-set-proxy"> Download rule sets through the main proxy group</label><p class="help">Rule sets download directly by default; enable when your network cannot reach the rule-set CDN directly.</p></div>
+<div id="clash-api-setting"><label><input type="checkbox" id="clash-api"> Enable local Clash API controller (127.0.0.1:9090)</label><p class="help">Exposes a localhost-only controller on desktop for switching policy groups and inspecting connections.</p></div>
 <div class="dns-grid">
-<div><label for="direct-dns">Direct DNS (default: AliDNS)</label><select id="direct-dns"><option value="default">Use preset</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option></select></div>
-<div><label for="proxy-dns">Proxy DNS (default: Google)</label><select id="proxy-dns"><option value="default">Use preset</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option></select></div>
+<div><label for="direct-dns">Direct DNS (default: AliDNS)</label><select id="direct-dns"><option value="default">Use preset</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.12.12.12">DNSPod · 1.12.12.12</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option></select></div>
+<div><label for="proxy-dns">Proxy DNS (default: Google)</label><select id="proxy-dns"><option value="default">Use preset</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.12.12.12">DNSPod · 1.12.12.12</option></select></div>
 </div>
 <p class="help">Choose a DNS-over-HTTPS provider. Direct DNS bypasses the proxy; proxy DNS follows the main selection. Availability depends on your network.</p>
 <div id="port-setting"><label for="listen-port">Local listen port</label><input type="number" id="listen-port" min="1" max="65535" step="1" value="2080"><p class="help">Bound to 127.0.0.1 to avoid exposing an unauthenticated proxy to the LAN.</p></div>

@@ -7,11 +7,11 @@
 ### 新增与调整
 
 - 聚焦日常分流与本地生成：保留基础接入和 DNS 配置，移除六个 Android 专项场景及默认广告拦截。
-- 网页与 CLI 共用接入、DNS、IPv6、LAN 绕行选项；IPv6 同步调整 DNS、TUN 地址和路由，mixed 禁用 FakeIP。
+- 网页与 CLI 共用接入、DNS（含 DNSPod `1.12.12.12`）、IPv6、LAN 绕行、可选 `category-ads-all` 广告拦截、经代理下载规则集及桌面端本地 Clash API 控制器选项；IPv6 同步调整 DNS、TUN 地址和路由，mixed 禁用 FakeIP。
 - TUN 按版本共享基础模块，叠加平台差异；LAN 排除路由保护 TUN、虚拟 DNS 和 FakeIP 地址。
 - TCP/UDP 遵循同一套应用策略；自动组使用已声明支持 UDP 的节点（没有时使用全部节点），手动选择不会静默换出口。
-- 统一使用 10 分钟 URLTest、warn 日志和默认跟随主选择的应用组。
-- 网页与 Node.js CLI 共用节点解析和配置生成逻辑，支持五种分享链接及原生节点 JSON。
+- 统一使用 10 分钟 URLTest、warn 日志和默认跟随主选择的应用组；生成配置时各应用策略组同时加入全部节点，方便为 AI、流媒体等单独指定节点。
+- 网页与 Node.js CLI 共用节点解析和配置生成逻辑，支持 Naive HTTPS、Hysteria2（含 `mport` 端口跳跃与带宽参数）、TUIC、AnyTLS、Trojan、VLESS、VMess、Shadowsocks、SOCKS5 分享链接（含 WebSocket `?ed=` Early Data）、整段 Base64 订阅内容解码及原生节点 JSON。
 - 提供节点文件导入/导出、完整配置下载与预览；修改输入后禁用旧结果，离开页面清空节点。
 - 五个平台统一使用 `platforms/<平台>/<版本>/`，共 33 份配置；支持 1.13 / 1.14，1.15 实验版固定按 `1.15.0-alpha.13` 验证。
 - 配置片段与场景组合统一在 `modules/`，构建和验证入口为 `scripts/build.py`、`scripts/check.py`。

@@ -141,13 +141,16 @@ try {
     assert.equal(tunFake.inbounds[0].type, 'tun');
     assert.ok(tunFake.dns.servers.some(server => server.type === 'fakeip'));
     assert.equal(tunFake.experimental.cache_file.store_fakeip, true);
-    await evaluate("document.getElementById('ipv6').click(); document.getElementById('lan-bypass').click(); document.getElementById('generate').click()");
+    await evaluate("document.getElementById('ipv6').click(); document.getElementById('lan-bypass').click(); document.getElementById('adblock').click(); document.getElementById('rule-set-proxy').click(); document.getElementById('clash-api').click(); document.getElementById('generate').click()");
     const dual = JSON.parse(await evaluate("document.getElementById('json-preview').value"));
     assert.equal(dual.dns.strategy, 'prefer_ipv4');
     assert.ok(dual.inbounds[0].address.includes('fdfe:dcba:9876::1/126'));
     assert.equal(Object.hasOwn(dual.inbounds[0], 'route_exclude_address'), false);
     assert.equal(dual.route.rules.some(r => r.ip_version === 6 && r.action === 'reject'), false);
-    assert.match(await evaluate("document.getElementById('out-cmd').value"), /--ipv6 --no-lan-bypass/);
+    assert.equal(dual.route.rule_set.some(r => r.tag === 'category-ads-all'), true);
+    assert.equal(dual.http_clients.find(item => item.tag === 'rule-set-direct').detour, 'select');
+    assert.equal(dual.experimental.clash_api.external_controller, '127.0.0.1:9090');
+    assert.match(await evaluate("document.getElementById('out-cmd').value"), /--ipv6 --no-lan-bypass --adblock --rule-set-proxy --clash-api-port 9090/);
     // Run the actual command advertised by the UI with the same node input.
     const advertised = (await evaluate("document.getElementById('out-cmd').value")).split('\n')[0].split(' ');
     const arguments_ = advertised.slice(2);
@@ -157,7 +160,7 @@ try {
     const cli = spawnSync(process.execPath, [fileURLToPath(new URL('../scripts/generate.mjs', import.meta.url)), ...arguments_], {input: sample, encoding: 'utf8'});
     assert.equal(cli.status, 0, cli.stderr);
     assert.deepEqual(JSON.parse(await readFile(cliOutput, 'utf8')), dual, 'Web and advertised CLI options must produce identical JSON');
-    await evaluate("document.getElementById('ipv6').click(); document.getElementById('lan-bypass').click(); document.getElementById('generate').click()");
+    await evaluate("document.getElementById('ipv6').click(); document.getElementById('lan-bypass').click(); document.getElementById('adblock').click(); document.getElementById('rule-set-proxy').click(); document.getElementById('clash-api').click(); document.getElementById('generate').click()");
     assert.equal(JSON.parse(await evaluate("document.getElementById('json-preview').value")).dns.strategy, 'ipv4_only');
     assert.equal(requests.length, before, 'Generation must make no network requests');
     // A changed input or device must invalidate an earlier successful result.

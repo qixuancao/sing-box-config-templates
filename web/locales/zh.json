@@ -13,8 +13,8 @@
   "nodes_heading": "放入你的节点",
   "input_label": "分享链接 / 节点 JSON",
   "example_button": "试用示例",
-  "placeholder": "每行粘贴一个节点分享链接\n\n也可以粘贴 sing-box 节点 JSON",
-  "input_help": "支持 Naive HTTPS、Hysteria2、Trojan、Shadowsocks、VLESS。每行一个链接，或使用 sing-box 节点 JSON；最多 200 个节点、1 MB。",
+  "placeholder": "每行粘贴一个节点分享链接，或直接粘贴 Base64 订阅内容\n\n也可以粘贴 sing-box 节点 JSON",
+  "input_help": "支持 Naive HTTPS、Hysteria2（含 mport）、TUIC、AnyTLS、Trojan、VLESS、VMess、Shadowsocks、SOCKS5。可粘贴多行链接、Base64 订阅文本或 sing-box 节点 JSON；最多 200 个节点、1 MB。",
   "file_label": "或从本地文件读取（JSON / TXT）",
   "privacy_note": "节点仅在当前标签页内处理，不上传、不自动保存；刷新页面后清空。",
   "nodes_list_label": "已解析节点",
@@ -88,6 +88,12 @@
   "ipv6_help": "同时调整 DNS、TUN 地址和路由；需要网络及出口支持 IPv6。默认使用 IPv4。",
   "lan_label": "局域网绕过 TUN",
   "lan_help": "默认方便访问路由器和 NAS；绕行流量不受代理策略控制。企业网或覆盖网络需要接管这些地址时取消。",
+  "adblock_label": "启用基础广告拦截（category-ads-all）",
+  "adblock_help": "在 DNS 和路由中拒绝常见广告域名；若个别网站或应用被误拦，取消勾选后重新生成。",
+  "rule_set_proxy_label": "经代理由主选择组下载规则集",
+  "rule_set_proxy_help": "默认直连下载规则集；当前网络无法直连规则 CDN 时可改为经代理下载。",
+  "clash_api_label": "启用本地 Clash API 控制器（127.0.0.1:9090）",
+  "clash_api_help": "方便桌面命令行运行时通过本地面板切换策略组和查看连接。",
   "port_label": "本地监听端口",
   "port_help": "只监听 127.0.0.1，避免无认证代理暴露到局域网。"
 }

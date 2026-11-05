@@ -13,7 +13,9 @@
 | 直连 / 代理 DNS | AliDNS / Google DoH | 国内外分别解析，代理 DNS 经主选择组 |
 | URLTest | 10 分钟、150 ms 容差 | 减少后台探测与频繁切换；不代表故障会立即切换 |
 | 日志 | warn | 保留错误和警告，减少日常输出 |
-| 广告过滤 | 不启用 | 基础配置优先保证连通性，避免额外规则误杀 |
+| 广告过滤 | 默认关闭，可选开启 | 基础配置优先保证连通性；网页或 CLI `--adblock` 可按需启用 `category-ads-all` |
+| 规则集下载 | 默认直连，可选走代理 | 无法直连规则 CDN 时，可启用 `--rule-set-proxy` 经主选择组下载 |
+| Clash API 面板 | 默认仅设置模式 | 桌面端可用 `--clash-api-port 9090` 开启 `127.0.0.1:9090` 本地控制器 |
 
 本地 HTTP/SOCKS 仅监听 `127.0.0.1:2080`。自动系统代理仍使用这个入口，启动时尝试设置系统 HTTP 代理，正常退出时恢复；不保证接管 UDP 或忽略系统代理的应用。
 
@@ -21,7 +23,7 @@
 
 RealIP 返回真实地址；FakeIP 对匹配国外规则的地址查询返回虚拟 IP，需要 TUN/VPN 正确接管 DNS。1.14+ FakeIP 还会使用响应评估判断国内 IP，具体版本差异见[兼容性](compatibility.md)。
 
-直连 DNS 默认 `223.5.5.5`，代理 DNS 默认 `8.8.8.8`；网页和 CLI 可选 AliDNS、Cloudflare、Google。高级 DNS 字段请修改私有模板，不要把普通 UDP DNS 的 IP 当作 DoH 服务。
+直连 DNS 默认 `223.5.5.5`，代理 DNS 默认 `8.8.8.8`；网页和 CLI 可选 AliDNS（`223.5.5.5`）、DNSPod（`1.12.12.12`）、Cloudflare（`1.1.1.1`）、Google（`8.8.8.8`）。高级 DNS 字段请修改私有模板，不要把普通 UDP DNS 的 IP 当作 DoH 服务。
 
 默认抑制 AAAA、HTTPS 和 SVCB 查询，并拒绝配置内的 IPv6 流量；本地 IPv6 绕行不受该拒绝规则控制。启用 IPv6 会同时：
 
@@ -51,7 +53,7 @@ node scripts/generate.mjs --platform linux --core 1.14 \
 | `direct` | 直接连接 |
 | `GLOBAL` | Clash API 的 Global 模式选择组 |
 
-所有应用组默认跟随 `select`，可切换 `auto` 或 `direct`。TCP、QUIC、其他 UDP 都遵循同一套应用规则，不为 UDP 偷换出口。`auto` 的 HTTPS 探测衡量连通性和延迟，不是 UDP 丢包或游戏体验测试。
+所有应用组默认跟随 `select`，也可切换为 `auto`、`direct` 或直接指定某个具体节点（例如主选择用低延迟节点、AI 或流媒体固定指定解锁节点）。TCP、QUIC、其他 UDP 都遵循同一套应用规则，不为 UDP 偷换出口。`auto` 的 HTTPS 探测衡量连通性和延迟，不是 UDP 丢包或游戏体验测试。
 
 手动选择 TCP-only 节点后，代理 UDP 可能失败，不能期待它自动使用其他节点或直连。全部节点仅支持 TCP 时也保留应用策略和直连规则；需要 UDP 的通话或游戏应添加支持 UDP 的节点。能力声明见[节点格式](nodes.md)。
 

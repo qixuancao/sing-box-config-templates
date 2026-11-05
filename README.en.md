@@ -17,7 +17,7 @@ Open the [configuration generator](https://qixuancao.github.io/sing-box-config-t
 2. Choose a device and traffic capture method. Core version, DNS and IPv6 are in Advanced.
 3. Generate and download `sing-box.json`, then import it in your client.
 
-Supports Naive HTTPS, Hysteria2, Trojan, Shadowsocks and VLESS links. Parsing, composition
+Supports Naive HTTPS, Hysteria2 (including port hopping), TUIC, AnyTLS, Trojan, VLESS, VMess, Shadowsocks and SOCKS5 links, as well as Base64 subscription text. Parsing, composition
 and downloads run in your browser; nodes are not uploaded or automatically stored. Save
 `nodes.json` to reuse your nodes for the next update.
 
@@ -28,7 +28,8 @@ or applications ignoring OS proxy settings. Automatic proxy changes depend on OS
 and privileges and are restored on shutdown.
 
 Advanced settings independently select RealIP/FakeIP DNS responses (FakeIP is disabled
-without DNS capture), DoH providers for direct and proxied traffic, IPv6, LAN bypass,
+without DNS capture), DoH providers (AliDNS, DNSPod, Cloudflare, Google) for direct and proxied traffic, IPv6, LAN bypass,
+basic ad blocking, proxied rule-set downloads, a desktop localhost Clash API controller (`127.0.0.1:9090`),
 and the mixed listener port. The page provides an equivalent CLI command including your
 options. Verify the downloaded file using `sing-box check -c sing-box.json`.
 

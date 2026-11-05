@@ -27,6 +27,42 @@ test('five link adapters preserve decoded credentials, TLS and transport', () =>
   assert.equal(document.udp_outbounds.includes(document.outbounds[0].tag), false);
 });
 
+test('Base64 subscription text, VMess, TUIC, AnyTLS, SOCKS5, Hysteria2 mport and WS early data', () => {
+  const vmessJson = Buffer.from(JSON.stringify({
+    v: '2', ps: 'VMess-WS', add: 'example.com', port: '443', id: uuid, aid: '0',
+    scy: 'auto', net: 'ws', type: 'none', host: 'example.com', path: '/ws?ed=2048', tls: 'tls', sni: 'example.com', alpn: 'h2,http/1.1', fp: 'chrome',
+  })).toString('base64');
+  const lines = [
+    `vmess://${vmessJson}`,
+    `vmess://${uuid}@example.com:443?security=tls&encryption=aes-128-gcm&type=ws&host=example.com&path=%2Fedge&ed=2048#VMess-URL`,
+    `tuic://${uuid}:tuic-pass@example.com:443?sni=example.com&alpn=h3&congestion_control=bbr&udp_relay_mode=native&zero_rtt_handshake=1#TUIC-Node`,
+    'anytls://any-pass@example.com:443?sni=example.com&fp=chrome#AnyTLS-Node',
+    'hy2://hy2-pass@example.com:443?sni=example.com&mport=20000-30000,35000&upmbps=100&downmbps=500#Hy2-Hop',
+    'socks5://' + Buffer.from('socks-user:socks-pass').toString('base64') + '@example.com:1080#SOCKS-Node',
+  ];
+  const subscription = Buffer.from(lines.join('\n')).toString('base64').replace(/(.{40})/g, '$1\n');
+  const parsed = parseNodes(subscription);
+  assert.equal(parsed.outbounds.length, 6);
+  assert.equal(parsed.udp_outbounds.length, 6);
+  assert.deepEqual(parsed.outbounds[0].transport, {
+    type: 'ws', path: '/ws', headers: {Host: 'example.com'},
+    max_early_data: 2048, early_data_header_name: 'Sec-WebSocket-Protocol',
+  });
+  assert.equal(parsed.outbounds[1].security, 'aes-128-gcm');
+  assert.equal(parsed.outbounds[1].transport.max_early_data, 2048);
+  assert.equal(parsed.outbounds[2].type, 'tuic');
+  assert.equal(parsed.outbounds[2].congestion_control, 'bbr');
+  assert.equal(parsed.outbounds[2].zero_rtt_handshake, true);
+  assert.equal(parsed.outbounds[3].type, 'anytls');
+  assert.deepEqual(parsed.outbounds[3].tls.utls, {enabled: true, fingerprint: 'chrome'});
+  assert.deepEqual(parsed.outbounds[4].server_ports, ['20000:30000', '35000:35000']);
+  assert.equal(parsed.outbounds[4].up_mbps, 100);
+  assert.equal(parsed.outbounds[4].down_mbps, 500);
+  assert.equal(parsed.outbounds[5].type, 'socks');
+  assert.equal(parsed.outbounds[5].username, 'socks-user');
+  assert.equal(parsed.outbounds[5].password, 'socks-pass');
+});
+
 test('legacy SS, IPv6, Unicode names and colliding link names', () => {
   const legacy = 'ss://' + btoa('aes-128-gcm:example-password@203.0.113.7:8388') + '#Legacy';
   assert.equal(parseNodes(legacy).outbounds[0].server, '203.0.113.7');
@@ -194,6 +230,9 @@ test('application policies are identical for TCP and UDP, with capability-aware 
     const mixed = renderConfig(template, {outbounds: [tcp, udp]});
     assert.deepEqual(mixed.outbounds.find(n => n.tag === 'auto').outbounds, ['udp']);
     assert.ok(mixed.outbounds.find(n => n.tag === 'select').outbounds.includes('tcp'));
+    for (const service of ['streaming', 'ai', 'telegram', 'microsoft', 'apple', 'google', 'github']) {
+      assert.deepEqual(mixed.outbounds.find(n => n.tag === service).outbounds, ['select', 'auto', 'direct', 'tcp', 'udp']);
+    }
     assert.deepEqual(mixed.route.rules, template.route.rules);
   }
 });
@@ -300,14 +339,22 @@ test('advanced ingress and DNS configuration is real, isolated and validated', (
   const sample = PROFILES[profilePath('linux', '1.14', 'mixed')];
   const original = JSON.stringify(sample);
   const edited = customizeTemplate(sample, {
-    systemProxy: true, listenPort: 3128, directDns: '1.1.1.1', proxyDns: '8.8.8.8',
+    systemProxy: true, listenPort: 3128, directDns: '1.12.12.12', proxyDns: '8.8.8.8',
+    adblock: true, ruleSetProxy: true, clashApiPort: 9090,
     dnsTemplate: PROFILES[profilePath('android', '1.14', 'realip')]
   });
   assert.equal(edited.inbounds[0].set_system_proxy, true);
   assert.equal(edited.inbounds[0].listen_port, 3128);
-  assert.equal(edited.dns.servers.find(item => item.tag === 'direct-dns').server, '1.1.1.1');
-  assert.equal(edited.dns.servers.find(item => item.tag === 'direct-dns-bootstrap').server, '1.1.1.1');
+  assert.equal(edited.dns.servers.find(item => item.tag === 'direct-dns').server, '1.12.12.12');
+  assert.equal(edited.dns.servers.find(item => item.tag === 'direct-dns-bootstrap').server, '1.12.12.12');
   assert.equal(edited.dns.servers.find(item => item.tag === 'proxy-dns').server, '8.8.8.8');
+  assert.equal(edited.route.rule_set.some(item => item.tag === 'category-ads-all' && item.http_client === 'rule-set-direct'), true);
+  assert.equal(edited.route.rules.some(item => item.rule_set === 'category-ads-all' && item.action === 'reject'), true);
+  assert.equal(edited.dns.rules.some(item => item.rule_set === 'category-ads-all' && item.action === 'reject'), true);
+  assert.equal(edited.http_clients.find(item => item.tag === 'rule-set-direct').detour, 'select');
+  assert.equal(edited.experimental.clash_api.external_controller, '127.0.0.1:9090');
+  const legacyEdited = customizeTemplate(PROFILES[profilePath('linux', '1.13', 'mixed')], {adblock: true, ruleSetProxy: true});
+  assert.ok(legacyEdited.route.rule_set.every(item => item.download_detour === 'select'));
   assert.equal(JSON.stringify(sample), original, 'preset must not be mutated');
   assert.equal(renderConfig(edited, {outbounds: [udp]}).inbounds[0].set_system_proxy, true);
   const local = customizeTemplate(sample);

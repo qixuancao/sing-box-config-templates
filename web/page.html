@@ -57,9 +57,12 @@
 <div><label for="dns-mode">$dns_mode_label</label><select id="dns-mode"><option value="fakeip">$dns_fakeip</option><option value="realip">$dns_realip</option></select><p class="help" id="dns-desc">$dns_help</p></div>
 <div><label><input type="checkbox" id="ipv6"> $ipv6_label</label><p class="help">$ipv6_help</p></div>
 <div id="lan-setting"><label><input type="checkbox" id="lan-bypass" checked> $lan_label</label><p class="help">$lan_help</p></div>
+<div><label><input type="checkbox" id="adblock"> $adblock_label</label><p class="help">$adblock_help</p></div>
+<div><label><input type="checkbox" id="rule-set-proxy"> $rule_set_proxy_label</label><p class="help">$rule_set_proxy_help</p></div>
+<div id="clash-api-setting"><label><input type="checkbox" id="clash-api"> $clash_api_label</label><p class="help">$clash_api_help</p></div>
 <div class="dns-grid">
-<div><label for="direct-dns">$direct_dns_label</label><select id="direct-dns"><option value="default">$dns_default</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option></select></div>
-<div><label for="proxy-dns">$proxy_dns_label</label><select id="proxy-dns"><option value="default">$dns_default</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option></select></div>
+<div><label for="direct-dns">$direct_dns_label</label><select id="direct-dns"><option value="default">$dns_default</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.12.12.12">DNSPod · 1.12.12.12</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option></select></div>
+<div><label for="proxy-dns">$proxy_dns_label</label><select id="proxy-dns"><option value="default">$dns_default</option><option value="8.8.8.8">Google · 8.8.8.8</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.12.12.12">DNSPod · 1.12.12.12</option></select></div>
 </div>
 <p class="help">$dns_upstream_help</p>
 <div id="port-setting"><label for="listen-port">$port_label</label><input type="number" id="listen-port" min="1" max="65535" step="1" value="2080"><p class="help">$port_help</p></div>
