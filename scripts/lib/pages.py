@@ -119,10 +119,12 @@ def check_page(path, *, root, lang, canonical, other_hreflang):
     expect({"zh-CN", "en"} <= set(hreflangs), "missing zh-CN/en hreflang")
     expect(hreflangs.get(other_hreflang[0]) == other_hreflang[1], "incorrect alternate language URL")
     expect(any(link.get("rel") == "sitemap" and "sitemap.xml" in link.get("href", "") for link in info.links), "missing sitemap link")
-    for prop in ("og:title", "og:description", "og:url", "og:type", "og:locale"):
+    for prop in ("og:title", "og:description", "og:url", "og:type", "og:locale",
+                 "og:image", "og:image:type", "og:image:width", "og:image:height", "og:image:alt"):
         expect(meta_ok(property=prop), f"missing {prop}")
-    for name in ("twitter:card", "twitter:title", "twitter:description"):
+    for name in ("twitter:card", "twitter:title", "twitter:description", "twitter:image", "twitter:image:alt"):
         expect(meta_ok(name=name), f"missing {name}")
+    expect((root / "docs/assets/og-preview.png").is_file(), "missing docs/assets/og-preview.png")
     for script in info.scripts:
         expect(not script.get("src", "").startswith(("http://", "https://", "//")), "external script")
     for analytics in ("google-analytics", "googletagmanager", "matomo", "umami", "plausible", "hotjar"):

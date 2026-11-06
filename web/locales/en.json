@@ -3,6 +3,7 @@
   "locale": "en_US",
   "title": "sing-box config generator · Build and download JSON locally",
   "description": "Paste node links, choose Android, iOS, macOS, Linux or Windows, and download a complete sing-box JSON configuration. Runs in your browser with 1.13 / 1.14 presets and no generator installation.",
+  "og_image_alt": "sing-box browser-based config generator preview: paste node links, choose your device and traffic mode, and download JSON",
   "skip": "Skip to the config generator",
   "brand": "config generator",
   "nav_label": "Language and repository",

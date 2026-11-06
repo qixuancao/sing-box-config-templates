@@ -3,6 +3,7 @@
   "locale": "zh_CN",
   "title": "sing-box 配置生成器 · 本地生成并下载 JSON",
   "description": "粘贴节点分享链接，选择 Android、iOS、macOS、Linux 或 Windows，在浏览器内生成并下载完整 sing-box JSON 配置。支持 1.13 / 1.14，无需安装生成工具。",
+  "og_image_alt": "sing-box 浏览器本地配置生成器界面预览：支持粘贴节点链接、选择平台与流量模式并下载完整 JSON",
   "skip": "跳到配置生成器",
   "brand": "配置生成器",
   "nav_label": "语言与仓库",

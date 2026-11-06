@@ -2,6 +2,7 @@
 
 - [GIF preview](generator-demo.gif) — 960 × 810, looping.
 - [MP4 video](generator-demo.mp4) — 1280 × 1080, H.264, silent, approximately 6 seconds.
+- [Social preview](../og-preview.png) — 1200 × 630, PNG for Open Graph (`og:image`) and GitHub Social Preview.
 - Captured on 2026-11-05 from the [public generator](https://qixuancao.github.io/sing-box-config-templates/) in Firefox on macOS.
 
 The walkthrough uses frame-by-frame captures of actual browser interactions, edited with readable holds and bilingual step captions. Browser chrome, bookmarks and the sidebar are cropped out. The native Firefox download panel is retained as an inset so its completion status is readable.

@@ -1,0 +1,14 @@
+# Generated outputs (built by scripts/build.py)
+platforms/** linguist-generated=true
+docs/index.html linguist-generated=true
+docs/en/index.html linguist-generated=true
+SUBSCRIPTIONS.md linguist-generated=true
+
+# Hand-written generator core and styles under docs/assets/
+docs/assets/*.mjs linguist-documentation=false
+docs/assets/core/** linguist-documentation=false
+docs/assets/*.css linguist-documentation=false
+
+# Generated browser data bundles under docs/assets/
+docs/assets/presets.mjs linguist-generated=true
+docs/assets/profiles.mjs linguist-generated=true
