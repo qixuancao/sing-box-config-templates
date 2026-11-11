@@ -119,6 +119,7 @@ function generate() {
     if (example) warnings.push(t('当前是演示节点。请替换成自己的节点后再连接。', 'These are demonstration nodes. Replace them with your own before connecting.'));
     if (!nodes.udp_outbounds.length) warnings.push(t('这些节点未声明 UDP 能力；代理 UDP 无法保证可用，不会自动改走直连。', 'These nodes have no declared UDP capability; proxied UDP may fail and will not fall back to direct.'));
     else if (nodes.udp_outbounds.length < nodes.outbounds.length) warnings.push(t('自动选择仅使用支持 UDP 的节点，以保持 TCP/UDP 出口一致；其他节点可手动选择。', 'Automatic selection uses UDP-capable nodes for a consistent TCP/UDP exit; other nodes remain available manually.'));
+    if (nodes.udp_outbounds.length < nodes.outbounds.length && !blockQuic.checked) warnings.push(t('如需手动选择只支持 TCP 的节点（如链式 SOCKS5），建议在高级设置勾选“屏蔽公网 QUIC”，否则 YouTube、Play 商店等 QUIC 连接可能长时间卡住。', 'If you manually select a TCP-only node (such as chained SOCKS5), enable "Block public QUIC" in Advanced; otherwise QUIC connections from YouTube, Play Store and others may stall.'));
     if (nodes.outbounds.some(node => node.tls?.insecure)) warnings.push(t('部分节点关闭了证书校验，请确认这是你的预期设置。', 'Some nodes disable TLS certificate verification; confirm this is intentional.'));
     if (nodes.outbounds.some(node => node.type === 'naive')) warnings.push(t('Naive 需要客户端内核包含 Naive 支持；Linux / Windows 请保留官方包内的 Cronet 库。', 'Naive requires a compatible core; keep the bundled Cronet library on Linux / Windows.'));
     byId('warnings').textContent = warnings.join(' '); byId('warnings').hidden = !warnings.length;
