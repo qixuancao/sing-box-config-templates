@@ -20,6 +20,7 @@
 
 ### 修复
 
+- 调整路由与 DNS 规则优先级：将已知海外服务规则（如 `google`、`youtube`、`category-ai-!cn`）置于 `geosite-cn` 之前，避免 `googleapis.cn`、`gstatic.cn`、`ggpht.cn` 等域名在 Android 等环境下被误判为国内直连；同时将路由 `resolve` 移至域名分流规则之后、仅用于未知域名的 `geoip-cn` / 私网 IP 兜底，保留代理出站（含链式 SOCKS5）的原始域名与 FakeIP 0-RTT 建连（[#6](https://github.com/qixuancao/sing-box-config-templates/issues/6)）。
 - 修复 Android TUN 配置缺少 `route.auto_detect_interface` 的问题，覆盖三条内核兼容线及网页/CLI 生成结果（[#4](https://github.com/qixuancao/sing-box-config-templates/issues/4)）；不默认启用 `override_android_vpn`，Android 上下行仍需实机复测。
 - 将 1.15 实验检查器及双语界面统一到 alpha.13，补充出站组成员唯一性测试；纠正 TUN `stack` 弃用时间和实验配置数量说明。
 - 修复旧版 Shadowsocks Base64 分享链接中特殊字符密码被误解析或静默修改的问题，保留原始密码与 IPv6 地址。

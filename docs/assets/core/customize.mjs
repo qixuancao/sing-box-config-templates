@@ -68,6 +68,9 @@ export function customizeTemplate(template, {dnsTemplate = null, systemProxy = f
     for (const rule of config.route.rules) {
       if (rule.action === 'resolve') rule.strategy = 'prefer_ipv4';
     }
+    if (object(config.route.default_domain_resolver)) {
+      config.route.default_domain_resolver.strategy = 'prefer_ipv4';
+    }
     for (const inbound of config.inbounds) {
       if (inbound.type !== 'tun') continue;
       requireValue(Array.isArray(inbound.address), 'template');

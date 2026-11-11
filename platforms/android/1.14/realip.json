@@ -46,6 +46,20 @@
         "server": "proxy-dns"
       },
       {
+        "rule_set": [
+          "category-ai-!cn",
+          "youtube",
+          "netflix",
+          "spotify",
+          "tiktok",
+          "telegram",
+          "google",
+          "github"
+        ],
+        "action": "route",
+        "server": "proxy-dns"
+      },
+      {
         "rule_set": "geosite-cn",
         "action": "route",
         "server": "direct-dns"
@@ -246,10 +260,6 @@
         "action": "hijack-dns"
       },
       {
-        "action": "resolve",
-        "strategy": "ipv4_only"
-      },
-      {
         "ip_version": 6,
         "action": "reject"
       },
@@ -269,31 +279,6 @@
         "outbound": "GLOBAL"
       },
       {
-        "rule_set": "geosite-private",
-        "action": "route",
-        "outbound": "direct"
-      },
-      {
-        "rule_set": "geosite-cn",
-        "action": "route",
-        "outbound": "direct"
-      },
-      {
-        "type": "logical",
-        "mode": "and",
-        "rules": [
-          {
-            "rule_set": "geoip-cn"
-          },
-          {
-            "rule_set": "geolocation-!cn",
-            "invert": true
-          }
-        ],
-        "action": "route",
-        "outbound": "direct"
-      },
-      {
         "rule_set": "category-ai-!cn",
         "action": "route",
         "outbound": "ai"
@@ -305,11 +290,6 @@
       },
       {
         "rule_set": "netflix",
-        "action": "route",
-        "outbound": "streaming"
-      },
-      {
-        "rule_set": "disney",
         "action": "route",
         "outbound": "streaming"
       },
@@ -329,6 +309,31 @@
         "outbound": "telegram"
       },
       {
+        "rule_set": "google",
+        "action": "route",
+        "outbound": "google"
+      },
+      {
+        "rule_set": "github",
+        "action": "route",
+        "outbound": "github"
+      },
+      {
+        "rule_set": "geosite-private",
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "geosite-cn",
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "disney",
+        "action": "route",
+        "outbound": "streaming"
+      },
+      {
         "rule_set": "microsoft",
         "action": "route",
         "outbound": "microsoft"
@@ -344,19 +349,23 @@
         "outbound": "apple"
       },
       {
-        "rule_set": "google",
-        "action": "route",
-        "outbound": "google"
-      },
-      {
-        "rule_set": "github",
-        "action": "route",
-        "outbound": "github"
-      },
-      {
         "rule_set": "geolocation-!cn",
         "action": "route",
         "outbound": "select"
+      },
+      {
+        "action": "resolve",
+        "strategy": "ipv4_only"
+      },
+      {
+        "ip_is_private": true,
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "geoip-cn",
+        "action": "route",
+        "outbound": "direct"
       }
     ],
     "rule_set": [
@@ -475,7 +484,8 @@
     ],
     "final": "select",
     "default_domain_resolver": {
-      "server": "direct-dns"
+      "server": "direct-dns",
+      "strategy": "ipv4_only"
     },
     "default_http_client": "rule-set-direct",
     "auto_detect_interface": true

@@ -225,6 +225,8 @@ class CoreContractsTest(unittest.TestCase):
             ("android/1.14/realip", lambda c: c["route"]["rule_set"].append({"tag": "category-ads-all", "type": "local"})),
             ("android/1.14/realip", lambda c: c["log"].update(level="debug")),
             ("android/1.14/realip", lambda c: c["route"]["rules"].insert(0, {"network": "udp", "outbound": "auto"})),
+            ("android/1.14/fakeip", lambda c: c["route"]["rules"].insert(0, {"action": "resolve", "strategy": "ipv4_only"})),
+            ("android/1.14/fakeip", lambda c: c["route"]["default_domain_resolver"].pop("strategy", None)),
         ]
         for name, mutate in cases:
             with self.subTest(name=name):

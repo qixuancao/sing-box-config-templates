@@ -45,6 +45,37 @@
         "server": "proxy-dns"
       },
       {
+        "rule_set": [
+          "category-ai-!cn",
+          "youtube",
+          "netflix",
+          "spotify",
+          "tiktok",
+          "telegram",
+          "google",
+          "github"
+        ],
+        "query_type": [
+          "A"
+        ],
+        "action": "route",
+        "server": "fakeip"
+      },
+      {
+        "rule_set": [
+          "category-ai-!cn",
+          "youtube",
+          "netflix",
+          "spotify",
+          "tiktok",
+          "telegram",
+          "google",
+          "github"
+        ],
+        "action": "route",
+        "server": "proxy-dns"
+      },
+      {
         "rule_set": "geosite-cn",
         "action": "route",
         "server": "direct-dns"

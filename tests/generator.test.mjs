@@ -399,6 +399,7 @@ test('IPv6 settings update DNS, routing and TUN together without bypassing virtu
     assert.equal(dual.dns.rules.some(r => r.action === 'predefined' && r.query_type.includes('AAAA')), false);
     assert.equal(dual.route.rules.some(r => r.ip_version === 6 && r.action === 'reject'), false);
     assert.ok(dual.route.rules.filter(r => r.action === 'resolve').every(r => r.strategy === 'prefer_ipv4'));
+    assert.equal(dual.route.default_domain_resolver.strategy, 'prefer_ipv4');
     for (const server of dual.dns.servers.filter(s => s.type === 'fakeip')) {
       assert.equal(server.inet6_range, 'fc00::/18');
       assert.ok(dual.dns.rules.some(r => r.server === server.tag && r.query_type.includes('AAAA')));
