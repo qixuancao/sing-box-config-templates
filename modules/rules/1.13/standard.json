@@ -27,6 +27,18 @@
         "outbound": "direct"
       },
       {
+        "ip_cidr": [
+          "100.64.0.0/10"
+        ],
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "protocol": "ntp",
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
         "clash_mode": "Direct",
         "action": "route",
         "outbound": "direct"
@@ -117,6 +129,13 @@
       },
       {
         "ip_is_private": true,
+        "action": "route",
+        "outbound": "direct"
+      },
+      {
+        "ip_cidr": [
+          "100.64.0.0/10"
+        ],
         "action": "route",
         "outbound": "direct"
       },

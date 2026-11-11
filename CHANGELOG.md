@@ -18,7 +18,13 @@
 - 三套内核集成测试、双语网页组合、下载与重新导入测试，以及 macOS 工具检查。
 - Raw 链接清单由平台目录声明自动生成；集中提供默认值与配置取舍说明。
 
+- 新增可选“屏蔽公网 QUIC（UDP 443）”（`--block-quic`），适合纯 TCP 节点或 UDP 受限网络；新增桌面端“虚拟局域网兼容”（`--overlay`），提供 Tailscale MagicDNS、按系统路由表直连私网与 `100.64.0.0/10`，以及组网守护进程直连。
+- 默认配置将 NTP（嗅探识别）直连，避免系统时间错误与代理握手互相依赖。
+
 ### 修复
+
+- `ip_is_private` 不包含 `100.64.0.0/10`：默认配置在私网直连规则后显式直连该共享地址段，避免系统代理或关闭 LAN 绕行时把 Tailscale、运营商内部地址发往远端节点。
+- DNS 规则补充 `geosite-private` 使用直连 DNS，路由器管理域名、`.lan` / `.local` 等私有名称及私网反向解析不再发往代理 DNS 或返回 FakeIP。
 
 - 调整路由与 DNS 规则优先级：将已知海外服务规则（如 `google`、`youtube`、`category-ai-!cn`）置于 `geosite-cn` 之前，避免 `googleapis.cn`、`gstatic.cn`、`ggpht.cn` 等域名在 Android 等环境下被误判为国内直连；同时将路由 `resolve` 移至域名分流规则之后、仅用于未知域名的 `geoip-cn` / 私网 IP 兜底，保留代理出站（含链式 SOCKS5）的原始域名与 FakeIP 0-RTT 建连（[#6](https://github.com/qixuancao/sing-box-config-templates/issues/6)）。
 - 修复 Android TUN 配置缺少 `route.auto_detect_interface` 的问题，覆盖三条内核兼容线及网页/CLI 生成结果（[#4](https://github.com/qixuancao/sing-box-config-templates/issues/4)）；不默认启用 `override_android_vpn`，Android 上下行仍需实机复测。

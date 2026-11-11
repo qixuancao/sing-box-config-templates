@@ -69,6 +69,8 @@
 <div id="lan-setting"><label><input type="checkbox" id="lan-bypass" checked> 局域网绕过 TUN</label><p class="help">默认方便访问路由器和 NAS；绕行流量不受代理策略控制。企业网或覆盖网络需要接管这些地址时取消。</p></div>
 <div><label><input type="checkbox" id="adblock"> 启用基础广告拦截（category-ads-all）</label><p class="help">在 DNS 和路由中拒绝常见广告域名；若个别网站或应用被误拦，取消勾选后重新生成。</p></div>
 <div><label><input type="checkbox" id="rule-set-proxy"> 经代理由主选择组下载规则集</label><p class="help">默认直连下载规则集；当前网络无法直连规则 CDN 时可改为经代理下载。</p></div>
+<div><label><input type="checkbox" id="block-quic"> 屏蔽公网 QUIC（UDP 443）</label><p class="help">拒绝公网 UDP 443，让浏览器和应用立即回退 TCP。适合纯 TCP 节点（Naive、HTTP、链式 SOCKS5）或 UDP 受限的网络；会关闭 HTTP/3，局域网不受影响。</p></div>
+<div id="overlay-setting"><label><input type="checkbox" id="overlay"> 虚拟局域网兼容（Tailscale / ZeroTier 等，桌面端）</label><p class="help">ts.net 交给 Tailscale MagicDNS（100.100.100.100），私网和 100.64.0.0/10 按系统路由表直连，tailscaled、zerotier-one、easytier-core、netbird 进程直连。需安装对应客户端；TUN 模式需保留局域网绕过。</p></div>
 <div id="clash-api-setting"><label><input type="checkbox" id="clash-api"> 启用本地 Clash API 控制器（127.0.0.1:9090）</label><p class="help">方便桌面命令行运行时通过本地面板切换策略组和查看连接。</p></div>
 <div class="dns-grid">
 <div><label for="direct-dns">直连 DNS（默认 AliDNS）</label><select id="direct-dns"><option value="default">跟随预设</option><option value="223.5.5.5">AliDNS · 223.5.5.5</option><option value="1.12.12.12">DNSPod · 1.12.12.12</option><option value="1.1.1.1">Cloudflare · 1.1.1.1</option><option value="8.8.8.8">Google · 8.8.8.8</option></select></div>

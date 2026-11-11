@@ -316,6 +316,8 @@ test('CLI output is private and atomic, preserves old files and refuses input al
       ['--platform', 'android', '--port', '2080'],
       ['--platform', 'android', '--clash-api-port', '9090'],
       ['--platform', 'linux', '--port', '9090', '--clash-api-port', '9090'],
+      ['--platform', 'android', '--overlay'],
+      ['--platform', 'linux', '--access', 'tun', '--no-lan-bypass', '--overlay'],
     ]) {
       const before = read(output, 'utf8');
       assert.notEqual(run(['--input', source, '--output', output, ...options]).status, 0, options.join(' '));
@@ -449,4 +451,41 @@ test('Android TUN presets and CLI/browser customization preserve auto_detect_int
       }
     }
   } finally { rmSync(directory, {recursive: true, force: true}); }
+});
+
+test('QUIC blocking and overlay compatibility are opt-in, ordered and never loop through TUN', () => {
+  const CGNAT = {ip_cidr: ['100.64.0.0/10'], action: 'route', outbound: 'direct'};
+  for (const [path, base] of Object.entries(PROFILES)) {
+    const before = JSON.stringify(base);
+    // Defaults: CGNAT and NTP direct, private names via direct DNS, no opt-in objects.
+    assert.equal(base.route.rules.filter(r => JSON.stringify(r) === JSON.stringify(CGNAT)).length, 2, path);
+    assert.ok(base.route.rules.some(r => r.protocol === 'ntp' && r.outbound === 'direct'), path);
+    assert.ok(base.dns.rules.some(r => r.rule_set === 'geosite-private' && r.server === 'direct-dns'), path);
+    assert.equal(base.route.rules.some(r => r.network === 'udp'), false, path);
+    const quic = customizeTemplate(base, {blockQuic: true});
+    const index = quic.route.rules.findIndex(r => r.network === 'udp' && r.port === 443);
+    assert.deepEqual(quic.route.rules[index], {network: 'udp', port: 443, action: 'reject', method: 'default', no_drop: true});
+    assert.equal(quic.route.rules[index + 1].clash_mode, 'Direct', path);
+    assert.ok(quic.route.rules.slice(0, index).some(r => r.ip_is_private === true), 'LAN rules stay ahead of QUIC blocking');
+    assert.equal(JSON.stringify(base), before);
+  }
+  for (const [platform, scenario] of [['linux', 'tun'], ['windows', 'mixed'], ['macos', 'fakeip'], ['macos', 'mixed']]) {
+    const base = PROFILES[profilePath(platform, '1.14', scenario)];
+    const edited = customizeTemplate(base, {overlay: true, ipv6: true});
+    assert.deepEqual(edited.outbounds.find(o => o.tag === 'overlay-direct'), {type: 'direct', tag: 'overlay-direct', inet4_bind_address: '0.0.0.0'});
+    assert.deepEqual(edited.dns.servers.find(s => s.tag === 'tailscale-dns'), {type: 'udp', tag: 'tailscale-dns', server: '100.100.100.100', inet4_bind_address: '0.0.0.0'});
+    const dnsIndex = edited.dns.rules.findIndex(r => r.server === 'tailscale-dns');
+    assert.ok(dnsIndex >= 0 && dnsIndex < edited.dns.rules.findIndex(r => r.clash_mode === 'Direct'));
+    assert.equal(edited.route.rules.filter(r => r.outbound === 'overlay-direct').length, 4);
+    assert.equal(edited.route.rules.some(r => (r.ip_is_private || r.ip_cidr) && r.outbound === 'direct'), false);
+    const resolveIndex = edited.route.rules.findIndex(r => r.action === 'resolve' && r.server === 'tailscale-dns');
+    assert.equal(edited.route.rules[resolveIndex].strategy, 'prefer_ipv4');
+    assert.ok(resolveIndex < edited.route.rules.findIndex(r => r.ip_is_private === true));
+    assert.ok(edited.route.rules.find(r => r.process_name)?.process_name.includes('tailscaled'));
+    const rendered = renderConfig(edited, {outbounds: [udp]});
+    assert.ok(rendered.outbounds.some(o => o.tag === 'overlay-direct'));
+  }
+  const tun = PROFILES[profilePath('linux', '1.14', 'tun')];
+  assert.throws(() => customizeTemplate(tun, {overlay: true, lanBypass: false}), {code: 'overlay-lan'});
+  for (const language of ['zh', 'en']) assert.match(errorMessage(new ConfigError('overlay-lan'), language), /TUN/);
 });

@@ -34,6 +34,7 @@ const MESSAGES = {
   profile: ['请选择有效的平台、版本和使用场景。', 'Choose a supported platform, core version and scenario.'],
   'listener-access': ['监听端口和系统代理只适用于“仅监听端口”或“自动系统代理”接入方式；TUN 不使用 --port。', 'Listener port and OS proxy apply only to local or system proxy access; TUN does not use --port.'],
   'fakeip-access': ['FakeIP 需要 TUN / VPN 接管 DNS；仅监听端口或系统代理模式请使用 RealIP。', 'FakeIP requires TUN / VPN DNS capture; use RealIP with local or system proxy access.'],
+  'overlay-lan': ['虚拟局域网兼容需要桌面端，并在 TUN 模式下保留“局域网绕过 TUN”。', 'Overlay network compatibility is desktop-only and requires local network bypass in TUN mode.'],
   'dns-server': ['DNS 服务商仅支持 223.5.5.5、1.12.12.12、1.1.1.1 或 8.8.8.8。', 'DNS provider must be 223.5.5.5, 1.12.12.12, 1.1.1.1 or 8.8.8.8.'],
   template: ['模板不完整，请更新页面后重试。', 'Incomplete template; update the page and retry.'],
   reference: ['节点引用了不存在的出站、DNS 或规则集，请检查节点 JSON。', 'A node references a missing outbound, DNS server or rule set; check the nodes JSON.'],

@@ -32,6 +32,24 @@
   改变路由效果；配置和内核静态检查不等于实机连通性测试。
 - 远程 Linux 机器修改 TUN 路由前，请保留其他管理连接及回退措施。
 
+## 虚拟局域网（Tailscale / ZeroTier 等）
+
+`ip_is_private` 只匹配 RFC 1918 和 ULA，不包含 Tailscale、EasyTier、NetBird
+及运营商内部服务使用的 `100.64.0.0/10`。因此所有配置都在私网直连规则后显式加入
+`100.64.0.0/10` 直连，系统代理模式下也不会把这些地址发往远端节点。
+
+桌面端（`auto_detect_interface` 开启）的普通 `direct` 出站会绑定默认网卡，
+无法到达 `tailscale0`、`zt*` 等虚拟网卡。需要通过 sing-box 访问虚拟局域网时，
+在网页高级设置勾选“虚拟局域网兼容”，或使用 CLI `--overlay`：
+
+- 新增 `overlay-direct` 出站（`inet4_bind_address: 0.0.0.0`），私网与 `100.64.0.0/10`
+  由系统路由表选择网卡；
+- `ts.net` 交给 Tailscale MagicDNS `100.100.100.100` 解析；
+- `tailscaled`、`zerotier-one`、`easytier-core`、`netbird` 进程直连，避免节点间打洞流量进入代理。
+
+该选项仅用于桌面端，需安装对应客户端；TUN 模式必须保留局域网绕行，
+否则未绑定网卡的连接会回到 TUN。Android / iOS 同时只能运行一个 VPN，不提供此选项。
+
 代码位于 `scripts/lib/lan_routes.py`；`modules/catalog.json` 中
 `platforms.*.lan_bypass` 控制默认平台策略，`docs/assets/core/customize.mjs` 应用用户的 IPv6 和绕行选项。
 测试在 `tests/test_lan_routes.py`。

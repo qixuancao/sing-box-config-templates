@@ -162,6 +162,29 @@ try {
     assert.deepEqual(JSON.parse(await readFile(cliOutput, 'utf8')), dual, 'Web and advertised CLI options must produce identical JSON');
     await evaluate("document.getElementById('ipv6').click(); document.getElementById('lan-bypass').click(); document.getElementById('adblock').click(); document.getElementById('rule-set-proxy').click(); document.getElementById('clash-api').click(); document.getElementById('generate').click()");
     assert.equal(JSON.parse(await evaluate("document.getElementById('json-preview').value")).dns.strategy, 'ipv4_only');
+    // QUIC blocking and overlay compatibility: web output must equal the advertised CLI command.
+    assert.equal(await evaluate("document.getElementById('overlay-setting').hidden"), false);
+    await evaluate("document.getElementById('block-quic').click(); document.getElementById('overlay').click(); document.getElementById('generate').click()");
+    assert.equal(await generated(), true, await evaluate("document.getElementById('status').textContent"));
+    const overlaid = JSON.parse(await evaluate("document.getElementById('json-preview').value"));
+    assert.ok(overlaid.route.rules.some(r => r.network === 'udp' && r.port === 443 && r.action === 'reject'));
+    assert.ok(overlaid.outbounds.some(o => o.tag === 'overlay-direct'));
+    assert.ok(overlaid.dns.servers.some(s => s.tag === 'tailscale-dns'));
+    const overlayCommand = (await evaluate("document.getElementById('out-cmd').value")).split('\n')[0].split(' ').slice(2);
+    assert.ok(overlayCommand.includes('--block-quic') && overlayCommand.includes('--overlay'));
+    overlayCommand[overlayCommand.indexOf('--input') + 1] = '-';
+    const overlayOutput = join(temporary, 'cli-overlay.json');
+    overlayCommand[overlayCommand.indexOf('--output') + 1] = overlayOutput;
+    const overlayCli = spawnSync(process.execPath, [fileURLToPath(new URL('../scripts/generate.mjs', import.meta.url)), ...overlayCommand], {input: sample, encoding: 'utf8'});
+    assert.equal(overlayCli.status, 0, overlayCli.stderr);
+    assert.deepEqual(JSON.parse(await readFile(overlayOutput, 'utf8')), overlaid, 'Web and CLI overlay/QUIC output must match');
+    await evaluate("document.getElementById('lan-bypass').click(); document.getElementById('generate').click()");
+    assert.equal(await evaluate("document.getElementById('download-json').disabled"), true, 'Overlay without LAN bypass must be refused in TUN');
+    await evaluate("document.getElementById('lan-bypass').click(); document.getElementById('block-quic').click(); document.getElementById('overlay').click()");
+    await evaluate("document.getElementById('platform').value='android'; document.getElementById('platform').dispatchEvent(new Event('change'))");
+    assert.equal(await evaluate("document.getElementById('overlay-setting').hidden"), true);
+    await evaluate("document.getElementById('platform').value='linux'; document.getElementById('platform').dispatchEvent(new Event('change'))");
+    await evaluate("document.getElementById('access-mode').value='tun'; document.getElementById('access-mode').dispatchEvent(new Event('change'))");
     assert.equal(requests.length, before, 'Generation must make no network requests');
     // A changed input or device must invalidate an earlier successful result.
     const deep = '{"type":"http","tag":"DO-NOT-ECHO","server":"example.com","server_port":443,"extra":' + '['.repeat(60000) + '0' + ']'.repeat(60000) + '}';

@@ -16,6 +16,8 @@
 | 广告过滤 | 默认关闭，可选开启 | 基础配置优先保证连通性；网页或 CLI `--adblock` 可按需启用 `category-ads-all` |
 | 规则集下载 | 默认直连，可选走代理 | 无法直连规则 CDN 时，可启用 `--rule-set-proxy` 经主选择组下载 |
 | Clash API 面板 | 默认仅设置模式 | 桌面端可用 `--clash-api-port 9090` 开启 `127.0.0.1:9090` 本地控制器 |
+| 公网 QUIC（UDP 443） | 默认按应用策略转发，可选屏蔽 | 纯 TCP 节点（Naive、HTTP、链式 SOCKS5）或 UDP 受限网络可用 `--block-quic`，让应用立即回退 TCP；会关闭 HTTP/3，局域网不受影响 |
+| 虚拟局域网 | 默认 `100.64.0.0/10` 直连，可选兼容模式 | 桌面端 `--overlay` 增加 Tailscale MagicDNS 与按系统路由表直连的私网出口，见[局域网绕行](lan-bypass.md#虚拟局域网tailscale--zerotier-等) |
 
 本地 HTTP/SOCKS 仅监听 `127.0.0.1:2080`。自动系统代理仍使用这个入口，启动时尝试设置系统 HTTP 代理，正常退出时恢复；不保证接管 UDP 或忽略系统代理的应用。
 
@@ -59,11 +61,11 @@ node scripts/generate.mjs --platform linux --core 1.14 \
 
 ## 规则顺序
 
-1. 嗅探；TUN 劫持 DNS；解析域名；默认拒绝 IPv6。
-2. 私有 IP 直连，处理 Direct / Global 模式。
-3. 私有域名、国内域名和可信国内 IP 直连。
-4. AI、流媒体及其他应用进入各自策略组。
-5. 国外域名和未匹配流量走 `select`。
+1. 嗅探；TUN 劫持 DNS；默认拒绝 IPv6。
+2. 私有 IP、`100.64.0.0/10`（`ip_is_private` 不包含此共享地址段）和 NTP 直连，处理 Direct / Global 模式。
+3. AI、YouTube、Netflix、Spotify、TikTok、Telegram、Google、GitHub 进入各自策略组；它们排在国内规则之前，避免 `googleapis.cn` 等被国内后缀误判。
+4. 私有域名、国内域名直连；随后 Disney、Microsoft、Apple 进入各自策略组，其国内 CDN 仍按国内规则直连。
+5. 国外域名走 `select`；仅剩未匹配的域名才解析，按私网 / 国内 IP 直连，其余走 `select`。
 
 应用组只控制走到该条规则的流量：已匹配国内直连规则的地址不会再进入应用组。系统级 LAN 绕行的流量也不会进入这套规则。
 

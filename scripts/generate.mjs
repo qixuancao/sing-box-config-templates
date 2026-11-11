@@ -11,13 +11,16 @@ const HELP = `Generate a private sing-box JSON file locally (Node.js 22+).
 node scripts/generate.mjs --input nodes.txt --output generated/sing-box.json
   [--platform android|ios|macos|linux|windows] [--core 1.14|1.13|1.15]
   [--access local|system|tun] [--dns fakeip|realip] [--ipv6] [--no-lan-bypass]
-  [--adblock] [--rule-set-proxy] [--port 2080] [--clash-api-port 9090]
+  [--adblock] [--rule-set-proxy] [--block-quic] [--overlay]
+  [--port 2080] [--clash-api-port 9090]
   [--direct-dns IP] [--proxy-dns IP]
   [--scenario fakeip|realip|mixed|tun | --template PATH]
 
 DNS providers: 223.5.5.5, 1.12.12.12, 1.1.1.1 or 8.8.8.8 (HTTPS).
 --scenario selects a public base; it cannot be combined with --access.
 --template uses a private config as-is; customization flags are not accepted.
+--block-quic rejects public UDP 443 so apps fall back to TCP.
+--overlay (desktop) adds Tailscale MagicDNS and OS-routed private/100.64.0.0/10 access.
 
 Input: node share links (one per line) or sing-box nodes JSON; --input - reads stdin.
 Defaults: Android, core 1.14, recommended scenario for the selected platform.
@@ -31,17 +34,17 @@ try {
     input: {type: 'string'}, output: {type: 'string'}, platform: {type: 'string', default: 'android'},
     core: {type: 'string', default: '1.14'}, scenario: {type: 'string'}, template: {type: 'string'}, help: {type: 'boolean'},
     access: {type: 'string'}, dns: {type: 'string'}, ipv6: {type: 'boolean'}, 'no-lan-bypass': {type: 'boolean'},
-    adblock: {type: 'boolean'}, 'rule-set-proxy': {type: 'boolean'},
+    adblock: {type: 'boolean'}, 'rule-set-proxy': {type: 'boolean'}, 'block-quic': {type: 'boolean'}, overlay: {type: 'boolean'},
     port: {type: 'string'}, 'clash-api-port': {type: 'string'}, 'direct-dns': {type: 'string'}, 'proxy-dns': {type: 'string'},
   }});
   if (values.help) { process.stdout.write(HELP); process.exit(0); }
   if (!values.input || !values.output) { process.stderr.write(HELP); process.exit(2); }
-  const custom = ['access', 'dns', 'ipv6', 'no-lan-bypass', 'adblock', 'rule-set-proxy', 'port', 'clash-api-port', 'direct-dns', 'proxy-dns'].some(key => values[key] !== undefined);
+  const custom = ['access', 'dns', 'ipv6', 'no-lan-bypass', 'adblock', 'rule-set-proxy', 'block-quic', 'overlay', 'port', 'clash-api-port', 'direct-dns', 'proxy-dns'].some(key => values[key] !== undefined);
   if (values.template && (custom || values.scenario) || values.access && values.scenario) throw new ConfigError('profile');
   if (values.access && !['local', 'system', 'tun'].includes(values.access) || values.dns && !['fakeip', 'realip'].includes(values.dns)) throw new ConfigError('profile');
   const desktop = ['linux', 'windows', 'macos'].includes(values.platform);
   const access = values.access || (['linux', 'windows'].includes(values.platform) ? 'local' : 'tun');
-  if (!desktop && (access !== 'tun' || values['clash-api-port'] !== undefined)) throw new ConfigError('profile');
+  if (!desktop && (access !== 'tun' || values['clash-api-port'] !== undefined || values.overlay)) throw new ConfigError('profile');
   let scenario = values.scenario;
   if (!scenario && !values.template) {
     scenario = access !== 'tun' ? 'mixed' : ['linux', 'windows'].includes(values.platform) ? 'tun' : (values.dns || 'fakeip');
@@ -84,6 +87,7 @@ try {
       directDns: values['direct-dns'] ?? null, proxyDns: values['proxy-dns'] ?? null,
       ipv6: values.ipv6 ?? false, lanBypass: !values['no-lan-bypass'],
       adblock: values.adblock ?? false, ruleSetProxy: values['rule-set-proxy'] ?? false,
+      blockQuic: values['block-quic'] ?? false, overlay: values.overlay ?? false,
       clashApiPort: values['clash-api-port'] === undefined ? null : Number(values['clash-api-port']),
     });
   }

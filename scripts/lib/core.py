@@ -81,6 +81,17 @@ def validate_profile(config, platform, line, scenario):
                            if isinstance(r.get("rule_set"), list) and "google" in r["rule_set"]), -1)
     dns_cn_idx = next((i for i, r in enumerate(config["dns"]["rules"]) if r.get("rule_set") == "geosite-cn"), -1)
     require(0 <= dns_google_idx < dns_cn_idx, "Overseas service DNS rules must precede geosite-cn")
+    dns_private_idx = next((i for i, r in enumerate(config["dns"]["rules"])
+                            if r.get("rule_set") == "geosite-private" and r.get("server") == "direct-dns"), -1)
+    require(0 <= dns_private_idx < dns_cn_idx, "geosite-private DNS must use direct-dns before geosite-cn")
+    # ip_is_private does not cover the shared 100.64.0.0/10 space (Tailscale, carrier-internal hosts).
+    cgnat = [i for i, r in enumerate(route["rules"])
+             if r == {"ip_cidr": ["100.64.0.0/10"], "action": "route", "outbound": "direct"}]
+    private = [i for i, r in enumerate(route["rules"]) if r.get("ip_is_private") is True]
+    require(len(private) == 2 and [i + 1 for i in private] == cgnat, "100.64.0.0/10 must follow each private-IP rule")
+    require({"protocol": "ntp", "action": "route", "outbound": "direct"} in route["rules"][:resolve_idx], "NTP must route directly")
+    require("overlay-direct" not in tags and not any(s.get("tag") == "tailscale-dns" for s in config["dns"]["servers"]),
+            "Overlay compatibility must stay opt-in")
     require("udp-auto" not in tags, "Unexpected transport-specific policy group")
     require(config["log"]["level"] == "warn", "Expected warning-level logging")
     require(all(outbound.get("interval") == "10m" for outbound in config["outbounds"] if outbound["type"] == "urltest"), "Unexpected probe interval")

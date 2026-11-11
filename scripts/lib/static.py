@@ -8,8 +8,11 @@ from .common import ROOT, read_json, require
 PUBLIC_DIRECTORIES = ("platforms", "modules", "docs", "scripts", "tests", "web", ".github")
 PUBLIC_FILES = ("README.md", "README.en.md", "CHANGELOG.md", "CONTRIBUTING.md", "PRIVACY.md",
                 "SECURITY.md", "SUBSCRIPTIONS.md", "THIRD_PARTY.md", "LICENSE", ".gitignore", ".gitattributes")
+# Allowed exactly: the CGNAT block and Tailscale's fixed MagicDNS resolver 100.100.100.100,
+# which is identical on every tailnet. Any other 100.64-127 host address is treated as private.
 PRIVATE_MARKER = re.compile(
-    r"100\.(?!64\.0\.0/10(?![0-9A-Za-z_./]))(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.\d{1,3}\.\d{1,3}"
+    r"100\.(?!64\.0\.0/10(?![0-9A-Za-z_./]))(?!100\.100\.100(?![0-9A-Za-z_./]))"
+    r"(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\.\d{1,3}\.\d{1,3}"
     r"|[a-z0-9-]+\.ts\.net|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|eyJ[a-zA-Z0-9_-]{20,}\."
 )
 RAW_PREFIX = "https://raw.githubusercontent.com/qixuancao/sing-box-config-templates/main/"

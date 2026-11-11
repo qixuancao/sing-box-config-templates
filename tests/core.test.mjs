@@ -58,6 +58,11 @@ test('generated links pass the selected real sing-box core on every maintained p
       ['fakeip-tun', 'linux', 'tun', {dnsTemplate: PROFILES[profilePath('android', line, 'fakeip')]}],
       ['custom-dns', 'windows', 'mixed', {directDns: '1.12.12.12', proxyDns: '8.8.8.8', adblock: true, ruleSetProxy: true, clashApiPort: 9090}],
       ['adblock-tun', 'android', 'fakeip', {adblock: true, ruleSetProxy: true}],
+      ['overlay-quic-tun', 'linux', 'tun', {blockQuic: true, overlay: true}],
+      ['overlay-fakeip-win', 'windows', 'tun', {dnsTemplate: PROFILES[profilePath('android', line, 'fakeip')], blockQuic: true, overlay: true, ipv6: true}],
+      ['overlay-mac', 'macos', 'fakeip', {overlay: true}],
+      ['overlay-system', 'macos', 'mixed', {systemProxy: true, overlay: true, blockQuic: true}],
+      ['quic-mobile', 'ios', 'realip', {blockQuic: true}],
     ]) {
       const template = customizeTemplate(PROFILES[profilePath(platform, line, scenario)], options);
       const result = renderConfig(template, parseNodes(Object.values(links)[0]));

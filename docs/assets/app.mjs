@@ -9,6 +9,7 @@ const access = byId('access-mode'), dnsMode = byId('dns-mode'), directDns = byId
 const desktop = () => ['linux', 'windows', 'macos'].includes(platform.value);
 const ipv6 = byId('ipv6'), lanBypass = byId('lan-bypass');
 const adblock = byId('adblock'), ruleSetProxy = byId('rule-set-proxy'), clashApi = byId('clash-api');
+const blockQuic = byId('block-quic'), overlay = byId('overlay');
 const chosenScenario = () => desktop() && access.value !== 'tun' ? 'mixed'
   : ['linux', 'windows'].includes(platform.value) ? 'tun' : dnsMode.value;
 const resolvedDNS = select => select.value === 'default' ? null : select.value;
@@ -43,6 +44,7 @@ function updateDetails() {
   byId('port-setting').hidden = isTun;
   byId('listen-port').disabled = isTun;
   byId('clash-api-setting').hidden = !isDesktop;
+  byId('overlay-setting').hidden = !isDesktop;
   byId('access-desc').textContent = access.value === 'system'
     ? t('启动 sing-box 时自动写入系统 HTTP 代理，退出时恢复。并非 TUN，未遵循系统代理的应用和 UDP 不保证接管。', 'sing-box sets the OS HTTP proxy on startup and restores it on shutdown. This is not TUN; applications that ignore OS proxy settings and UDP may bypass it.')
     : access.value === 'tun'
@@ -62,6 +64,8 @@ function updateDetails() {
   if (isTun && !lanBypass.checked) options.push('--no-lan-bypass');
   if (adblock.checked) options.push('--adblock');
   if (ruleSetProxy.checked) options.push('--rule-set-proxy');
+  if (blockQuic.checked) options.push('--block-quic');
+  if (isDesktop && overlay.checked) options.push('--overlay');
   if (!isTun) options.push(`--port ${listenPort.value}`);
   if (isDesktop && clashApi.checked) options.push('--clash-api-port 9090');
   if (resolvedDNS(directDns)) options.push(`--direct-dns ${directDns.value}`);
@@ -91,6 +95,7 @@ function generate() {
       listenPort: port, directDns: direct, proxyDns: proxy, ipv6: ipv6.checked, lanBypass: lanBypass.checked,
       adblock: adblock.checked, ruleSetProxy: ruleSetProxy.checked,
       clashApiPort: desktop() && clashApi.checked ? 9090 : null,
+      blockQuic: blockQuic.checked, overlay: desktop() && overlay.checked,
     });
     const result = renderConfig(template, nodes);
     config = result; parsed = nodes;
@@ -140,7 +145,7 @@ input.addEventListener('input', () => { example = false; byId('nodes-file').valu
 platform.addEventListener('change', () => updatePreset(true));
 core.addEventListener('change', updateDetails);
 ipv6.addEventListener('change', updateDetails); lanBypass.addEventListener('change', updateDetails);
-for (const toggle of [adblock, ruleSetProxy, clashApi]) toggle.addEventListener('change', updateDetails);
+for (const toggle of [adblock, ruleSetProxy, clashApi, blockQuic, overlay]) toggle.addEventListener('change', updateDetails);
 access.addEventListener('change', updateDetails); dnsMode.addEventListener('change', updateDetails);
 for (const select of [directDns, proxyDns]) select.addEventListener('change', updateDetails);
 listenPort.addEventListener('input', updateDetails);

@@ -54,6 +54,11 @@
         "server": "proxy-dns"
       },
       {
+        "rule_set": "geosite-private",
+        "action": "route",
+        "server": "direct-dns"
+      },
+      {
         "rule_set": "geosite-cn",
         "action": "route",
         "server": "direct-dns"

@@ -47,13 +47,11 @@ sing-box check -c generated/your-config.json
 确认 `nodes.json` 的 `udp_outbounds` 只包含确实支持 UDP 的节点，并检查应用策略组实际选中的节点。
 手选 TCP-only 节点不会自动为 UDP 换出口。URLTest 的 HTTPS 延迟也不能反映 UDP 丢包。
 
-若仅 QUIC 失败，可在私有模板的嗅探规则之后临时加入以下规则，比较应用表现：
+若仅 QUIC 失败（常见于纯 TCP 节点、链式 SOCKS5 或 UDP 受限的校园 / 公司网络），
+在网页高级设置勾选“屏蔽公网 QUIC（UDP 443）”，或使用 CLI `--block-quic` 重新生成。
+该规则位于局域网规则之后，以 ICMP 不可达立即拒绝公网 UDP 443，浏览器和多数应用会回退 TCP。
 
-```json
-{"protocol": "quic", "action": "reject"}
-```
-
-部分 HTTPS 应用会回退 TCP，但这不是游戏或语音的通用修复。确认原因后移除临时规则；不应一并封锁 DoT 和 STUN。
+部分 HTTPS 应用会回退 TCP，但这不是游戏或语音的通用修复；节点支持 UDP 且网络正常时应保持关闭，以保留 HTTP/3。
 
 ## 日志出现 `dial tcp ... i/o timeout`
 

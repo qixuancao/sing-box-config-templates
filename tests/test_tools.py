@@ -98,6 +98,18 @@ class PublicAuditTest(TemporaryRepoTest):
                     with self.assertRaises(CheckError):
                         audit(self.root)
 
+    def test_only_the_exact_tailscale_magicdns_address_is_allowed(self):
+        quad = ipaddress.ip_address("100.100.100.100")
+        for value, allowed in ((str(quad), True), (str(quad + 1), False), (str(quad) + "0", False),
+                               (str(quad - 90), False), (str(quad) + "/32", False), (str(quad + 65536), False)):
+            with self.subTest(value=value), redirect_stdout(self.quiet):
+                self.fixture.write_text(json.dumps({"server": value}), encoding="utf-8")
+                if allowed:
+                    audit(self.root)
+                else:
+                    with self.assertRaises(CheckError):
+                        audit(self.root)
+
     def test_audit_has_no_shell_dependencies_and_does_not_read_private_inputs(self):
         marker = str(ipaddress.ip_network("100.64.0.0/10").network_address + 1)
         private = self.root / "proxy-config-backup"
@@ -227,6 +239,9 @@ class CoreContractsTest(unittest.TestCase):
             ("android/1.14/realip", lambda c: c["route"]["rules"].insert(0, {"network": "udp", "outbound": "auto"})),
             ("android/1.14/fakeip", lambda c: c["route"]["rules"].insert(0, {"action": "resolve", "strategy": "ipv4_only"})),
             ("android/1.14/fakeip", lambda c: c["route"]["default_domain_resolver"].pop("strategy", None)),
+            ("android/1.14/fakeip", lambda c: c["route"]["rules"].remove({"ip_cidr": ["100.64.0.0/10"], "action": "route", "outbound": "direct"})),
+            ("linux/1.13/mixed", lambda c: c["route"]["rules"].remove({"protocol": "ntp", "action": "route", "outbound": "direct"})),
+            ("ios/1.15/realip", lambda c: c["dns"]["rules"].remove({"rule_set": "geosite-private", "action": "route", "server": "direct-dns"})),
         ]
         for name, mutate in cases:
             with self.subTest(name=name):
